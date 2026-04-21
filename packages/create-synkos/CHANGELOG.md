@@ -1,5 +1,11 @@
 # create-synkos
 
+## 0.2.1
+
+### Patch Changes
+
+- 8d655c5: fix: include templates directory in published npm package
+
 ## 0.2.0
 
 ### Minor Changes
