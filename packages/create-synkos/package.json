@@ -1,0 +1,23 @@
+{
+  "name": "create-synkos",
+  "version": "0.0.1",
+  "description": "CLI scaffolding tool for the Synkos framework",
+  "type": "module",
+  "bin": {
+    "create-synkos": "./dist/index.js"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": ["dist/"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": ["synkos", "cli", "scaffolding", "create"]
+}

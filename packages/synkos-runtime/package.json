@@ -1,0 +1,27 @@
+{
+  "name": "@synkos/runtime",
+  "version": "0.0.1",
+  "description": "Synkos shared runtime: plugin system, lifecycle hooks, config loader",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist/"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": ["synkos", "runtime", "plugins", "hooks"]
+}
