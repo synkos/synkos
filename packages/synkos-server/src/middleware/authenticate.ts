@@ -1,24 +1,20 @@
-import type { Request, Response, NextFunction } from "express";
-import { User } from "@/modules/auth/user.model";
-import { AuthService } from "@/modules/auth/auth.service";
-import { getCache, CacheKeys } from "@/adapters/cache/cache.registry";
-import { setRequestUserId } from "@/context/request-context";
+import type { Request, Response, NextFunction } from 'express';
+import { User } from '@/modules/auth/user.model';
+import { AuthService } from '@/modules/auth/auth.service';
+import { getCache, CacheKeys } from '@/adapters/cache/cache.registry';
+import { setRequestUserId } from '@/context/request-context';
 
 /**
  * Extracts and verifies the Bearer access token.
  * Populates req.user with the full user document.
  * Rejects with 401 if token is missing, invalid, or expired.
  */
-export async function authenticate(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
+export async function authenticate(req: Request, res: Response, next: NextFunction): Promise<void> {
   const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith("Bearer ")) {
+  if (!authHeader?.startsWith('Bearer ')) {
     res.status(401).json({
       success: false,
-      error: { code: "UNAUTHORIZED", message: "Missing authorization header" },
+      error: { code: 'UNAUTHORIZED', message: 'Missing authorization header' },
     });
     return;
   }
@@ -36,7 +32,7 @@ export async function authenticate(
     if (!user || !user.isActive) {
       res.status(401).json({
         success: false,
-        error: { code: "UNAUTHORIZED", message: "User not found or disabled" },
+        error: { code: 'UNAUTHORIZED', message: 'User not found or disabled' },
       });
       return;
     }
@@ -47,7 +43,7 @@ export async function authenticate(
   } catch {
     res.status(401).json({
       success: false,
-      error: { code: "UNAUTHORIZED", message: "Invalid or expired token" },
+      error: { code: 'UNAUTHORIZED', message: 'Invalid or expired token' },
     });
   }
 }
@@ -62,7 +58,7 @@ export async function optionalAuth(
   next: NextFunction
 ): Promise<void> {
   const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith("Bearer ")) {
+  if (!authHeader?.startsWith('Bearer ')) {
     next();
     return;
   }

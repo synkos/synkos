@@ -18,23 +18,23 @@ When you scaffold a project, Synkos gives you a production-ready codebase with:
 
 ## Templates
 
-| Template | Description |
-|---|---|
-| `fullstack` | frontend + backend |
-| `frontend` | Quasar + Vue 3 + Capacitor only |
-| `backend` | Express + Mongoose + @synkos/server only |
+| Template    | Description                              |
+| ----------- | ---------------------------------------- |
+| `fullstack` | frontend + backend                       |
+| `frontend`  | Quasar + Vue 3 + Capacitor only          |
+| `backend`   | Express + Mongoose + @synkos/server only |
 
 ## Packages
 
-| Package | Description |
-|---|---|
-| [`create-synkos`](./packages/create-synkos/) | CLI scaffolder (`pnpm create synkos`) |
-| [`synkos`](./packages/synkos/) | Frontend core — `defineAppConfig`, `createSynkosPlugin`, `createAuthGuard` |
-| [`@synkos/ui`](./packages/synkos-ui/) | Component library — iOS-styled Vue 3 + Quasar components |
-| [`@synkos/server`](./packages/synkos-server/) | Backend framework — Express + Mongoose + adapters |
-| [`@synkos/runtime`](./packages/synkos-runtime/) | Shared plugin/lifecycle system (isomorphic) |
-| [`@synkos/utils`](./packages/synkos-utils/) | Zero-dep utilities — types, string, object, error, env |
-| [`@synkos/config`](./packages/synkos-config/) | Shared ESLint, Prettier, TypeScript configs |
+| Package                                         | Description                                                                |
+| ----------------------------------------------- | -------------------------------------------------------------------------- |
+| [`create-synkos`](./packages/create-synkos/)    | CLI scaffolder (`pnpm create synkos`)                                      |
+| [`synkos`](./packages/synkos/)                  | Frontend core — `defineAppConfig`, `createSynkosPlugin`, `createAuthGuard` |
+| [`@synkos/ui`](./packages/synkos-ui/)           | Component library — iOS-styled Vue 3 + Quasar components                   |
+| [`@synkos/server`](./packages/synkos-server/)   | Backend framework — Express + Mongoose + adapters                          |
+| [`@synkos/runtime`](./packages/synkos-runtime/) | Shared plugin/lifecycle system (isomorphic)                                |
+| [`@synkos/utils`](./packages/synkos-utils/)     | Zero-dep utilities — types, string, object, error, env                     |
+| [`@synkos/config`](./packages/synkos-config/)   | Shared ESLint, Prettier, TypeScript configs                                |
 
 ## Monorepo structure
 
@@ -79,6 +79,7 @@ MIT
 ---
 
 <!-- Original spec below — kept for reference during active development -->
+
 - Developer Experience (DX)
 - Modularidad y mantenibilidad
 
@@ -100,9 +101,11 @@ Synkos no es solo un framework, sino un **ecosistema completo**:
 # 🏢 ORGANIZACIÓN
 
 ## npm
+
 - Scope: `@synkos/*`
 
 ## GitHub
+
 - Organización: `synkos`
 - Repositorio principal: `synkos` (monorepo)
 
@@ -111,6 +114,7 @@ Synkos no es solo un framework, sino un **ecosistema completo**:
 # 📦 ARQUITECTURA MONOREPO
 
 Gestión mediante:
+
 - `pnpm workspaces`
 
 Estructura:
@@ -140,7 +144,6 @@ synkos/
 └─ tsconfig.base.json
 ```
 
-
 ---
 
 # ⚙️ TOOLING BASE
@@ -151,6 +154,7 @@ synkos/
 - Formatting: `prettier`
 
 Opcional (recomendado):
+
 - `lint-staged`
 - `husky`
 
@@ -159,6 +163,7 @@ Opcional (recomendado):
 # 📐 ESTÁNDARES TÉCNICOS
 
 ## Módulos
+
 - ESM por defecto
 - Compatibilidad opcional CJS
 
@@ -176,21 +181,25 @@ Opcional (recomendado):
 ```
 
 Tipado
+
 - Tipos incluidos (.d.ts)
 - Strict mode activado
 
 # 🧱 FRAMEWORK FRONTEND
 
 ## Stack base
+
 - Quasar
 - Capacitor
 
 ## Objetivos
+
 - APP Mobile
 - Integración nativa con backend
 - Configuración mínima (zero-config por defecto)
 
 ## Características
+
 - Auto-imports (components, composables, utils)
 - Sistema de plugins
 - Configuración mediante `synkos.config.ts`
@@ -214,24 +223,24 @@ frontend/
 └─ assets/
 ```
 
-
 ## Configuración
 
 ```ts
 // synkos.config.ts
 export default defineConfig({
   app: {
-    name: 'MyApp'
+    name: 'MyApp',
   },
   quasar: {},
   capacitor: {},
-  plugins: []
+  plugins: [],
 });
 ```
 
 # 🧩 FRAMEWORK BACKEND
 
 ## Stack base
+
 - Express
 - Mongoose
 
@@ -242,6 +251,7 @@ export default defineConfig({
 - Modularidad
 
 ## Características
+
 - Sistema de módulos
 - Inyección de dependencias (opcional)
 - Middleware configurable
@@ -265,9 +275,11 @@ export default defineConfig({
 # 🧰 CLI — create-synkos
 
 ## Objetivo
+
 - Scaffolding profesional con DX excelente.
 
 ## Uso
+
 ```
 pnpm create synkos
 ```
@@ -358,9 +370,11 @@ Archivo: `.github/workflows/release.yml`
 ### Pipeline
 
 **Trigger:**
+
 - `push` a `main`
 
 **Steps:**
+
 1. checkout
 2. setup pnpm
 3. install deps
@@ -440,7 +454,7 @@ export default definePlugin({
   name: 'my-plugin',
   setup(ctx) {
     ctx.hook('onInit', () => {});
-  }
+  },
 });
 ```
 

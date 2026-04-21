@@ -43,7 +43,9 @@ defineEmits<{
   font-weight: 500;
   color: $text-disabled;
   cursor: pointer;
-  transition: background $transition-quick, color $transition-quick;
+  transition:
+    background $transition-quick,
+    color $transition-quick;
   -webkit-tap-highlight-color: transparent;
   letter-spacing: $ls-normal;
 

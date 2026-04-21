@@ -101,7 +101,7 @@ export function scaffold(opts: ProjectOptions): void {
     fs.writeFileSync(
       path.join(outDir, 'package.json'),
       JSON.stringify(rootPkg, null, 2) + '\n',
-      'utf8',
+      'utf8'
     );
   } else {
     const src = path.join(TEMPLATE_DIR, template);

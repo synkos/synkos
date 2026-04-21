@@ -1,5 +1,5 @@
-import client from "prom-client";
-import type { HttpRequestRecord, MetricsPort } from "@/ports/metrics.port";
+import client from 'prom-client';
+import type { HttpRequestRecord, MetricsPort } from '@/ports/metrics.port';
 
 /**
  * Prometheus metrics adapter — exposes standard HTTP metrics via GET /metrics.
@@ -26,18 +26,18 @@ export class PrometheusMetricsAdapter implements MetricsPort {
     client.collectDefaultMetrics({ register: this.registry });
 
     this.httpRequestsTotal = new client.Counter({
-      name:       "http_requests_total",
-      help:       "Total number of HTTP requests",
-      labelNames: ["method", "route", "status_code"],
-      registers:  [this.registry],
+      name: 'http_requests_total',
+      help: 'Total number of HTTP requests',
+      labelNames: ['method', 'route', 'status_code'],
+      registers: [this.registry],
     });
 
     this.httpRequestDuration = new client.Histogram({
-      name:       "http_request_duration_ms",
-      help:       "HTTP request duration in milliseconds",
-      labelNames: ["method", "route"],
-      buckets:    [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000],
-      registers:  [this.registry],
+      name: 'http_request_duration_ms',
+      help: 'HTTP request duration in milliseconds',
+      labelNames: ['method', 'route'],
+      buckets: [5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000],
+      registers: [this.registry],
     });
 
     this.contentType = client.Registry.OPENMETRICS_CONTENT_TYPE;

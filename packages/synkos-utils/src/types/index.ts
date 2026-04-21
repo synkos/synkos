@@ -8,14 +8,10 @@ export type Nullable<T> = T | null;
 export type Optional<T> = T | undefined;
 
 /** Recursively makes all properties optional */
-export type DeepPartial<T> = T extends object
-  ? { [P in keyof T]?: DeepPartial<T[P]> }
-  : T;
+export type DeepPartial<T> = T extends object ? { [P in keyof T]?: DeepPartial<T[P]> } : T;
 
 /** Recursively makes all properties required */
-export type DeepRequired<T> = T extends object
-  ? { [P in keyof T]-?: DeepRequired<T[P]> }
-  : T;
+export type DeepRequired<T> = T extends object ? { [P in keyof T]-?: DeepRequired<T[P]> } : T;
 
 /** Flattens intersection types for readable hover tooltips */
 export type Prettify<T> = { [K in keyof T]: T[K] } & {};

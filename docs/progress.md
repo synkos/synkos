@@ -6,18 +6,18 @@
 
 ## Estado general
 
-| Fase | Descripción | Estado |
-|------|-------------|--------|
-| 0 | Fundación del monorepo | ✅ Completada |
-| 1.1 | Migración `@synkos/server` | ✅ Completada |
-| 1.2 | Template `frontend` | ✅ Completada |
-| 1.3 | Template `backend` | ✅ Completada |
-| 2.1 | `@synkos/utils` | ✅ Completada |
-| 2.2 | `@synkos/runtime` | ✅ Completada |
-| 2.3 | CLI `create-synkos` | ✅ Completada |
-| 3 | `@synkos/ui` | ✅ Completada |
-| 4 | `synkos` (frontend core) | ✅ Completada |
-| 5 | Playground + Docs + Publicación | ✅ Completada |
+| Fase | Descripción                     | Estado        |
+| ---- | ------------------------------- | ------------- |
+| 0    | Fundación del monorepo          | ✅ Completada |
+| 1.1  | Migración `@synkos/server`      | ✅ Completada |
+| 1.2  | Template `frontend`             | ✅ Completada |
+| 1.3  | Template `backend`              | ✅ Completada |
+| 2.1  | `@synkos/utils`                 | ✅ Completada |
+| 2.2  | `@synkos/runtime`               | ✅ Completada |
+| 2.3  | CLI `create-synkos`             | ✅ Completada |
+| 3    | `@synkos/ui`                    | ✅ Completada |
+| 4    | `synkos` (frontend core)        | ✅ Completada |
+| 5    | Playground + Docs + Publicación | ✅ Completada |
 
 ---
 
@@ -50,15 +50,15 @@
 
 Todos los paquetes del workspace tienen `package.json` con nombre, versión, export maps y scripts básicos:
 
-| Directorio | Nombre npm |
-|---|---|
-| `packages/create-synkos/` | `create-synkos` |
-| `packages/synkos/` | `synkos` |
-| `packages/synkos-config/` | `@synkos/config` |
+| Directorio                 | Nombre npm        |
+| -------------------------- | ----------------- |
+| `packages/create-synkos/`  | `create-synkos`   |
+| `packages/synkos/`         | `synkos`          |
+| `packages/synkos-config/`  | `@synkos/config`  |
 | `packages/synkos-runtime/` | `@synkos/runtime` |
-| `packages/synkos-server/` | `@synkos/server` |
-| `packages/synkos-ui/` | `@synkos/ui` |
-| `packages/synkos-utils/` | `@synkos/utils` |
+| `packages/synkos-server/`  | `@synkos/server`  |
+| `packages/synkos-ui/`      | `@synkos/ui`      |
+| `packages/synkos-utils/`   | `@synkos/utils`   |
 
 ### Verificación
 
@@ -122,26 +122,26 @@ Sin errores, sin warnings.
 
 ### Exclusiones aplicadas
 
-| Excluido | Razón |
-|---|---|
-| `node_modules/` | Se regenera con `pnpm install` |
-| `dist/` | Artefacto de build |
-| `pnpm-lock.yaml` | Se regenera |
-| `.env` | Contiene valores reales del desarrollador |
-| `src-capacitor/ios/DerivedData/` | Artefactos Xcode |
-| `src-capacitor/android/app/build/` | Artefactos Gradle |
-| `CLAUDE.md`, `TODO.md` | Archivos internos del proyecto original |
+| Excluido                           | Razón                                     |
+| ---------------------------------- | ----------------------------------------- |
+| `node_modules/`                    | Se regenera con `pnpm install`            |
+| `dist/`                            | Artefacto de build                        |
+| `pnpm-lock.yaml`                   | Se regenera                               |
+| `.env`                             | Contiene valores reales del desarrollador |
+| `src-capacitor/ios/DerivedData/`   | Artefactos Xcode                          |
+| `src-capacitor/android/app/build/` | Artefactos Gradle                         |
+| `CLAUDE.md`, `TODO.md`             | Archivos internos del proyecto original   |
 
 ### Variables dinámicas inyectadas
 
 El CLI (`create-synkos`) reemplazará estas variables al generar un proyecto:
 
-| Variable | Archivo(s) | Descripción |
-|---|---|---|
-| `{{PROJECT_NAME}}` | `package.json`, `app.config.ts` | Nombre kebab-case del proyecto |
-| `{{APP_NAME}}` | `package.json`, `app.config.ts`, `capacitor.config.json` | Nombre display de la app |
-| `{{BUNDLE_ID}}` | `app.config.ts`, `capacitor.config.json`, `.env.example` | Bundle ID iOS/Android (`com.company.app`) |
-| `{{API_PORT}}` | `.env.example` | Puerto del backend (por defecto `3001`) |
+| Variable           | Archivo(s)                                               | Descripción                               |
+| ------------------ | -------------------------------------------------------- | ----------------------------------------- |
+| `{{PROJECT_NAME}}` | `package.json`, `app.config.ts`                          | Nombre kebab-case del proyecto            |
+| `{{APP_NAME}}`     | `package.json`, `app.config.ts`, `capacitor.config.json` | Nombre display de la app                  |
+| `{{BUNDLE_ID}}`    | `app.config.ts`, `capacitor.config.json`, `.env.example` | Bundle ID iOS/Android (`com.company.app`) |
+| `{{API_PORT}}`     | `.env.example`                                           | Puerto del backend (por defecto `3001`)   |
 
 ### Qué NO se cambió
 
@@ -168,12 +168,12 @@ El CLI (`create-synkos`) reemplazará estas variables al generar un proyecto:
 
 ### Variables dinámicas inyectadas
 
-| Variable | Archivo(s) | Descripción |
-|---|---|---|
-| `{{PROJECT_NAME}}` | `package.json`, `env.example` | Nombre kebab-case del proyecto |
-| `{{PROJECT_DESCRIPTION}}` | `package.json` | Descripción corta |
-| `{{API_PORT}}` | `env.example` | Puerto del servidor (default `3001`) |
-| `{{BUNDLE_ID}}` | `env.example` | Bundle ID para Apple Sign-In / APNs |
+| Variable                  | Archivo(s)                    | Descripción                          |
+| ------------------------- | ----------------------------- | ------------------------------------ |
+| `{{PROJECT_NAME}}`        | `package.json`, `env.example` | Nombre kebab-case del proyecto       |
+| `{{PROJECT_DESCRIPTION}}` | `package.json`                | Descripción corta                    |
+| `{{API_PORT}}`            | `env.example`                 | Puerto del servidor (default `3001`) |
+| `{{BUNDLE_ID}}`           | `env.example`                 | Bundle ID para Apple Sign-In / APNs  |
 
 ### Convención de archivos sin punto
 
@@ -202,10 +202,10 @@ El CLI (`create-synkos`) reemplazará estas variables al generar un proyecto:
 
 ### Módulos
 
-| Subpath | Contenido |
-|---|---|
-| `@synkos/utils` | types + string + object + error (zero deps) |
-| `@synkos/utils/env` | `parseEnv(schema, process.env)` con Zod |
+| Subpath             | Contenido                                   |
+| ------------------- | ------------------------------------------- |
+| `@synkos/utils`     | types + string + object + error (zero deps) |
+| `@synkos/utils/env` | `parseEnv(schema, process.env)` con Zod     |
 
 ### API exportada
 
@@ -243,9 +243,15 @@ Eliminado `templates/*` de `pnpm-workspace.yaml` — los templates son archivos 
 export const myPlugin = definePlugin({
   name: 'my-plugin',
   setup(ctx) {
-    ctx.hook('onInit', async () => { /* antes de arrancar */ });
-    ctx.hook('onReady', () => { /* app lista */ });
-    ctx.hook('onDispose', () => { /* cleanup */ });
+    ctx.hook('onInit', async () => {
+      /* antes de arrancar */
+    });
+    ctx.hook('onReady', () => {
+      /* app lista */
+    });
+    ctx.hook('onDispose', () => {
+      /* cleanup */
+    });
   },
 });
 
@@ -257,18 +263,18 @@ export default defineConfig({
 
 // Crear y arrancar el runtime
 const runtime = createRuntime(config);
-await runtime.init();    // onInit → onReady
+await runtime.init(); // onInit → onReady
 await runtime.dispose(); // onDispose
 ```
 
 ### Lifecycle hooks
 
-| Hook | Cuándo se llama |
-|---|---|
-| `onInit` | Al inicio, antes de que la app esté lista |
-| `onReady` | Cuando la app está completamente inicializada |
-| `onError` | Cuando un hook o plugin lanza un error |
-| `onDispose` | Al hacer shutdown graceful |
+| Hook        | Cuándo se llama                               |
+| ----------- | --------------------------------------------- |
+| `onInit`    | Al inicio, antes de que la app esté lista     |
+| `onReady`   | Cuando la app está completamente inicializada |
+| `onError`   | Cuando un hook o plugin lanza un error        |
+| `onDispose` | Al hacer shutdown graceful                    |
 
 ### Diseño
 
@@ -304,20 +310,20 @@ await runtime.dispose(); // onDispose
 
 ### Templates soportados
 
-| Valor | Resultado |
-|---|---|
-| `frontend` | Copia `templates/frontend/` con variables reemplazadas |
-| `backend` | Copia `templates/backend/` con variables reemplazadas |
+| Valor       | Resultado                                                                                     |
+| ----------- | --------------------------------------------------------------------------------------------- |
+| `frontend`  | Copia `templates/frontend/` con variables reemplazadas                                        |
+| `backend`   | Copia `templates/backend/` con variables reemplazadas                                         |
 | `fullstack` | Crea `frontend/` + `backend/` + `package.json` raíz con scripts `dev:frontend`, `dev:backend` |
 
 ### Variables reemplazadas en archivos de template
 
-| Variable | Descripción |
-|---|---|
-| `{{PROJECT_NAME}}` | kebab-case del nombre |
-| `{{APP_NAME}}` | Nombre display (PascalCase words) |
-| `{{BUNDLE_ID}}` | Bundle ID iOS/Android |
-| `{{API_PORT}}` | Puerto del backend |
+| Variable                  | Descripción                          |
+| ------------------------- | ------------------------------------ |
+| `{{PROJECT_NAME}}`        | kebab-case del nombre                |
+| `{{APP_NAME}}`            | Nombre display (PascalCase words)    |
+| `{{BUNDLE_ID}}`           | Bundle ID iOS/Android                |
+| `{{API_PORT}}`            | Puerto del backend                   |
 | `{{PROJECT_DESCRIPTION}}` | Descripción generada automáticamente |
 
 ### Verificación
@@ -344,19 +350,19 @@ Templates verificados: variables presentes, ios/android excluidos, dotfiles corr
 
 ### Componentes exportados
 
-| Componente | Descripción |
-|---|---|
-| `AppEmptyState` | Estado vacío con icono, título, subtítulo y CTA |
-| `AppListRow` | Fila de lista iOS: icono, label, hint, valor, chevron, "coming soon" |
-| `AppListSection` | Contenedor de grupo de filas con encabezado uppercase |
-| `AppListDivider` | Separador 0.5px con indent configurable |
-| `AppPageLargeTitle` | Header de página estilo iOS (34px) con slot right |
-| `SegmentControl` | Control de segmentos tipo iOS, v-model compatible |
+| Componente          | Descripción                                                          |
+| ------------------- | -------------------------------------------------------------------- |
+| `AppEmptyState`     | Estado vacío con icono, título, subtítulo y CTA                      |
+| `AppListRow`        | Fila de lista iOS: icono, label, hint, valor, chevron, "coming soon" |
+| `AppListSection`    | Contenedor de grupo de filas con encabezado uppercase                |
+| `AppListDivider`    | Separador 0.5px con indent configurable                              |
+| `AppPageLargeTitle` | Header de página estilo iOS (34px) con slot right                    |
+| `SegmentControl`    | Control de segmentos tipo iOS, v-model compatible                    |
 
 ### Composable exportado
 
-| Composable | Descripción |
-|---|---|
+| Composable     | Descripción                                                       |
+| -------------- | ----------------------------------------------------------------- |
 | `useSheetDrag` | Rubber-band drag para bottom sheets (iOS-like, sin deps externas) |
 
 ### API de estilos
@@ -462,6 +468,7 @@ Output verificado: slugify, toPascalCase, Errors, isAppError, plugin lifecycle c
 `.changeset/initial-release.md` — bump `minor` para los 7 paquetes publicables.
 
 `pnpm changeset status` confirma:
+
 - **minor**: create-synkos, synkos, @synkos/ui, @synkos/server, @synkos/runtime, @synkos/utils, @synkos/config
 
 ---
@@ -470,22 +477,21 @@ Output verificado: slugify, toPascalCase, Errors, isAppError, plugin lifecycle c
 
 Todos los paquetes compilados, documentados, y con changeset. Ver instrucciones en el README raíz.
 
-
 ## Contexto técnico
 
 ### Stack
 
-| Capa | Tecnología |
-|---|---|
-| Backend framework | Express 5 + Mongoose 9 + Zod 4 |
+| Capa               | Tecnología                     |
+| ------------------ | ------------------------------ |
+| Backend framework  | Express 5 + Mongoose 9 + Zod 4 |
 | Frontend framework | Quasar 2 + Vue 3 + Capacitor 8 |
-| Estado frontend | Pinia 3 |
-| HTTP client | Axios 1 con interceptors JWT |
-| Build packages | tsup 8 (ESM + CJS + DTS) |
-| Build frontend | Vite via @quasar/app-vite |
-| Monorepo | pnpm workspaces |
-| Versionado | Changesets |
-| CI/CD | GitHub Actions |
+| Estado frontend    | Pinia 3                        |
+| HTTP client        | Axios 1 con interceptors JWT   |
+| Build packages     | tsup 8 (ESM + CJS + DTS)       |
+| Build frontend     | Vite via @quasar/app-vite      |
+| Monorepo           | pnpm workspaces                |
+| Versionado         | Changesets                     |
+| CI/CD              | GitHub Actions                 |
 
 ### Variables de template (referencia CLI)
 

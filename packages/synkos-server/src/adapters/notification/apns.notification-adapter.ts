@@ -13,12 +13,12 @@
  *   production — true for api.push.apple.com, false for sandbox
  */
 
-import http2 from "node:http2";
-import crypto from "node:crypto";
-import { createLogger } from "@/utils/logger";
-import type { NotificationPort, PushPayload } from "@/ports/notification.port";
+import http2 from 'node:http2';
+import crypto from 'node:crypto';
+import { createLogger } from '@/utils/logger';
+import type { NotificationPort, PushPayload } from '@/ports/notification.port';
 
-const log = createLogger("notification:apns");
+const log = createLogger('notification:apns');
 
 export interface ApnsAdapterConfig {
   keyP8: string;
@@ -40,9 +40,7 @@ export class ApnsNotificationAdapter implements NotificationPort {
 
   constructor(config: ApnsAdapterConfig) {
     this.config = config;
-    this.host = config.production
-      ? "api.push.apple.com"
-      : "api.sandbox.push.apple.com";
+    this.host = config.production ? 'api.push.apple.com' : 'api.sandbox.push.apple.com';
   }
 
   // ── Provider token ────────────────────────────────────────────────────────────
@@ -50,17 +48,17 @@ export class ApnsNotificationAdapter implements NotificationPort {
   private generateProviderToken(): string {
     const { keyP8, keyId, teamId } = this.config;
 
-    const header  = Buffer.from(JSON.stringify({ alg: "ES256", kid: keyId })).toString("base64url");
-    const payload = Buffer.from(JSON.stringify({ iss: teamId, iat: Math.floor(Date.now() / 1000) })).toString("base64url");
+    const header = Buffer.from(JSON.stringify({ alg: 'ES256', kid: keyId })).toString('base64url');
+    const payload = Buffer.from(
+      JSON.stringify({ iss: teamId, iat: Math.floor(Date.now() / 1000) })
+    ).toString('base64url');
     const signingInput = `${header}.${payload}`;
 
-    const sign = crypto.createSign("SHA256");
+    const sign = crypto.createSign('SHA256');
     sign.update(signingInput);
     sign.end();
 
-    const signature = sign
-      .sign({ key: keyP8, dsaEncoding: "ieee-p1363" })
-      .toString("base64url");
+    const signature = sign.sign({ key: keyP8, dsaEncoding: 'ieee-p1363' }).toString('base64url');
 
     return `${signingInput}.${signature}`;
   }
@@ -82,7 +80,7 @@ export class ApnsNotificationAdapter implements NotificationPort {
     }
 
     this.h2Session = http2.connect(`https://${this.host}`);
-    this.h2Session.on("error", () => {
+    this.h2Session.on('error', () => {
       this.h2Session?.destroy();
       this.h2Session = null;
     });
@@ -97,7 +95,7 @@ export class ApnsNotificationAdapter implements NotificationPort {
       aps: {
         alert: { title: payload.title, body: payload.body },
         badge: payload.badge,
-        sound: payload.sound ?? "default",
+        sound: payload.sound ?? 'default',
       },
       ...payload.data,
     });
@@ -106,20 +104,20 @@ export class ApnsNotificationAdapter implements NotificationPort {
       const session = this.getH2Session();
 
       const req = session.request({
-        ":method":        "POST",
-        ":path":          `/3/device/${token}`,
-        authorization:    `bearer ${this.getProviderToken()}`,
-        "apns-topic":     this.config.bundleId,
-        "apns-push-type": "alert",
-        "content-type":   "application/json",
-        "content-length": Buffer.byteLength(body),
+        ':method': 'POST',
+        ':path': `/3/device/${token}`,
+        authorization: `bearer ${this.getProviderToken()}`,
+        'apns-topic': this.config.bundleId,
+        'apns-push-type': 'alert',
+        'content-type': 'application/json',
+        'content-length': Buffer.byteLength(body),
       });
 
       req.write(body);
       req.end();
 
-      req.on("response", (headers) => {
-        const status = headers[":status"];
+      req.on('response', (headers) => {
+        const status = headers[':status'];
 
         if (status === 200) {
           req.close();
@@ -127,9 +125,9 @@ export class ApnsNotificationAdapter implements NotificationPort {
           return;
         }
 
-        let raw = "";
-        req.on("data", (chunk: Buffer) => (raw += chunk.toString()));
-        req.on("end", () => {
+        let raw = '';
+        req.on('data', (chunk: Buffer) => (raw += chunk.toString()));
+        req.on('end', () => {
           try {
             const parsed = JSON.parse(raw) as { reason?: string };
             reject(new Error(`APNs error ${status}: ${parsed.reason ?? raw}`));
@@ -139,7 +137,7 @@ export class ApnsNotificationAdapter implements NotificationPort {
         });
       });
 
-      req.on("error", reject);
+      req.on('error', reject);
     });
   }
 
@@ -147,7 +145,7 @@ export class ApnsNotificationAdapter implements NotificationPort {
     await Promise.allSettled(
       tokens.map((token) =>
         this.sendToDevice(token, payload).catch((err: unknown) => {
-          log.error({ err, tokenPrefix: token.slice(0, 8) }, "APNs push failed for token");
+          log.error({ err, tokenPrefix: token.slice(0, 8) }, 'APNs push failed for token');
         })
       )
     );

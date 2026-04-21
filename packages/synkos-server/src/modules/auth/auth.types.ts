@@ -1,4 +1,4 @@
-import type { IUser } from "./user.model";
+import type { IUser } from './user.model';
 
 // ── DTOs ──────────────────────────────────────────────────────────────────────
 
@@ -57,13 +57,13 @@ export interface PublicUser {
   id: string;
   email: string;
   displayName: string;
-  username?: string;            // null until the user completes the username picker
-  usernameChangedAt?: string;  // ISO date string — used to compute change cooldown
+  username?: string; // null until the user completes the username picker
+  usernameChangedAt?: string; // ISO date string — used to compute change cooldown
   avatar?: string;
   isEmailVerified: boolean;
   role: string;
   providers: string[];
-  deletionStatus: "active" | "pending_deletion";
+  deletionStatus: 'active' | 'pending_deletion';
   deletionScheduledAt?: string; // ISO date string, only present when pending_deletion
 }
 

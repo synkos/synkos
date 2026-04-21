@@ -7,10 +7,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
-  plugins: [
-    vue(),
-    dts({ include: ['src'], insertTypesEntry: true }),
-  ],
+  plugins: [vue(), dts({ include: ['src'], insertTypesEntry: true })],
   css: {
     preprocessorOptions: {
       scss: {

@@ -1,6 +1,6 @@
-import type { Request, Response } from "express";
-import { z } from "zod";
-import { AuthService } from "./auth.service";
+import type { Request, Response } from 'express';
+import { z } from 'zod';
+import { AuthService } from './auth.service';
 
 // ── Validation schemas ────────────────────────────────────────────────────────
 
@@ -16,9 +16,9 @@ const registerSchema = z.object({
   email: z.email(),
   password: z
     .string()
-    .min(8, "Password must be at least 8 characters")
-    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .regex(/[0-9]/, "Password must contain at least one number"),
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number'),
 });
 
 const forgotPasswordSchema = z.object({
@@ -28,17 +28,17 @@ const forgotPasswordSchema = z.object({
 
 const validateResetCodeSchema = z.object({
   email: z.email(),
-  code: z.string().length(6, "Code must be 6 digits").regex(/^\d+$/, "Code must be numeric"),
+  code: z.string().length(6, 'Code must be 6 digits').regex(/^\d+$/, 'Code must be numeric'),
 });
 
 const resetPasswordSchema = z.object({
   email: z.email(),
-  code: z.string().length(6, "Code must be 6 digits").regex(/^\d+$/, "Code must be numeric"),
+  code: z.string().length(6, 'Code must be 6 digits').regex(/^\d+$/, 'Code must be numeric'),
   newPassword: z
     .string()
-    .min(8, "Password must be at least 8 characters")
-    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .regex(/[0-9]/, "Password must contain at least one number"),
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number'),
 });
 
 const loginSchema = z.object({
@@ -66,7 +66,7 @@ const logoutSchema = z.object({
 
 const verifyEmailSchema = z.object({
   email: z.email(),
-  code: z.string().length(6, "Code must be 6 digits").regex(/^\d+$/, "Code must be numeric"),
+  code: z.string().length(6, 'Code must be 6 digits').regex(/^\d+$/, 'Code must be numeric'),
 });
 
 const sendVerificationSchema = z.object({
@@ -78,7 +78,7 @@ const sendVerificationSchema = z.object({
 function validationError(res: Response, message: string) {
   return res.status(400).json({
     success: false,
-    error: { code: "VALIDATION_ERROR", message },
+    error: { code: 'VALIDATION_ERROR', message },
   });
 }
 
@@ -91,7 +91,7 @@ export const AuthController = {
   register: async (req: Request, res: Response) => {
     const parsed = registerSchema.safeParse(req.body);
     if (!parsed.success) {
-      return validationError(res, parsed.error.issues[0]?.message ?? "Invalid input");
+      return validationError(res, parsed.error.issues[0]?.message ?? 'Invalid input');
     }
 
     const result = await AuthService.register(parsed.data);
@@ -104,7 +104,7 @@ export const AuthController = {
   loginEmail: async (req: Request, res: Response) => {
     const parsed = loginSchema.safeParse(req.body);
     if (!parsed.success) {
-      return validationError(res, parsed.error.issues[0]?.message ?? "Invalid input");
+      return validationError(res, parsed.error.issues[0]?.message ?? 'Invalid input');
     }
 
     const result = await AuthService.loginEmail(parsed.data);
@@ -117,7 +117,7 @@ export const AuthController = {
   loginGoogle: async (req: Request, res: Response) => {
     const parsed = oauthSchema.safeParse(req.body);
     if (!parsed.success) {
-      return validationError(res, parsed.error.issues[0]?.message ?? "Invalid input");
+      return validationError(res, parsed.error.issues[0]?.message ?? 'Invalid input');
     }
 
     const result = await AuthService.loginGoogle(parsed.data);
@@ -130,7 +130,7 @@ export const AuthController = {
   loginApple: async (req: Request, res: Response) => {
     const parsed = oauthSchema.safeParse(req.body);
     if (!parsed.success) {
-      return validationError(res, parsed.error.issues[0]?.message ?? "Invalid input");
+      return validationError(res, parsed.error.issues[0]?.message ?? 'Invalid input');
     }
 
     const result = await AuthService.loginApple(parsed.data);
@@ -143,7 +143,7 @@ export const AuthController = {
   refresh: async (req: Request, res: Response) => {
     const parsed = refreshSchema.safeParse(req.body);
     if (!parsed.success) {
-      return validationError(res, "refreshToken is required");
+      return validationError(res, 'refreshToken is required');
     }
 
     const tokens = await AuthService.refresh(parsed.data);
@@ -157,7 +157,7 @@ export const AuthController = {
   logout: async (req: Request, res: Response) => {
     const parsed = logoutSchema.safeParse(req.body);
     if (!parsed.success) {
-      return validationError(res, "refreshToken is required");
+      return validationError(res, 'refreshToken is required');
     }
 
     if (parsed.data.allDevices && req.user) {
@@ -175,12 +175,15 @@ export const AuthController = {
   forgotPassword: async (req: Request, res: Response) => {
     const parsed = forgotPasswordSchema.safeParse(req.body);
     if (!parsed.success) {
-      return validationError(res, parsed.error.issues[0]?.message ?? "Invalid input");
+      return validationError(res, parsed.error.issues[0]?.message ?? 'Invalid input');
     }
 
     const result = await AuthService.forgotPassword(parsed.data);
     // Always 200 — never reveal whether the email exists
-    res.json({ success: true, data: { expiresAt: result.expiresAt, lastSentAt: result.lastSentAt } });
+    res.json({
+      success: true,
+      data: { expiresAt: result.expiresAt, lastSentAt: result.lastSentAt },
+    });
   },
 
   /**
@@ -189,7 +192,7 @@ export const AuthController = {
   validateResetCode: async (req: Request, res: Response) => {
     const parsed = validateResetCodeSchema.safeParse(req.body);
     if (!parsed.success) {
-      return validationError(res, parsed.error.issues[0]?.message ?? "Invalid input");
+      return validationError(res, parsed.error.issues[0]?.message ?? 'Invalid input');
     }
 
     await AuthService.validateResetCode(parsed.data);
@@ -202,7 +205,7 @@ export const AuthController = {
   resetPassword: async (req: Request, res: Response) => {
     const parsed = resetPasswordSchema.safeParse(req.body);
     if (!parsed.success) {
-      return validationError(res, parsed.error.issues[0]?.message ?? "Invalid input");
+      return validationError(res, parsed.error.issues[0]?.message ?? 'Invalid input');
     }
 
     await AuthService.resetPassword(parsed.data);
@@ -215,7 +218,7 @@ export const AuthController = {
   verifyEmail: async (req: Request, res: Response) => {
     const parsed = verifyEmailSchema.safeParse(req.body);
     if (!parsed.success) {
-      return validationError(res, parsed.error.issues[0]?.message ?? "Invalid input");
+      return validationError(res, parsed.error.issues[0]?.message ?? 'Invalid input');
     }
 
     const user = await AuthService.verifyEmail(parsed.data.email, parsed.data.code);
@@ -229,7 +232,7 @@ export const AuthController = {
   sendVerification: async (req: Request, res: Response) => {
     const parsed = sendVerificationSchema.safeParse(req.body);
     if (!parsed.success) {
-      return validationError(res, parsed.error.issues[0]?.message ?? "Invalid input");
+      return validationError(res, parsed.error.issues[0]?.message ?? 'Invalid input');
     }
 
     await AuthService.sendVerificationEmail(parsed.data.email);
@@ -244,7 +247,7 @@ export const AuthController = {
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        error: { code: "UNAUTHORIZED", message: "Not authenticated" },
+        error: { code: 'UNAUTHORIZED', message: 'Not authenticated' },
       });
     }
 

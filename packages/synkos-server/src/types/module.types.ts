@@ -1,4 +1,4 @@
-import type { Router } from "express";
+import type { Router } from 'express';
 
 /**
  * Contract that every module (core or feature) must export.
@@ -7,7 +7,7 @@ import type { Router } from "express";
  * Authentication is handled inside each module's own routes file.
  * The `auth` field is informational — documents the module's access level.
  */
-export type ModuleAuth = "required" | "optional" | "none" | "mixed";
+export type ModuleAuth = 'required' | 'optional' | 'none' | 'mixed';
 
 export interface ModuleDefinition {
   /** Base path for the module, e.g. '/auth', '/cards' */

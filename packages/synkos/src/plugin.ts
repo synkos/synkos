@@ -15,7 +15,7 @@ export function useAppConfig(): AppConfig {
   const config = inject(appConfigKey);
   if (!config) {
     throw new Error(
-      '[synkos] useAppConfig() called outside a Synkos app. Did you install createSynkosPlugin()?',
+      '[synkos] useAppConfig() called outside a Synkos app. Did you install createSynkosPlugin()?'
     );
   }
   return config;

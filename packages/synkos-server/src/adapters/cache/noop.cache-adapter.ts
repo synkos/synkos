@@ -1,4 +1,4 @@
-import type { CachePort } from "@/ports/cache.port";
+import type { CachePort } from '@/ports/cache.port';
 
 /**
  * Noop cache adapter — default when no cache provider is configured.
@@ -22,11 +22,7 @@ export class NoopCacheAdapter implements CachePort {
     // no-op
   }
 
-  async getOrSet<T>(
-    _key: string,
-    fn: () => Promise<T>,
-    _ttlSeconds?: number
-  ): Promise<T> {
+  async getOrSet<T>(_key: string, fn: () => Promise<T>, _ttlSeconds?: number): Promise<T> {
     return fn();
   }
 }

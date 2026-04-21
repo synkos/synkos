@@ -14,9 +14,9 @@ pnpm add @synkos/utils
 
 ```ts
 import type {
-  Maybe,       // T | null | undefined
-  Nullable,    // T | null
-  Optional,    // T | undefined
+  Maybe, // T | null | undefined
+  Nullable, // T | null
+  Optional, // T | undefined
   DeepPartial,
   DeepRequired,
   Prettify,
@@ -32,12 +32,12 @@ import type {
 ```ts
 import { slugify, capitalize, toPascalCase, toCamelCase, truncate, isBlank } from '@synkos/utils';
 
-slugify('Hello World!')     // 'hello-world'
-capitalize('hello')         // 'Hello'
-toPascalCase('foo-bar')     // 'FooBar'
-toCamelCase('foo-bar')      // 'fooBar'
-truncate('Long text', 8)    // 'Long tex…'
-isBlank('  ')               // true
+slugify('Hello World!'); // 'hello-world'
+capitalize('hello'); // 'Hello'
+toPascalCase('foo-bar'); // 'FooBar'
+toCamelCase('foo-bar'); // 'fooBar'
+truncate('Long text', 8); // 'Long tex…'
+isBlank('  '); // true
 ```
 
 ### Object
@@ -45,9 +45,9 @@ isBlank('  ')               // true
 ```ts
 import { pick, omit, deepMerge, isPlainObject } from '@synkos/utils';
 
-pick({ a: 1, b: 2, c: 3 }, ['a', 'c'])   // { a: 1, c: 3 }
-omit({ a: 1, b: 2, c: 3 }, ['b'])        // { a: 1, c: 3 }
-deepMerge({ a: { x: 1 } }, { a: { y: 2 } }) // { a: { x: 1, y: 2 } }
+pick({ a: 1, b: 2, c: 3 }, ['a', 'c']); // { a: 1, c: 3 }
+omit({ a: 1, b: 2, c: 3 }, ['b']); // { a: 1, c: 3 }
+deepMerge({ a: { x: 1 } }, { a: { y: 2 } }); // { a: { x: 1, y: 2 } }
 ```
 
 ### Error
@@ -84,7 +84,7 @@ const env = parseEnv(
     DATABASE_URL: z.string().url(),
     JWT_SECRET: z.string().min(32),
   }),
-  process.env,
+  process.env
 );
 
 // env is fully typed. Exits with a readable error if validation fails.

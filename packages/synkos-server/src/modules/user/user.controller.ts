@@ -1,32 +1,32 @@
-import type { Request, Response } from "express";
-import { z } from "zod";
-import { UserService } from "./user.service";
+import type { Request, Response } from 'express';
+import { z } from 'zod';
+import { UserService } from './user.service';
 
 // ── Validation schemas ────────────────────────────────────────────────────────
 
 const nameSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  name: z.string().min(1, 'Name is required'),
 });
 
 const usernameSchema = z.object({
-  username: z.string().min(1, "Username is required"),
+  username: z.string().min(1, 'Username is required'),
 });
 
 const pushTokenSchema = z.object({
-  token: z.string().min(8, "Invalid push token"),
+  token: z.string().min(8, 'Invalid push token'),
 });
 
 const deletePushTokenSchema = z.object({
-  token: z.string().min(8, "Invalid push token"),
+  token: z.string().min(8, 'Invalid push token'),
 });
 
 const passwordSchema = z.object({
-  currentPassword: z.string().min(1, "Current password is required"),
+  currentPassword: z.string().min(1, 'Current password is required'),
   newPassword: z
     .string()
-    .min(8, "Password must be at least 8 characters")
-    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .regex(/[0-9]/, "Password must contain at least one number"),
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number'),
 });
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -34,7 +34,7 @@ const passwordSchema = z.object({
 function validationError(res: Response, message: string) {
   return res.status(400).json({
     success: false,
-    error: { code: "VALIDATION_ERROR", message },
+    error: { code: 'VALIDATION_ERROR', message },
   });
 }
 
@@ -42,7 +42,7 @@ function requireUser(req: Request, res: Response): boolean {
   if (!req.user) {
     res.status(401).json({
       success: false,
-      error: { code: "UNAUTHORIZED", message: "Not authenticated" },
+      error: { code: 'UNAUTHORIZED', message: 'Not authenticated' },
     });
     return false;
   }
@@ -61,13 +61,10 @@ export const UserController = {
 
     const parsed = nameSchema.safeParse(req.body);
     if (!parsed.success) {
-      return validationError(res, parsed.error.issues[0]?.message ?? "Invalid input");
+      return validationError(res, parsed.error.issues[0]?.message ?? 'Invalid input');
     }
 
-    const user = await UserService.updateName(
-      req.user!._id.toString(),
-      parsed.data.name
-    );
+    const user = await UserService.updateName(req.user!._id.toString(), parsed.data.name);
 
     res.json({ success: true, data: { user } });
   },
@@ -81,13 +78,10 @@ export const UserController = {
 
     const parsed = usernameSchema.safeParse(req.body);
     if (!parsed.success) {
-      return validationError(res, parsed.error.issues[0]?.message ?? "Invalid input");
+      return validationError(res, parsed.error.issues[0]?.message ?? 'Invalid input');
     }
 
-    const user = await UserService.updateUsername(
-      req.user!._id.toString(),
-      parsed.data.username
-    );
+    const user = await UserService.updateUsername(req.user!._id.toString(), parsed.data.username);
 
     res.json({ success: true, data: { user } });
   },
@@ -102,10 +96,7 @@ export const UserController = {
     if (!requireUser(req, res)) return;
 
     // req.file is populated by Multer (optional — absence means remove)
-    const user = await UserService.updatePhoto(
-      req.user!._id.toString(),
-      req.file
-    );
+    const user = await UserService.updatePhoto(req.user!._id.toString(), req.file);
 
     res.json({ success: true, data: { user } });
   },
@@ -119,13 +110,10 @@ export const UserController = {
 
     const parsed = pushTokenSchema.safeParse(req.body);
     if (!parsed.success) {
-      return validationError(res, parsed.error.issues[0]?.message ?? "Invalid input");
+      return validationError(res, parsed.error.issues[0]?.message ?? 'Invalid input');
     }
 
-    await UserService.registerPushToken(
-      req.user!._id.toString(),
-      parsed.data.token
-    );
+    await UserService.registerPushToken(req.user!._id.toString(), parsed.data.token);
 
     res.json({ success: true, data: null });
   },
@@ -139,13 +127,10 @@ export const UserController = {
 
     const parsed = deletePushTokenSchema.safeParse(req.body);
     if (!parsed.success) {
-      return validationError(res, parsed.error.issues[0]?.message ?? "Invalid input");
+      return validationError(res, parsed.error.issues[0]?.message ?? 'Invalid input');
     }
 
-    await UserService.unregisterPushToken(
-      req.user!._id.toString(),
-      parsed.data.token
-    );
+    await UserService.unregisterPushToken(req.user!._id.toString(), parsed.data.token);
 
     res.json({ success: true, data: null });
   },
@@ -160,7 +145,7 @@ export const UserController = {
 
     const parsed = passwordSchema.safeParse(req.body);
     if (!parsed.success) {
-      return validationError(res, parsed.error.issues[0]?.message ?? "Invalid input");
+      return validationError(res, parsed.error.issues[0]?.message ?? 'Invalid input');
     }
 
     await UserService.updatePassword(

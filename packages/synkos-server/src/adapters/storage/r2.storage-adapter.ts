@@ -1,8 +1,8 @@
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { createLogger } from "@/utils/logger";
-import type { StoragePort, UploadedAsset } from "@/ports/storage.port";
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { createLogger } from '@/utils/logger';
+import type { StoragePort, UploadedAsset } from '@/ports/storage.port';
 
-const log = createLogger("storage:r2");
+const log = createLogger('storage:r2');
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
@@ -30,27 +30,27 @@ export class R2StorageAdapter implements StoragePort {
   private readonly publicBaseUrl: string;
 
   constructor(config: R2AdapterConfig) {
-    this.bucket        = config.bucket;
-    this.publicBaseUrl = config.publicBaseUrl.replace(/\/$/, "");
+    this.bucket = config.bucket;
+    this.publicBaseUrl = config.publicBaseUrl.replace(/\/$/, '');
 
     this.client = new S3Client({
-      region:   "auto",
+      region: 'auto',
       endpoint: `https://${config.accountId}.r2.cloudflarestorage.com`,
       credentials: {
-        accessKeyId:     config.accessKeyId,
+        accessKeyId: config.accessKeyId,
         secretAccessKey: config.secretAccessKey,
       },
     });
   }
 
   async upload(key: string, buffer: Buffer, contentType: string): Promise<UploadedAsset> {
-    log.debug({ key, contentType, bytes: buffer.byteLength }, "Uploading object");
+    log.debug({ key, contentType, bytes: buffer.byteLength }, 'Uploading object');
 
     await this.client.send(
       new PutObjectCommand({
-        Bucket:      this.bucket,
-        Key:         key,
-        Body:        buffer,
+        Bucket: this.bucket,
+        Key: key,
+        Body: buffer,
         ContentType: contentType,
       })
     );
@@ -62,12 +62,12 @@ export class R2StorageAdapter implements StoragePort {
   }
 
   async delete(key: string): Promise<void> {
-    log.debug({ key }, "Deleting object");
+    log.debug({ key }, 'Deleting object');
 
     await this.client.send(
       new DeleteObjectCommand({
         Bucket: this.bucket,
-        Key:    key,
+        Key: key,
       })
     );
   }

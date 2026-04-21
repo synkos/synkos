@@ -1,12 +1,12 @@
-import bcrypt from "bcryptjs";
-import { Types } from "mongoose";
-import { User } from "@/modules/auth/user.model";
-import { RefreshToken } from "@/modules/auth/refresh-token.model";
-import { getEmailAdapter } from "@/adapters/email/email.registry";
-import { getCache, CacheKeys } from "@/adapters/cache/cache.registry";
-import { reserveUsername } from "@/modules/username/username.service";
-import { createLogger } from "@/utils/logger";
-import { coreEvents } from "@/events/core-events";
+import bcrypt from 'bcryptjs';
+import { Types } from 'mongoose';
+import { User } from '@/modules/auth/user.model';
+import { RefreshToken } from '@/modules/auth/refresh-token.model';
+import { getEmailAdapter } from '@/adapters/email/email.registry';
+import { getCache, CacheKeys } from '@/adapters/cache/cache.registry';
+import { reserveUsername } from '@/modules/username/username.service';
+import { createLogger } from '@/utils/logger';
+import { coreEvents } from '@/events/core-events';
 
 // ── Deletion cleanup registry ─────────────────────────────────────────────────
 
@@ -29,7 +29,7 @@ export function registerDeletionCleanup(fn: DeletionCleanupFn): void {
   deletionCleanupFns.push(fn);
 }
 
-const log = createLogger("account");
+const log = createLogger('account');
 
 const DELETION_GRACE_DAYS = 30;
 
@@ -41,60 +41,57 @@ export const AccountService = {
    * - OAuth-only users are already authenticated via JWT (no password needed).
    * - Idempotent: returns the existing scheduled date if already pending.
    */
-  async requestDeletion(
-    userId: string,
-    password?: string
-  ): Promise<{ scheduledAt: Date }> {
-    const user = await User.findById(userId).select("+passwordHash");
+  async requestDeletion(userId: string, password?: string): Promise<{ scheduledAt: Date }> {
+    const user = await User.findById(userId).select('+passwordHash');
     if (!user) {
-      const err = new Error("User not found") as Error & { status: number };
+      const err = new Error('User not found') as Error & { status: number };
       err.status = 404;
       throw err;
     }
 
     // Already pending — idempotent, return existing date
-    if (user.deletionStatus === "pending_deletion") {
+    if (user.deletionStatus === 'pending_deletion') {
       return { scheduledAt: user.deletionScheduledAt! };
     }
 
     // Re-authenticate local users via password
-    const hasLocalProvider = user.providers.some((p) => p.provider === "local");
+    const hasLocalProvider = user.providers.some((p) => p.provider === 'local');
     if (hasLocalProvider) {
       if (!password) {
-        const err = new Error("Password is required to delete your account") as Error & { status: number };
+        const err = new Error('Password is required to delete your account') as Error & {
+          status: number;
+        };
         err.status = 400;
         throw err;
       }
       if (!user.passwordHash) {
-        const err = new Error("No password set for this account") as Error & { status: number };
+        const err = new Error('No password set for this account') as Error & { status: number };
         err.status = 400;
         throw err;
       }
       const valid = await bcrypt.compare(password, user.passwordHash);
       if (!valid) {
-        const err = new Error("Incorrect password") as Error & { status: number };
+        const err = new Error('Incorrect password') as Error & { status: number };
         err.status = 401;
         throw err;
       }
     }
 
     const now = new Date();
-    const scheduledAt = new Date(
-      now.getTime() + DELETION_GRACE_DAYS * 24 * 60 * 60 * 1000
-    );
+    const scheduledAt = new Date(now.getTime() + DELETION_GRACE_DAYS * 24 * 60 * 60 * 1000);
 
-    user.deletionStatus = "pending_deletion";
+    user.deletionStatus = 'pending_deletion';
     user.deletionRequestedAt = now;
     user.deletionScheduledAt = scheduledAt;
     await user.save();
 
     // Best-effort notification — never fail the request on email error
-    getEmailAdapter().sendDeletionConfirmation(user.email, scheduledAt).catch(
-      (err) => log.error({ err }, "Deletion confirmation email failed")
-    );
+    getEmailAdapter()
+      .sendDeletionConfirmation(user.email, scheduledAt)
+      .catch((err) => log.error({ err }, 'Deletion confirmation email failed'));
 
     await getCache().del(CacheKeys.user(userId));
-    coreEvents.emit("user:deletion_requested", { userId, scheduledAt });
+    coreEvents.emit('user:deletion_requested', { userId, scheduledAt });
 
     return { scheduledAt };
   },
@@ -106,28 +103,28 @@ export const AccountService = {
   async cancelDeletion(userId: string): Promise<void> {
     const user = await User.findById(userId);
     if (!user) {
-      const err = new Error("User not found") as Error & { status: number };
+      const err = new Error('User not found') as Error & { status: number };
       err.status = 404;
       throw err;
     }
 
-    if (user.deletionStatus !== "pending_deletion") {
-      const err = new Error("No pending deletion to cancel") as Error & { status: number };
+    if (user.deletionStatus !== 'pending_deletion') {
+      const err = new Error('No pending deletion to cancel') as Error & { status: number };
       err.status = 400;
       throw err;
     }
 
-    user.deletionStatus = "active";
+    user.deletionStatus = 'active';
     user.deletionRequestedAt = undefined;
     user.deletionScheduledAt = undefined;
     await user.save();
 
-    getEmailAdapter().sendDeletionCancelled(user.email).catch(
-      (err) => log.error({ err }, "Deletion cancelled notification email failed")
-    );
+    getEmailAdapter()
+      .sendDeletionCancelled(user.email)
+      .catch((err) => log.error({ err }, 'Deletion cancelled notification email failed'));
 
     await getCache().del(CacheKeys.user(userId));
-    coreEvents.emit("user:deletion_cancelled", { userId });
+    coreEvents.emit('user:deletion_cancelled', { userId });
   },
 
   /**
@@ -140,7 +137,7 @@ export const AccountService = {
 
     const candidates = await User.find(
       {
-        deletionStatus: "pending_deletion",
+        deletionStatus: 'pending_deletion',
         deletionScheduledAt: { $lte: now },
       },
       { _id: 1 }
@@ -150,16 +147,16 @@ export const AccountService = {
 
     if (candidates.length === 0) return;
 
-    log.info({ count: candidates.length }, "Processing pending deletions");
+    log.info({ count: candidates.length }, 'Processing pending deletions');
 
     for (const candidate of candidates) {
       const userId = (candidate._id as Types.ObjectId).toString();
       try {
         await AccountService.permanentlyDeleteUser(userId);
-        log.info({ userId }, "User permanently deleted");
+        log.info({ userId }, 'User permanently deleted');
       } catch (err) {
         // Log and continue — failed users will be retried on the next run
-        log.error({ err, userId }, "Failed to permanently delete user");
+        log.error({ err, userId }, 'Failed to permanently delete user');
       }
     }
   },
@@ -174,7 +171,7 @@ export const AccountService = {
     // 1. Reserve the username so it cannot be grabbed immediately after deletion
     const user = await User.findById(oid, { username: 1 }).lean();
     if (user?.username) {
-      await reserveUsername(user.username, "deleted", {
+      await reserveUsername(user.username, 'deleted', {
         userId,
         durationDays: 90,
       });
@@ -194,6 +191,6 @@ export const AccountService = {
 
     await getCache().del(CacheKeys.user(userId));
     // Emitted after all data is removed — listeners receive a userId that no longer exists
-    coreEvents.emit("user:deleted", { userId });
+    coreEvents.emit('user:deleted', { userId });
   },
 };

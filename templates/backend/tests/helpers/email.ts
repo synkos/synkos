@@ -1,4 +1,4 @@
-import type { EmailPort } from "@synkos/server/ports";
+import type { EmailPort } from '@synkos/server/ports';
 
 /**
  * In-memory email adapter that captures every send call.
@@ -9,14 +9,14 @@ import type { EmailPort } from "@synkos/server/ports";
  * Call capturingEmail.reset() in beforeEach to prevent bleed between tests.
  */
 export class CapturingEmailAdapter implements EmailPort {
-  verifications:         Array<{ to: string; code: string }> = [];
-  passwordResets:        Array<{ to: string; code: string }> = [];
+  verifications: Array<{ to: string; code: string }> = [];
+  passwordResets: Array<{ to: string; code: string }> = [];
   deletionConfirmations: Array<{ to: string; scheduledAt: Date }> = [];
   deletionCancellations: Array<{ to: string }> = [];
 
   reset(): void {
-    this.verifications         = [];
-    this.passwordResets        = [];
+    this.verifications = [];
+    this.passwordResets = [];
     this.deletionConfirmations = [];
     this.deletionCancellations = [];
   }

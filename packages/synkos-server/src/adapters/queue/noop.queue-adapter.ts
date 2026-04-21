@@ -1,7 +1,7 @@
-import { createLogger } from "@/utils/logger";
-import type { JobHandler, JobOptions, QueuePort, RepeatOptions } from "@/ports/queue.port";
+import { createLogger } from '@/utils/logger';
+import type { JobHandler, JobOptions, QueuePort, RepeatOptions } from '@/ports/queue.port';
 
-const log = createLogger("queue:noop");
+const log = createLogger('queue:noop');
 
 /**
  * Noop queue adapter — default when no queue provider is configured.
@@ -23,15 +23,15 @@ export class NoopQueueAdapter implements QueuePort {
   async add<T>(name: string, data: T, _options?: JobOptions): Promise<void> {
     const handler = this.handlers.get(name);
     if (!handler) {
-      log.warn({ name }, "No handler registered for job — skipping");
+      log.warn({ name }, 'No handler registered for job — skipping');
       return;
     }
 
-    log.info({ name }, "🔧 [queue:add] running job in-process");
+    log.info({ name }, '🔧 [queue:add] running job in-process');
 
     // Fire-and-forget — errors are caught so they never crash the caller
     handler(data).catch((err: unknown) => {
-      log.error({ err, name }, "In-process job failed");
+      log.error({ err, name }, 'In-process job failed');
     });
   }
 
@@ -43,13 +43,13 @@ export class NoopQueueAdapter implements QueuePort {
   ): Promise<void> {
     const handler = this.handlers.get(name);
     if (!handler) {
-      log.warn({ name }, "No handler registered for scheduled job — skipping");
+      log.warn({ name }, 'No handler registered for scheduled job — skipping');
       return;
     }
 
     const run = () =>
       handler(data).catch((err: unknown) => {
-        log.error({ err, name }, "Scheduled in-process job failed");
+        log.error({ err, name }, 'Scheduled in-process job failed');
       });
 
     if (repeat.immediately) {
@@ -59,7 +59,10 @@ export class NoopQueueAdapter implements QueuePort {
     if (repeat.every) {
       const interval = setInterval(() => void run(), repeat.every);
       this.intervals.push(interval);
-      log.info({ name, everyMs: repeat.every }, "🔧 [queue:schedule] registered in-process interval");
+      log.info(
+        { name, everyMs: repeat.every },
+        '🔧 [queue:schedule] registered in-process interval'
+      );
     }
   }
 

@@ -1,5 +1,5 @@
-import { NoopNotificationAdapter } from "./noop.notification-adapter";
-import type { NotificationPort } from "@/ports/notification.port";
+import { NoopNotificationAdapter } from './noop.notification-adapter';
+import type { NotificationPort } from '@/ports/notification.port';
 
 /**
  * Module-level singleton. Starts with the noop adapter so the app is safe

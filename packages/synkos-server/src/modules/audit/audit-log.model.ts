@@ -1,12 +1,12 @@
-import type { Document, Types } from "mongoose";
-import mongoose, { Schema } from "mongoose";
+import type { Document, Types } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
 export type AuditEventType =
-  | "name_changed"
-  | "username_changed"
-  | "password_changed"
-  | "photo_updated"
-  | "photo_removed";
+  | 'name_changed'
+  | 'username_changed'
+  | 'password_changed'
+  | 'photo_updated'
+  | 'photo_removed';
 
 export interface IAuditLog extends Document {
   userId: Types.ObjectId;
@@ -18,10 +18,16 @@ export interface IAuditLog extends Document {
 
 const AuditLogSchema = new Schema<IAuditLog>(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "User", required: true, index: true },
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
     type: {
       type: String,
-      enum: ["name_changed", "username_changed", "password_changed", "photo_updated", "photo_removed"],
+      enum: [
+        'name_changed',
+        'username_changed',
+        'password_changed',
+        'photo_updated',
+        'photo_removed',
+      ],
       required: true,
     },
     // Store only non-sensitive values — never store passwords here
@@ -34,4 +40,4 @@ const AuditLogSchema = new Schema<IAuditLog>(
 // Efficient lookup by user + recency
 AuditLogSchema.index({ userId: 1, createdAt: -1 });
 
-export const AuditLog = mongoose.model<IAuditLog>("AuditLog", AuditLogSchema);
+export const AuditLog = mongoose.model<IAuditLog>('AuditLog', AuditLogSchema);

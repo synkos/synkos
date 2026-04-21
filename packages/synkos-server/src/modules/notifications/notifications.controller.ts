@@ -1,22 +1,22 @@
-import type { Request, Response } from "express";
-import { z } from "zod";
-import { User } from "@/modules/auth/user.model";
-import { getNotificationAdapter } from "@/adapters/notification/notification.registry";
+import type { Request, Response } from 'express';
+import { z } from 'zod';
+import { User } from '@/modules/auth/user.model';
+import { getNotificationAdapter } from '@/adapters/notification/notification.registry';
 
 // ── Validation schemas ────────────────────────────────────────────────────────
 
 const sendToUserSchema = z.object({
-  userId: z.string().min(1, "userId is required"),
-  title: z.string().min(1, "title is required"),
-  body: z.string().min(1, "body is required"),
+  userId: z.string().min(1, 'userId is required'),
+  title: z.string().min(1, 'title is required'),
+  body: z.string().min(1, 'body is required'),
   data: z.record(z.string(), z.unknown()).optional(),
   badge: z.number().int().min(0).optional(),
   sound: z.string().optional(),
 });
 
 const broadcastSchema = z.object({
-  title: z.string().min(1, "title is required"),
-  body: z.string().min(1, "body is required"),
+  title: z.string().min(1, 'title is required'),
+  body: z.string().min(1, 'body is required'),
   data: z.record(z.string(), z.unknown()).optional(),
   badge: z.number().int().min(0).optional(),
   sound: z.string().optional(),
@@ -37,7 +37,10 @@ export const NotificationsController = {
     if (!parsed.success) {
       res.status(400).json({
         success: false,
-        error: { code: "VALIDATION_ERROR", message: parsed.error.issues[0]?.message ?? "Invalid input" },
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: parsed.error.issues[0]?.message ?? 'Invalid input',
+        },
       });
       return;
     }
@@ -48,7 +51,7 @@ export const NotificationsController = {
     if (!user) {
       res.status(404).json({
         success: false,
-        error: { code: "USER_NOT_FOUND", message: "User not found." },
+        error: { code: 'USER_NOT_FOUND', message: 'User not found.' },
       });
       return;
     }
@@ -57,7 +60,7 @@ export const NotificationsController = {
     if (tokens.length === 0) {
       res.status(200).json({
         success: true,
-        data: { sent: 0, message: "User has no registered devices." },
+        data: { sent: 0, message: 'User has no registered devices.' },
       });
       return;
     }
@@ -80,7 +83,10 @@ export const NotificationsController = {
     if (!parsed.success) {
       res.status(400).json({
         success: false,
-        error: { code: "VALIDATION_ERROR", message: parsed.error.issues[0]?.message ?? "Invalid input" },
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: parsed.error.issues[0]?.message ?? 'Invalid input',
+        },
       });
       return;
     }
@@ -93,7 +99,7 @@ export const NotificationsController = {
 
     while (true) {
       const users = await User.find(
-        { "pushTokens.0": { $exists: true }, isActive: true },
+        { 'pushTokens.0': { $exists: true }, isActive: true },
         { pushTokens: 1 }
       )
         .skip(skip)
@@ -103,9 +109,7 @@ export const NotificationsController = {
       if (users.length === 0) break;
 
       await Promise.all(
-        users.map((u) =>
-          getNotificationAdapter().sendToMany(u.pushTokens ?? [], payload)
-        )
+        users.map((u) => getNotificationAdapter().sendToMany(u.pushTokens ?? [], payload))
       );
 
       totalSent += users.reduce((acc, u) => acc + (u.pushTokens?.length ?? 0), 0);

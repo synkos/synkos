@@ -34,22 +34,22 @@ pnpm create synkos my-app
 
 ## Templates
 
-| Template | Generates |
-|---|---|
+| Template    | Generates                                      |
+| ----------- | ---------------------------------------------- |
 | `fullstack` | `frontend/` + `backend/` + root `package.json` |
-| `frontend` | Quasar 2 + Vue 3 + Capacitor 8 app |
-| `backend` | Express 5 + Mongoose 9 + @synkos/server API |
+| `frontend`  | Quasar 2 + Vue 3 + Capacitor 8 app             |
+| `backend`   | Express 5 + Mongoose 9 + @synkos/server API    |
 
 ## Template variables
 
 The CLI replaces these placeholders in template files:
 
-| Variable | Example |
-|---|---|
-| `{{PROJECT_NAME}}` | `my-app` |
-| `{{APP_NAME}}` | `My App` |
-| `{{BUNDLE_ID}}` | `com.company.myapp` |
-| `{{API_PORT}}` | `3001` |
+| Variable                  | Example                      |
+| ------------------------- | ---------------------------- |
+| `{{PROJECT_NAME}}`        | `my-app`                     |
+| `{{APP_NAME}}`            | `My App`                     |
+| `{{BUNDLE_ID}}`           | `com.company.myapp`          |
+| `{{API_PORT}}`            | `3001`                       |
 | `{{PROJECT_DESCRIPTION}}` | `My App — built with Synkos` |
 
 ## After scaffolding

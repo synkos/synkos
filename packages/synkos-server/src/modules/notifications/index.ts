@@ -1,9 +1,9 @@
-import type { ModuleDefinition } from "@/types/module.types";
-import router from "./notifications.routes";
+import type { ModuleDefinition } from '@/types/module.types';
+import router from './notifications.routes';
 
 export const notificationsModule: ModuleDefinition = {
-  path: "/admin/notifications",
+  path: '/admin/notifications',
   router,
-  auth: "required",
+  auth: 'required',
   adminOnly: true,
 };

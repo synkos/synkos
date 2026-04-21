@@ -1,10 +1,10 @@
-import { type Request, type Response } from "express";
-import { z } from "zod";
-import { getRequestContext } from "@synkos/server/context";
-import { ExampleService }    from "./example.service";
+import { type Request, type Response } from 'express';
+import { z } from 'zod';
+import { getRequestContext } from '@synkos/server/context';
+import { ExampleService } from './example.service';
 
 const createSchema = z.object({
-  title:   z.string().min(1).max(200),
+  title: z.string().min(1).max(200),
   content: z.string().min(1).max(5000),
 });
 
@@ -26,7 +26,7 @@ export const ExampleController = {
 
   async getById(req: Request, res: Response): Promise<void> {
     const { userId } = getRequestContext();
-    const { id }     = z.object({ id: z.string().length(24) }).parse(req.params);
+    const { id } = z.object({ id: z.string().length(24) }).parse(req.params);
 
     const example = await ExampleService.findById(id, userId);
     res.json({ success: true, data: example });
@@ -34,7 +34,7 @@ export const ExampleController = {
 
   async delete(req: Request, res: Response): Promise<void> {
     const { userId } = getRequestContext();
-    const { id }     = z.object({ id: z.string().length(24) }).parse(req.params);
+    const { id } = z.object({ id: z.string().length(24) }).parse(req.params);
 
     await ExampleService.delete(id, userId);
     res.json({ success: true });

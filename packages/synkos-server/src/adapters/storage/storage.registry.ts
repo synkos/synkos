@@ -1,5 +1,5 @@
-import { NoopStorageAdapter } from "./noop.storage-adapter";
-import type { StoragePort } from "@/ports/storage.port";
+import { NoopStorageAdapter } from './noop.storage-adapter';
+import type { StoragePort } from '@/ports/storage.port';
 
 /**
  * Module-level singleton. Starts with the noop adapter so the app boots safely

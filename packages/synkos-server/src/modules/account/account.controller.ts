@@ -1,6 +1,6 @@
-import type { Request, Response } from "express";
-import { AccountService } from "./account.service";
-import type { RequestDeletionDto } from "./account.types";
+import type { Request, Response } from 'express';
+import { AccountService } from './account.service';
+import type { RequestDeletionDto } from './account.types';
 
 export const AccountController = {
   /**

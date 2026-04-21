@@ -70,18 +70,18 @@ iOS-style grouped list.
 
 `AppListRow` props:
 
-| Prop | Type | Description |
-|---|---|---|
-| `label` | `string` | Row label (required) |
-| `icon` | `string` | Material icon name |
-| `iconBg` | `string` | Icon background color |
-| `iconColor` | `string` | Icon color |
-| `hint` | `string` | Secondary text below label |
-| `value` | `string` | Static value (renders as div, no chevron) |
-| `danger` | `boolean` | Red label |
-| `disabled` | `boolean` | Disabled state |
-| `comingSoon` | `boolean` | Shows "Coming soon" badge |
-| `comingSoonLabel` | `string` | Override badge text (default: `'Coming soon'`) |
+| Prop              | Type      | Description                                    |
+| ----------------- | --------- | ---------------------------------------------- |
+| `label`           | `string`  | Row label (required)                           |
+| `icon`            | `string`  | Material icon name                             |
+| `iconBg`          | `string`  | Icon background color                          |
+| `iconColor`       | `string`  | Icon color                                     |
+| `hint`            | `string`  | Secondary text below label                     |
+| `value`           | `string`  | Static value (renders as div, no chevron)      |
+| `danger`          | `boolean` | Red label                                      |
+| `disabled`        | `boolean` | Disabled state                                 |
+| `comingSoon`      | `boolean` | Shows "Coming soon" badge                      |
+| `comingSoonLabel` | `string`  | Override badge text (default: `'Coming soon'`) |
 
 ### `AppPageLargeTitle`
 
@@ -144,5 +144,5 @@ The package ships the full SCSS variable system used by the components. Import i
 @use '@synkos/ui/variables.scss' as *;
 
 // Override any token:
-$primary: #FF6B00;
+$primary: #ff6b00;
 ```

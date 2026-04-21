@@ -51,7 +51,7 @@ const config = defineConfig({
 
 // 3. Create and start the runtime
 const runtime = createRuntime(config);
-await runtime.init();    // runs onInit → onReady for all plugins, in order
+await runtime.init(); // runs onInit → onReady for all plugins, in order
 
 // On shutdown:
 await runtime.dispose(); // runs onDispose for all plugins
@@ -59,12 +59,12 @@ await runtime.dispose(); // runs onDispose for all plugins
 
 ## Lifecycle hooks
 
-| Hook | When |
-|---|---|
-| `onInit` | Before the app is ready. Use for setup (DB connect, cache warm-up). |
-| `onReady` | App is fully initialized. |
-| `onError` | A hook or plugin threw. Receives the error as payload. |
-| `onDispose` | Graceful shutdown. Use for cleanup (close connections). |
+| Hook        | When                                                                |
+| ----------- | ------------------------------------------------------------------- |
+| `onInit`    | Before the app is ready. Use for setup (DB connect, cache warm-up). |
+| `onReady`   | App is fully initialized.                                           |
+| `onError`   | A hook or plugin threw. Receives the error as payload.              |
+| `onDispose` | Graceful shutdown. Use for cleanup (close connections).             |
 
 ## Registering hooks from outside a plugin
 

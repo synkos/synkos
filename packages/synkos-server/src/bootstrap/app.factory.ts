@@ -1,23 +1,23 @@
-import { randomUUID } from "crypto";
-import type { NextFunction, Request, Response } from "express";
-import express from "express";
-import cors from "cors";
-import helmet from "helmet";
-import rateLimit from "express-rate-limit";
-import pinoHttp from "pino-http";
-import mongoose from "mongoose";
-import { env } from "@/config/env";
-import { logger } from "@/utils/logger";
-import type { ModuleDefinition } from "@/types/module.types";
-import { requestContextMiddleware } from "@/middleware/request-context.middleware";
-import { getMetricsAdapter } from "@/adapters/metrics/metrics.registry";
-import { connectDatabase } from "@/config/database";
-import { wireAdapters as wireCoreAdapters } from "@/bootstrap/wire-adapters";
-import { authModule } from "@/modules/auth";
-import { userModule } from "@/modules/user";
-import { accountModule } from "@/modules/account";
-import { usernameModule } from "@/modules/username";
-import { notificationsModule } from "@/modules/notifications";
+import { randomUUID } from 'crypto';
+import type { NextFunction, Request, Response } from 'express';
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import pinoHttp from 'pino-http';
+import mongoose from 'mongoose';
+import { env } from '@/config/env';
+import { logger } from '@/utils/logger';
+import type { ModuleDefinition } from '@/types/module.types';
+import { requestContextMiddleware } from '@/middleware/request-context.middleware';
+import { getMetricsAdapter } from '@/adapters/metrics/metrics.registry';
+import { connectDatabase } from '@/config/database';
+import { wireAdapters as wireCoreAdapters } from '@/bootstrap/wire-adapters';
+import { authModule } from '@/modules/auth';
+import { userModule } from '@/modules/user';
+import { accountModule } from '@/modules/account';
+import { usernameModule } from '@/modules/username';
+import { notificationsModule } from '@/modules/notifications';
 
 const CORE_MODULES: ModuleDefinition[] = [
   authModule,
@@ -56,8 +56,8 @@ export async function createApp({
   listeners,
   adapters,
   startupHooks = [],
-  apiPrefix = "/api/v1",
-  serviceName = "API",
+  apiPrefix = '/api/v1',
+  serviceName = 'API',
   disableCoreModules = [],
 }: AppConfig): Promise<void> {
   try {
@@ -79,14 +79,14 @@ export async function createApp({
     });
 
     const shutdown = async (signal: string) => {
-      logger.info({ signal }, "Shutting down server — draining in-flight requests");
+      logger.info({ signal }, 'Shutting down server — draining in-flight requests');
       server.close(() => process.exit(0));
     };
 
-    process.on("SIGTERM", () => void shutdown("SIGTERM"));
-    process.on("SIGINT",  () => void shutdown("SIGINT"));
+    process.on('SIGTERM', () => void shutdown('SIGTERM'));
+    process.on('SIGINT', () => void shutdown('SIGINT'));
   } catch (error) {
-    logger.error({ err: error }, "Startup error — shutting down");
+    logger.error({ err: error }, 'Startup error — shutting down');
     process.exit(1);
   }
 }
@@ -96,34 +96,34 @@ function _buildApp({
   apiPrefix,
   serviceName,
   disableCoreModules,
-}: Required<Pick<AppConfig, "modules" | "apiPrefix" | "serviceName" | "disableCoreModules">>): express.Application {
+}: Required<
+  Pick<AppConfig, 'modules' | 'apiPrefix' | 'serviceName' | 'disableCoreModules'>
+>): express.Application {
   const app = express();
 
   // Trust the first hop (reverse proxy / Cloudflare) so req.ip contains the real client IP
-  app.set("trust proxy", 1);
+  app.set('trust proxy', 1);
 
   // HTTP request/response logger — health checks are excluded to avoid log noise
   app.use(
     pinoHttp({
       logger,
       genReqId: () => randomUUID(),
-      autoLogging: { ignore: (req) => req.url === "/health/live" || req.url === "/health/ready" },
+      autoLogging: { ignore: (req) => req.url === '/health/live' || req.url === '/health/ready' },
       customLogLevel: (_req, res, err) => {
-        if (err || res.statusCode >= 500) return "error";
-        if (res.statusCode >= 400) return "warn";
-        return "info";
+        if (err || res.statusCode >= 500) return 'error';
+        if (res.statusCode >= 400) return 'warn';
+        return 'info';
       },
-      customSuccessMessage: (req, res) =>
-        `${req.method} ${req.url} → ${res.statusCode}`,
-      customErrorMessage: (req, res) =>
-        `${req.method} ${req.url} → ${res.statusCode}`,
+      customSuccessMessage: (req, res) => `${req.method} ${req.url} → ${res.statusCode}`,
+      customErrorMessage: (req, res) => `${req.method} ${req.url} → ${res.statusCode}`,
       serializers: {
         req: (req) => ({
           id: req.id,
           method: req.method,
           url: req.url,
           remoteAddress: req.remoteAddress,
-          userAgent: (req.headers as Record<string, string>)["user-agent"],
+          userAgent: (req.headers as Record<string, string>)['user-agent'],
         }),
         res: (res) => ({
           statusCode: res.statusCode,
@@ -140,9 +140,7 @@ function _buildApp({
   app.use(helmet());
   app.use(
     cors({
-      origin: env.CORS_ORIGINS === "*"
-        ? "*"
-        : env.CORS_ORIGINS.split(",").map((o) => o.trim()),
+      origin: env.CORS_ORIGINS === '*' ? '*' : env.CORS_ORIGINS.split(',').map((o) => o.trim()),
       credentials: true,
     })
   );
@@ -150,39 +148,41 @@ function _buildApp({
 
   // Metrics — before rate limiter so scraping is never throttled.
   // Returns 404 if no metrics adapter is configured (noop default).
-  app.get("/metrics", async (_req, res) => {
+  app.get('/metrics', async (_req, res) => {
     const metrics = await getMetricsAdapter().getMetrics();
     if (metrics === null) {
-      res.status(404).json({ success: false, error: { code: "NOT_FOUND", message: "Metrics not configured" } });
+      res
+        .status(404)
+        .json({ success: false, error: { code: 'NOT_FOUND', message: 'Metrics not configured' } });
       return;
     }
-    res.set("Content-Type", getMetricsAdapter().contentType).send(metrics);
+    res.set('Content-Type', getMetricsAdapter().contentType).send(metrics);
   });
 
   // Liveness — is the process alive? Never fails (if this responds, the process is up)
   // Railway/k8s: restart only when this stops responding
-  app.get("/health/live", (_req, res) => {
-    res.status(200).json({ success: true, data: { status: "ok" } });
+  app.get('/health/live', (_req, res) => {
+    res.status(200).json({ success: true, data: { status: 'ok' } });
   });
 
   // Readiness — is the process ready to serve traffic?
   // Railway/k8s: stop sending traffic when this returns 503 (e.g. DB not connected yet)
-  app.get("/health/ready", (_req, res) => {
+  app.get('/health/ready', (_req, res) => {
     const dbState = mongoose.connection.readyState;
-    const dbOk    = dbState === 1; // 1 = connected
+    const dbOk = dbState === 1; // 1 = connected
 
-    const allOk    = dbOk;
+    const allOk = dbOk;
     const httpCode = allOk ? 200 : 503;
 
     res.status(httpCode).json({
       success: allOk,
       data: {
-        status:    allOk ? "ok" : "degraded",
-        service:   serviceName,
-        uptime:    Math.floor(process.uptime()),
+        status: allOk ? 'ok' : 'degraded',
+        service: serviceName,
+        uptime: Math.floor(process.uptime()),
         timestamp: new Date().toISOString(),
         checks: {
-          database: dbOk ? "ok" : "error",
+          database: dbOk ? 'ok' : 'error',
         },
       },
     });
@@ -191,8 +191,8 @@ function _buildApp({
   app.use(
     rateLimit({
       windowMs: env.RATE_LIMIT_WINDOW_MS,
-      max:      env.RATE_LIMIT_MAX,
-      skip:     () => env.NODE_ENV !== "production" && env.RATE_LIMIT_SKIP_DEV,
+      max: env.RATE_LIMIT_MAX,
+      skip: () => env.NODE_ENV !== 'production' && env.RATE_LIMIT_SKIP_DEV,
     })
   );
 
@@ -222,20 +222,14 @@ function _buildApp({
     const customCode = (err as { code?: string }).code;
     const code =
       customCode ??
-      (status === 500
-        ? "INTERNAL_ERROR"
-        : status === 429
-          ? "TOO_MANY_REQUESTS"
-          : "REQUEST_ERROR");
+      (status === 500 ? 'INTERNAL_ERROR' : status === 429 ? 'TOO_MANY_REQUESTS' : 'REQUEST_ERROR');
 
     res.status(status).json({
       success: false,
       error: {
         code,
         message:
-          env.NODE_ENV === "production" && status === 500
-            ? "Internal server error"
-            : err.message,
+          env.NODE_ENV === 'production' && status === 500 ? 'Internal server error' : err.message,
       },
     });
   });

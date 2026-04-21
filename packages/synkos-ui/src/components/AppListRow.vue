@@ -10,7 +10,11 @@
     </div>
 
     <div class="row-body">
-      <span class="row-label" :class="{ 'row-label--muted': disabled && !value, 'row-label--danger': danger }">{{ label }}</span>
+      <span
+        class="row-label"
+        :class="{ 'row-label--muted': disabled && !value, 'row-label--danger': danger }"
+        >{{ label }}</span
+      >
       <span v-if="hint" class="row-hint">{{ hint }}</span>
     </div>
 
@@ -27,20 +31,23 @@
 </template>
 
 <script setup lang="ts">
-withDefaults(defineProps<{
-  icon?: string;
-  iconColor?: string;
-  iconBg?: string;
-  label: string;
-  hint?: string;
-  disabled?: boolean;
-  danger?: boolean;
-  comingSoon?: boolean;
-  comingSoonLabel?: string;
-  value?: string;
-}>(), {
-  comingSoonLabel: 'Coming soon',
-});
+withDefaults(
+  defineProps<{
+    icon?: string;
+    iconColor?: string;
+    iconBg?: string;
+    label: string;
+    hint?: string;
+    disabled?: boolean;
+    danger?: boolean;
+    comingSoon?: boolean;
+    comingSoonLabel?: string;
+    value?: string;
+  }>(),
+  {
+    comingSoonLabel: 'Coming soon',
+  }
+);
 
 defineEmits<{ click: [] }>();
 </script>
@@ -63,8 +70,13 @@ defineEmits<{ click: [] }>();
 button.app-list-row {
   cursor: pointer;
 
-  &:active:not(:disabled) { background: $surface-press; }
-  &:disabled { opacity: 0.45; cursor: default; }
+  &:active:not(:disabled) {
+    background: $surface-press;
+  }
+  &:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
 }
 
 .row-icon-wrap {
@@ -91,8 +103,12 @@ button.app-list-row {
   color: $text-secondary;
   letter-spacing: $ls-normal;
 
-  &--muted  { color: $text-disabled; }
-  &--danger { color: $negative; }
+  &--muted {
+    color: $text-disabled;
+  }
+  &--danger {
+    color: $negative;
+  }
 }
 
 .row-hint {

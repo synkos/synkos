@@ -4,14 +4,14 @@
   "description": "{{PROJECT_DESCRIPTION}}",
   "main": "index.js",
   "scripts": {
-    "dev":           "tsx watch --env-file=.env src/server.ts",
-    "dev:worker":    "tsx watch --env-file=.env src/worker.ts",
-    "build":         "npx rimraf dist && npx tsc -p tsconfig.build.json && npx tsc-alias -p tsconfig.build.json",
-    "start":         "node dist/server.js",
-    "start:worker":  "node dist/worker.js",
-    "lint":          "eslint .",
-    "test":          "vitest run",
-    "test:watch":    "vitest",
+    "dev": "tsx watch --env-file=.env src/server.ts",
+    "dev:worker": "tsx watch --env-file=.env src/worker.ts",
+    "build": "npx rimraf dist && npx tsc -p tsconfig.build.json && npx tsc-alias -p tsconfig.build.json",
+    "start": "node dist/server.js",
+    "start:worker": "node dist/worker.js",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
   },
   "pnpm": {

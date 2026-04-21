@@ -1,5 +1,5 @@
-import { NoopQueueAdapter } from "./noop.queue-adapter";
-import type { QueuePort } from "@/ports/queue.port";
+import { NoopQueueAdapter } from './noop.queue-adapter';
+import type { QueuePort } from '@/ports/queue.port';
 
 /**
  * Module-level singleton. Starts with the noop adapter so the app is safe

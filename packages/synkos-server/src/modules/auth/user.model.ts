@@ -1,8 +1,8 @@
-import mongoose from "mongoose";
-import { userSchema, type IUser } from "./user.schema";
+import mongoose from 'mongoose';
+import { userSchema, type IUser } from './user.schema';
 
 // Re-export all types so existing imports from "user.model" continue to work
-export type { IUser, IAuthProvider, AuthProvider, DeletionStatus } from "./user.schema";
+export type { IUser, IAuthProvider, AuthProvider, DeletionStatus } from './user.schema';
 
 /**
  * User model with deferred compilation.
@@ -27,9 +27,9 @@ function getUser(): mongoose.Model<IUser> {
     // This handles hot-reload (tsx watch) where the module may be re-evaluated
     // but mongoose.model() would throw "Cannot overwrite model once compiled".
     try {
-      _User = mongoose.model<IUser>("User");
+      _User = mongoose.model<IUser>('User');
     } catch {
-      _User = mongoose.model<IUser>("User", userSchema);
+      _User = mongoose.model<IUser>('User', userSchema);
     }
   }
   return _User;
@@ -40,7 +40,9 @@ export const User = new Proxy<mongoose.Model<IUser>>({} as mongoose.Model<IUser>
     const model = getUser();
     const value = (model as unknown as Record<string | symbol, unknown>)[prop];
     // Bind methods to preserve the correct `this` context
-    return typeof value === "function" ? (value as (...a: unknown[]) => unknown).bind(model) : value;
+    return typeof value === 'function'
+      ? (value as (...a: unknown[]) => unknown).bind(model)
+      : value;
   },
   construct(_target, args) {
     const model = getUser();

@@ -1,5 +1,5 @@
-import { ConsoleEmailAdapter } from "./console.email-adapter";
-import type { EmailPort } from "@/ports/email.port";
+import { ConsoleEmailAdapter } from './console.email-adapter';
+import type { EmailPort } from '@/ports/email.port';
 
 /**
  * Module-level singleton. Starts with the console adapter so the app is safe

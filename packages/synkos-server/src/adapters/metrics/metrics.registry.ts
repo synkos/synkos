@@ -1,5 +1,5 @@
-import { NoopMetricsAdapter } from "./noop.metrics-adapter";
-import type { MetricsPort } from "@/ports/metrics.port";
+import { NoopMetricsAdapter } from './noop.metrics-adapter';
+import type { MetricsPort } from '@/ports/metrics.port';
 
 /**
  * Module-level singleton. Starts with the noop adapter — zero overhead

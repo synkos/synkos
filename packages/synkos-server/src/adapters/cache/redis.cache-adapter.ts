@@ -1,8 +1,8 @@
-import IORedis from "ioredis";
-import { createLogger } from "@/utils/logger";
-import type { CachePort } from "@/ports/cache.port";
+import IORedis from 'ioredis';
+import { createLogger } from '@/utils/logger';
+import type { CachePort } from '@/ports/cache.port';
 
-const log = createLogger("cache:redis");
+const log = createLogger('cache:redis');
 
 const DEFAULT_TTL_SECONDS = 300; // 5 min
 
@@ -23,12 +23,12 @@ export class RedisCacheAdapter implements CachePort {
       lazyConnect: true,
     });
 
-    this.client.on("error", (err) => {
-      log.error({ err }, "Redis cache connection error");
+    this.client.on('error', (err) => {
+      log.error({ err }, 'Redis cache connection error');
     });
 
-    this.client.on("connect", () => {
-      log.info("Redis cache connected");
+    this.client.on('connect', () => {
+      log.info('Redis cache connected');
     });
   }
 
@@ -38,17 +38,17 @@ export class RedisCacheAdapter implements CachePort {
       if (raw === null) return null;
       return JSON.parse(raw) as T;
     } catch (err) {
-      log.error({ err, key }, "Cache get failed — returning null");
+      log.error({ err, key }, 'Cache get failed — returning null');
       return null;
     }
   }
 
   async set<T>(key: string, value: T, ttlSeconds = DEFAULT_TTL_SECONDS): Promise<void> {
     try {
-      await this.client.set(key, JSON.stringify(value), "EX", ttlSeconds);
+      await this.client.set(key, JSON.stringify(value), 'EX', ttlSeconds);
     } catch (err) {
       // Cache failures must never crash the application
-      log.error({ err, key }, "Cache set failed — continuing without cache");
+      log.error({ err, key }, 'Cache set failed — continuing without cache');
     }
   }
 
@@ -58,7 +58,7 @@ export class RedisCacheAdapter implements CachePort {
       if (keys.length === 0) return;
       await this.client.del(...keys);
     } catch (err) {
-      log.error({ err, key }, "Cache del failed — continuing without cache");
+      log.error({ err, key }, 'Cache del failed — continuing without cache');
     }
   }
 

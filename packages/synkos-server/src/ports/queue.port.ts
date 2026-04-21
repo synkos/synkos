@@ -15,7 +15,7 @@ export interface JobOptions {
   /** Milliseconds to wait before the first attempt */
   delay?: number;
   backoff?: {
-    type: "fixed" | "exponential";
+    type: 'fixed' | 'exponential';
     /** Base delay in ms between retries */
     delay: number;
   };

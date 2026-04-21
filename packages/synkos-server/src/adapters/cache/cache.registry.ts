@@ -1,5 +1,5 @@
-import { NoopCacheAdapter } from "./noop.cache-adapter";
-import type { CachePort } from "@/ports/cache.port";
+import { NoopCacheAdapter } from './noop.cache-adapter';
+import type { CachePort } from '@/ports/cache.port';
 
 /**
  * Module-level singleton. Starts with the noop adapter so the app is safe

@@ -1,7 +1,7 @@
-import { User } from "@/modules/auth/user.model";
-import { ReservedUsername } from "./reserved-username.model";
-import type { ReservationReason } from "./reserved-username.model";
-import { coreEvents } from "@/events/core-events";
+import { User } from '@/modules/auth/user.model';
+import { ReservedUsername } from './reserved-username.model';
+import type { ReservationReason } from './reserved-username.model';
+import { coreEvents } from '@/events/core-events';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -12,13 +12,52 @@ const LEADING_TRAILING_SEPARATOR = /^[._]|[._]$/;
 const CONSECUTIVE_SEPARATORS = /[._]{2,}/;
 
 const RESERVED_KEYWORDS = new Set([
-  "admin", "administrator", "support", "help", "helpdesk", "api", "www",
-  "mail", "email", "bot", "robot", "info", "team", "staff", "mod",
-  "moderator", "official", "system", "null", "undefined", "anonymous",
-  "guest", "test", "demo", "app", "apps", "account", "accounts", "user",
-  "users", "me", "my", "settings", "profile", "signup", "login", "logout",
-  "register", "root", "superuser", "webmaster", "postmaster", "abuse",
-  "noreply", "no.reply", "security",
+  'admin',
+  'administrator',
+  'support',
+  'help',
+  'helpdesk',
+  'api',
+  'www',
+  'mail',
+  'email',
+  'bot',
+  'robot',
+  'info',
+  'team',
+  'staff',
+  'mod',
+  'moderator',
+  'official',
+  'system',
+  'null',
+  'undefined',
+  'anonymous',
+  'guest',
+  'test',
+  'demo',
+  'app',
+  'apps',
+  'account',
+  'accounts',
+  'user',
+  'users',
+  'me',
+  'my',
+  'settings',
+  'profile',
+  'signup',
+  'login',
+  'logout',
+  'register',
+  'root',
+  'superuser',
+  'webmaster',
+  'postmaster',
+  'abuse',
+  'noreply',
+  'no.reply',
+  'security',
 ]);
 
 /**
@@ -47,34 +86,34 @@ export function normalizeUsername(raw: string): string {
 }
 
 export type UsernameValidationError =
-  | "too_short"
-  | "too_long"
-  | "invalid_chars"
-  | "invalid_start_end"
-  | "consecutive_separators"
-  | "reserved_keyword";
+  | 'too_short'
+  | 'too_long'
+  | 'invalid_chars'
+  | 'invalid_start_end'
+  | 'consecutive_separators'
+  | 'reserved_keyword';
 
 /**
  * Validate a *normalized* username string.
  * Returns null if valid, or a UsernameValidationError code if not.
  */
 export function validateUsernameFormat(normalized: string): UsernameValidationError | null {
-  if (normalized.length < 3) return "too_short";
-  if (normalized.length > 20) return "too_long";
-  if (!USERNAME_REGEX.test(normalized)) return "invalid_chars";
-  if (LEADING_TRAILING_SEPARATOR.test(normalized)) return "invalid_start_end";
-  if (CONSECUTIVE_SEPARATORS.test(normalized)) return "consecutive_separators";
-  if (RESERVED_KEYWORDS.has(normalized)) return "reserved_keyword";
+  if (normalized.length < 3) return 'too_short';
+  if (normalized.length > 20) return 'too_long';
+  if (!USERNAME_REGEX.test(normalized)) return 'invalid_chars';
+  if (LEADING_TRAILING_SEPARATOR.test(normalized)) return 'invalid_start_end';
+  if (CONSECUTIVE_SEPARATORS.test(normalized)) return 'consecutive_separators';
+  if (RESERVED_KEYWORDS.has(normalized)) return 'reserved_keyword';
   return null;
 }
 
 const VALIDATION_MESSAGES: Record<UsernameValidationError, string> = {
-  too_short: "Username must be at least 3 characters.",
-  too_long: "Username must be at most 20 characters.",
-  invalid_chars: "Username may only contain letters, numbers, dots, and underscores.",
-  invalid_start_end: "Username cannot start or end with a dot or underscore.",
-  consecutive_separators: "Username cannot contain consecutive dots or underscores.",
-  reserved_keyword: "This username is reserved.",
+  too_short: 'Username must be at least 3 characters.',
+  too_long: 'Username must be at most 20 characters.',
+  invalid_chars: 'Username may only contain letters, numbers, dots, and underscores.',
+  invalid_start_end: 'Username cannot start or end with a dot or underscore.',
+  consecutive_separators: 'Username cannot contain consecutive dots or underscores.',
+  reserved_keyword: 'This username is reserved.',
 };
 
 // ── Availability ──────────────────────────────────────────────────────────────
@@ -100,8 +139,8 @@ export async function isUsernameAvailable(
     ReservedUsername.exists({
       usernameNormalized: normalized,
       $or: [
-        { reservedUntil: null },                 // permanent reservation
-        { reservedUntil: { $gt: now } },         // active time-limited reservation
+        { reservedUntil: null }, // permanent reservation
+        { reservedUntil: { $gt: now } }, // active time-limited reservation
       ],
     }),
   ]);
@@ -147,10 +186,10 @@ export async function checkUsernameAvailability(
 function baseFromDisplayName(displayName: string): string {
   const slug = displayName
     .toLowerCase()
-    .replace(/[^a-z0-9]/g, "")   // strip anything that isn't letter or digit
+    .replace(/[^a-z0-9]/g, '') // strip anything that isn't letter or digit
     .slice(0, 15);
 
-  return slug.length >= 3 ? slug : "trainer";
+  return slug.length >= 3 ? slug : 'trainer';
 }
 
 /**
@@ -164,7 +203,7 @@ function baseFromDisplayName(displayName: string): string {
  * only generates the string; persistence is the caller's responsibility.
  */
 export async function generateUniqueUsername(displayName?: string): Promise<string> {
-  const base = baseFromDisplayName(displayName ?? "trainer");
+  const base = baseFromDisplayName(displayName ?? 'trainer');
 
   // Step 1: try base slug itself (if valid length)
   if (base.length >= 3 && !validateUsernameFormat(base)) {
@@ -173,9 +212,9 @@ export async function generateUniqueUsername(displayName?: string): Promise<stri
 
   // Step 2: append short incrementing numbers (_01 … _99)
   for (let i = 1; i <= 99; i++) {
-    const suffix = String(i).padStart(2, "0");
+    const suffix = String(i).padStart(2, '0');
     const candidate = `${base}_${suffix}`.slice(0, 20);
-    if (!validateUsernameFormat(candidate) && await isUsernameAvailable(candidate)) {
+    if (!validateUsernameFormat(candidate) && (await isUsernameAvailable(candidate))) {
       return candidate;
     }
   }
@@ -184,7 +223,7 @@ export async function generateUniqueUsername(displayName?: string): Promise<stri
   for (let attempt = 0; attempt < 20; attempt++) {
     const num = Math.floor(Math.random() * 9000) + 1000;
     const candidate = `${base.slice(0, 15)}_${num}`;
-    if (!validateUsernameFormat(candidate) && await isUsernameAvailable(candidate)) {
+    if (!validateUsernameFormat(candidate) && (await isUsernameAvailable(candidate))) {
       return candidate;
     }
   }
@@ -199,18 +238,18 @@ export async function generateUniqueUsername(displayName?: string): Promise<stri
  * Generate up to N username suggestions based on a taken username.
  * Used by the frontend to offer alternatives when the desired handle is unavailable.
  */
-export async function generateSuggestions(
-  raw: string,
-  count = 3
-): Promise<string[]> {
-  const base = normalizeUsername(raw).replace(/[^a-z0-9]/g, "").slice(0, 15) || "trainer";
+export async function generateSuggestions(raw: string, count = 3): Promise<string[]> {
+  const base =
+    normalizeUsername(raw)
+      .replace(/[^a-z0-9]/g, '')
+      .slice(0, 15) || 'trainer';
   const suggestions: string[] = [];
 
   // Try sequential numeric suffixes first (friendlier UX)
   for (let i = 1; suggestions.length < count && i <= 99; i++) {
-    const suffix = String(i).padStart(2, "0");
+    const suffix = String(i).padStart(2, '0');
     const candidate = `${base}_${suffix}`.slice(0, 20);
-    if (!validateUsernameFormat(candidate) && await isUsernameAvailable(candidate)) {
+    if (!validateUsernameFormat(candidate) && (await isUsernameAvailable(candidate))) {
       suggestions.push(candidate);
     }
   }
@@ -220,7 +259,7 @@ export async function generateSuggestions(
   while (suggestions.length < count && attempts < 30) {
     const num = Math.floor(Math.random() * 9000) + 1000;
     const candidate = `${base.slice(0, 15)}_${num}`;
-    if (!validateUsernameFormat(candidate) && await isUsernameAvailable(candidate)) {
+    if (!validateUsernameFormat(candidate) && (await isUsernameAvailable(candidate))) {
       suggestions.push(candidate);
     }
     attempts++;
@@ -247,9 +286,7 @@ export async function reserveUsername(
   const { userId, durationDays = RESERVATION_DURATION_DAYS } = options;
 
   const reservedUntil =
-    durationDays === null
-      ? null
-      : new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000);
+    durationDays === null ? null : new Date(Date.now() + durationDays * 24 * 60 * 60 * 1000);
 
   await ReservedUsername.findOneAndUpdate(
     { usernameNormalized },
@@ -285,7 +322,7 @@ export async function setUsername(userId: string, rawUsername: string): Promise<
   // name is not already taken (enforced by the sparse unique index on usernameNormalized).
   const available = await isUsernameAvailable(normalized, userId);
   if (!available) {
-    const err = new Error("Username is already taken.") as Error & { status: number };
+    const err = new Error('Username is already taken.') as Error & { status: number };
     err.status = 409;
     throw err;
   }
@@ -299,18 +336,20 @@ export async function setUsername(userId: string, rawUsername: string): Promise<
 
     if (!user) {
       // User already has a username — should use changeUsername instead
-      const err = new Error("User already has a username. Use the change endpoint.") as Error & { status: number };
+      const err = new Error('User already has a username. Use the change endpoint.') as Error & {
+        status: number;
+      };
       err.status = 409;
       throw err;
     }
 
-    coreEvents.emit("user:username_set", { userId, username: normalized });
+    coreEvents.emit('user:username_set', { userId, username: normalized });
 
     return normalized;
   } catch (err: unknown) {
     // Handle MongoDB duplicate key error (E11000) on the unique index
     if ((err as { code?: number }).code === 11000) {
-      const duplicate = new Error("Username is already taken.") as Error & { status: number };
+      const duplicate = new Error('Username is already taken.') as Error & { status: number };
       duplicate.status = 409;
       throw duplicate;
     }
@@ -341,7 +380,7 @@ export async function changeUsername(userId: string, rawUsername: string): Promi
 
   const user = await User.findById(userId);
   if (!user) {
-    const err = new Error("User not found.") as Error & { status: number };
+    const err = new Error('User not found.') as Error & { status: number };
     err.status = 404;
     throw err;
   }
@@ -355,7 +394,7 @@ export async function changeUsername(userId: string, rawUsername: string): Promi
         (nextChangeAllowedAt.getTime() - Date.now()) / (24 * 60 * 60 * 1000)
       );
       const err = new Error(
-        `You can change your username again in ${daysLeft} day${daysLeft === 1 ? "" : "s"}.`
+        `You can change your username again in ${daysLeft} day${daysLeft === 1 ? '' : 's'}.`
       ) as Error & { status: number; daysLeft: number; nextChangeAllowedAt: string };
       err.status = 429;
       (err as typeof err & { daysLeft: number }).daysLeft = daysLeft;
@@ -372,7 +411,7 @@ export async function changeUsername(userId: string, rawUsername: string): Promi
 
   const available = await isUsernameAvailable(normalized, userId);
   if (!available) {
-    const err = new Error("Username is already taken.") as Error & { status: number };
+    const err = new Error('Username is already taken.') as Error & { status: number };
     err.status = 409;
     throw err;
   }
@@ -389,7 +428,7 @@ export async function changeUsername(userId: string, rawUsername: string): Promi
     });
   } catch (err: unknown) {
     if ((err as { code?: number }).code === 11000) {
-      const duplicate = new Error("Username is already taken.") as Error & { status: number };
+      const duplicate = new Error('Username is already taken.') as Error & { status: number };
       duplicate.status = 409;
       throw duplicate;
     }
@@ -398,7 +437,7 @@ export async function changeUsername(userId: string, rawUsername: string): Promi
 
   // Reserve the old username so it can't be immediately grabbed
   if (oldUsername && oldNormalized) {
-    await reserveUsername(oldUsername, "changed", {
+    await reserveUsername(oldUsername, 'changed', {
       userId,
       durationDays: RESERVATION_DURATION_DAYS,
     });

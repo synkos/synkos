@@ -1,10 +1,10 @@
-import type { ModuleDefinition } from "@/types/module.types";
-import router from "./account.routes";
+import type { ModuleDefinition } from '@/types/module.types';
+import router from './account.routes';
 
 export const accountModule: ModuleDefinition = {
-  path: "/account",
+  path: '/account',
   router,
-  auth: "required",
+  auth: 'required',
 };
 
-export { AccountService, registerDeletionCleanup } from "./account.service";
+export { AccountService, registerDeletionCleanup } from './account.service';

@@ -1,4 +1,4 @@
-import type { StoragePort, UploadedAsset } from "@/ports/storage.port";
+import type { StoragePort, UploadedAsset } from '@/ports/storage.port';
 
 /**
  * Noop storage adapter — default when no provider is configured.
@@ -8,10 +8,10 @@ import type { StoragePort, UploadedAsset } from "@/ports/storage.port";
  */
 export class NoopStorageAdapter implements StoragePort {
   async upload(_key: string, _buffer: Buffer, _contentType: string): Promise<UploadedAsset> {
-    throw Object.assign(
-      new Error("Photo uploads are not available. Storage is not configured."),
-      { status: 503, code: "STORAGE_NOT_CONFIGURED" }
-    );
+    throw Object.assign(new Error('Photo uploads are not available. Storage is not configured.'), {
+      status: 503,
+      code: 'STORAGE_NOT_CONFIGURED',
+    });
   }
 
   async delete(_key: string): Promise<void> {

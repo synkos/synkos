@@ -1,7 +1,7 @@
-import { createLogger } from "@/utils/logger";
-import type { EmailPort, EmailTemplates } from "@/ports/email.port";
+import { createLogger } from '@/utils/logger';
+import type { EmailPort, EmailTemplates } from '@/ports/email.port';
 
-const log = createLogger("email:resend");
+const log = createLogger('email:resend');
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
@@ -71,10 +71,10 @@ function buildDefaultTemplates(appName: string, brandColor: string): EmailTempla
     }),
 
     deletionConfirmation: (scheduledAt) => {
-      const date = scheduledAt.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
+      const date = scheduledAt.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
       });
       return {
         subject: `Account deletion scheduled — ${appName}`,
@@ -115,17 +115,17 @@ export class ResendEmailAdapter implements EmailPort {
   private readonly templates: EmailTemplates;
 
   constructor(config: ResendAdapterConfig) {
-    this.apiKey       = config.apiKey;
-    this.from         = config.from;
-    this.fromDev      = config.fromDev ?? config.from;
+    this.apiKey = config.apiKey;
+    this.from = config.from;
+    this.fromDev = config.fromDev ?? config.from;
     this.devOverrideTo = config.devOverrideTo;
-    this.isDev        = config.isDev ?? false;
+    this.isDev = config.isDev ?? false;
 
     // Extract app name from the `from` string if not explicitly provided.
     // "Grading Center <noreply@app.com>" → "Grading Center"
-    const appName    = config.appName ?? config.from.split("<")[0].trim();
-    const brandColor = config.brandColor ?? "#0A84FF";
-    const defaults   = buildDefaultTemplates(appName, brandColor);
+    const appName = config.appName ?? config.from.split('<')[0].trim();
+    const brandColor = config.brandColor ?? '#0A84FF';
+    const defaults = buildDefaultTemplates(appName, brandColor);
 
     this.templates = { ...defaults, ...config.templates };
   }
@@ -138,23 +138,23 @@ export class ResendEmailAdapter implements EmailPort {
 
   private async send(to: string, subject: string, html: string): Promise<void> {
     const recipient = this.resolveRecipient(to);
-    const from      = this.isDev ? this.fromDev : this.from;
+    const from = this.isDev ? this.fromDev : this.from;
 
     if (this.isDev && recipient !== to) {
-      log.debug({ recipient, original: to }, "Dev override applied");
+      log.debug({ recipient, original: to }, 'Dev override applied');
     }
 
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${this.apiKey}`,
       },
       body: JSON.stringify({ from, to: recipient, subject, html }),
     });
 
     if (!res.ok) {
-      const body = await res.text().catch(() => "");
+      const body = await res.text().catch(() => '');
       throw new Error(`Resend delivery failed [${res.status}]: ${body}`);
     }
   }

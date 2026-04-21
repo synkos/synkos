@@ -1,7 +1,7 @@
-import { createLogger } from "@/utils/logger";
-import type { EmailPort } from "@/ports/email.port";
+import { createLogger } from '@/utils/logger';
+import type { EmailPort } from '@/ports/email.port';
 
-const log = createLogger("email:console");
+const log = createLogger('email:console');
 
 /**
  * Console email adapter — default when no provider is configured.
@@ -11,18 +11,18 @@ const log = createLogger("email:console");
  */
 export class ConsoleEmailAdapter implements EmailPort {
   async sendEmailVerification(to: string, code: string): Promise<void> {
-    log.info({ to, code }, "📧 [email:verification]");
+    log.info({ to, code }, '📧 [email:verification]');
   }
 
   async sendPasswordReset(to: string, code: string): Promise<void> {
-    log.info({ to, code }, "📧 [email:password-reset]");
+    log.info({ to, code }, '📧 [email:password-reset]');
   }
 
   async sendDeletionConfirmation(to: string, scheduledAt: Date): Promise<void> {
-    log.info({ to, scheduledAt }, "📧 [email:deletion-confirmation]");
+    log.info({ to, scheduledAt }, '📧 [email:deletion-confirmation]');
   }
 
   async sendDeletionCancelled(to: string): Promise<void> {
-    log.info({ to }, "📧 [email:deletion-cancelled]");
+    log.info({ to }, '📧 [email:deletion-cancelled]');
   }
 }

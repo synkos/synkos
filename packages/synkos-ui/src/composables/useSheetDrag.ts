@@ -7,9 +7,7 @@ export function useSheetDrag() {
 
   const sheetDragStyle = computed(() => ({
     transform: `translateY(${sheetTranslateY.value}px)`,
-    transition: sheetSnapping.value
-      ? 'transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1)'
-      : 'none',
+    transition: sheetSnapping.value ? 'transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1)' : 'none',
   }));
 
   function onDragStart(e: TouchEvent) {

@@ -17,8 +17,8 @@ export interface EmailPort {
  * When a template is omitted, the adapter uses its own default.
  */
 export interface EmailTemplates {
-  verification:          (code: string)        => { subject: string; html: string };
-  passwordReset:         (code: string)        => { subject: string; html: string };
-  deletionConfirmation:  (scheduledAt: Date)   => { subject: string; html: string };
-  deletionCancelled:     ()                    => { subject: string; html: string };
+  verification: (code: string) => { subject: string; html: string };
+  passwordReset: (code: string) => { subject: string; html: string };
+  deletionConfirmation: (scheduledAt: Date) => { subject: string; html: string };
+  deletionCancelled: () => { subject: string; html: string };
 }

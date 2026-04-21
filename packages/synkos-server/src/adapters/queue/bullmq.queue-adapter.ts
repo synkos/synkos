@@ -1,8 +1,8 @@
-import { Queue, Worker, type ConnectionOptions } from "bullmq";
-import { createLogger } from "@/utils/logger";
-import type { JobHandler, JobOptions, QueuePort, RepeatOptions } from "@/ports/queue.port";
+import { Queue, Worker, type ConnectionOptions } from 'bullmq';
+import { createLogger } from '@/utils/logger';
+import type { JobHandler, JobOptions, QueuePort, RepeatOptions } from '@/ports/queue.port';
 
-const log = createLogger("queue:bullmq");
+const log = createLogger('queue:bullmq');
 
 export interface BullMQAdapterConfig {
   /** Redis connection URL (e.g. redis://localhost:6379) */
@@ -33,8 +33,8 @@ export class BullMQAdapter implements QueuePort {
   private readonly queueName: string;
   private readonly concurrency: number;
 
-  constructor({ redisUrl, queueName = "core", concurrency = 5 }: BullMQAdapterConfig) {
-    this.queueName  = queueName;
+  constructor({ redisUrl, queueName = 'core', concurrency = 5 }: BullMQAdapterConfig) {
+    this.queueName = queueName;
     this.concurrency = concurrency;
 
     // BullMQ requires maxRetriesPerRequest: null for blocking commands used by the Worker.
@@ -49,13 +49,13 @@ export class BullMQAdapter implements QueuePort {
 
   async add<T>(name: string, data: T, options?: JobOptions): Promise<void> {
     await this.queue.add(name, data, {
-      attempts:  options?.attempts ?? 3,
-      delay:     options?.delay,
-      backoff:   options?.backoff
+      attempts: options?.attempts ?? 3,
+      delay: options?.delay,
+      backoff: options?.backoff
         ? { type: options.backoff.type, delay: options.backoff.delay }
-        : { type: "exponential", delay: 5000 },
+        : { type: 'exponential', delay: 5000 },
       removeOnComplete: { count: 100 }, // keep last 100 completed for debugging
-      removeOnFail:     { count: 500 },
+      removeOnFail: { count: 500 },
     });
   }
 
@@ -71,19 +71,16 @@ export class BullMQAdapter implements QueuePort {
 
     // BullMQ deduplicates repeatable jobs by name + repeat pattern, so this is idempotent.
     await this.queue.add(name, data, {
-      repeat:    repeat.cron ? { pattern: repeat.cron } : { every: repeat.every },
-      attempts:  options?.attempts ?? 3,
-      backoff:   options?.backoff
+      repeat: repeat.cron ? { pattern: repeat.cron } : { every: repeat.every },
+      attempts: options?.attempts ?? 3,
+      backoff: options?.backoff
         ? { type: options.backoff.type, delay: options.backoff.delay }
-        : { type: "exponential", delay: 5000 },
+        : { type: 'exponential', delay: 5000 },
       removeOnComplete: { count: 100 },
-      removeOnFail:     { count: 500 },
+      removeOnFail: { count: 500 },
     });
 
-    log.info(
-      { name, repeat },
-      "Repeatable job scheduled"
-    );
+    log.info({ name, repeat }, 'Repeatable job scheduled');
 
     // Run immediately on startup if requested (one-off job, separate from the repeating schedule)
     if (repeat.immediately) {
@@ -99,30 +96,30 @@ export class BullMQAdapter implements QueuePort {
         if (!handler) {
           throw new Error(`No handler registered for job: ${job.name}`);
         }
-        log.info({ jobId: job.id, name: job.name }, "Processing job");
+        log.info({ jobId: job.id, name: job.name }, 'Processing job');
         await handler(job.data);
-        log.info({ jobId: job.id, name: job.name }, "Job completed");
+        log.info({ jobId: job.id, name: job.name }, 'Job completed');
       },
       {
-        connection:  this.connection,
+        connection: this.connection,
         concurrency: this.concurrency,
       }
     );
 
-    this.worker.on("failed", (job, err) => {
-      log.error({ err, jobId: job?.id, name: job?.name }, "Job failed");
+    this.worker.on('failed', (job, err) => {
+      log.error({ err, jobId: job?.id, name: job?.name }, 'Job failed');
     });
 
-    this.worker.on("error", (err) => {
-      log.error({ err }, "BullMQ worker error");
+    this.worker.on('error', (err) => {
+      log.error({ err }, 'BullMQ worker error');
     });
 
-    log.info({ queue: this.queueName, concurrency: this.concurrency }, "BullMQ worker started");
+    log.info({ queue: this.queueName, concurrency: this.concurrency }, 'BullMQ worker started');
   }
 
   async close(): Promise<void> {
     await this.worker?.close();
     await this.queue.close();
-    log.info("BullMQ worker and queue closed");
+    log.info('BullMQ worker and queue closed');
   }
 }

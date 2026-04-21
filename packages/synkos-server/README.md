@@ -25,7 +25,12 @@ import { notificationsRouter } from '@synkos/server/modules/notifications';
 import { authenticate, requireAdmin, requestContext } from '@synkos/server/middleware';
 
 // Adapters (interfaces for email, storage, cache, queue, etc.)
-import type { EmailAdapter, StorageAdapter, CacheAdapter, QueueAdapter } from '@synkos/server/ports';
+import type {
+  EmailAdapter,
+  StorageAdapter,
+  CacheAdapter,
+  QueueAdapter,
+} from '@synkos/server/ports';
 
 // Built-in adapter implementations
 import { ResendEmailAdapter, ConsoleEmailAdapter } from '@synkos/server/adapters';
@@ -43,31 +48,32 @@ import { coreEvents } from '@synkos/server/events';
 
 `@synkos/server` is organized around **6 extension points** defined in `bootstrap/`:
 
-| File | Purpose |
-|---|---|
-| `bootstrap/adapters.ts` | Wire adapter implementations (email, storage, cache, etc.) |
-| `bootstrap/routes.ts` | Register Express routers |
-| `bootstrap/middleware.ts` | Global middleware (CORS, body parser, rate limit) |
-| `bootstrap/events.ts` | Subscribe to core domain events |
-| `bootstrap/jobs.ts` | Register BullMQ workers and scheduled jobs |
-| `bootstrap/config.ts` | Validate and export typed env config |
+| File                      | Purpose                                                    |
+| ------------------------- | ---------------------------------------------------------- |
+| `bootstrap/adapters.ts`   | Wire adapter implementations (email, storage, cache, etc.) |
+| `bootstrap/routes.ts`     | Register Express routers                                   |
+| `bootstrap/middleware.ts` | Global middleware (CORS, body parser, rate limit)          |
+| `bootstrap/events.ts`     | Subscribe to core domain events                            |
+| `bootstrap/jobs.ts`       | Register BullMQ workers and scheduled jobs                 |
+| `bootstrap/config.ts`     | Validate and export typed env config                       |
 
 ## Adapters
 
 The framework uses the port/adapter pattern. You swap implementations without touching business logic:
 
-| Port | Built-in adapters |
-|---|---|
-| Email | `ResendEmailAdapter`, `ConsoleEmailAdapter` |
-| Storage | `R2StorageAdapter`, `NoopStorageAdapter` |
-| Cache | `RedisAdapter`, `MemoryAdapter` |
-| Queue | `BullMQAdapter`, `NoopQueueAdapter` |
-| Push notifications | `APNsAdapter`, `NoopNotificationsAdapter` |
-| Metrics | `PrometheusAdapter`, `NoopMetricsAdapter` |
+| Port               | Built-in adapters                           |
+| ------------------ | ------------------------------------------- |
+| Email              | `ResendEmailAdapter`, `ConsoleEmailAdapter` |
+| Storage            | `R2StorageAdapter`, `NoopStorageAdapter`    |
+| Cache              | `RedisAdapter`, `MemoryAdapter`             |
+| Queue              | `BullMQAdapter`, `NoopQueueAdapter`         |
+| Push notifications | `APNsAdapter`, `NoopNotificationsAdapter`   |
+| Metrics            | `PrometheusAdapter`, `NoopMetricsAdapter`   |
 
 ## Auth module
 
 Provides ready-to-use routes for:
+
 - Email/password registration and login
 - JWT access + refresh token flow
 - Apple Sign In, Google OAuth

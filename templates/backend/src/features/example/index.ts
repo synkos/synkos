@@ -1,5 +1,5 @@
-import type { ModuleDefinition } from "@synkos/server/types";
-import { router }                from "./example.routes";
+import type { ModuleDefinition } from '@synkos/server/types';
+import { router } from './example.routes';
 
 /**
  * Example feature module.
@@ -17,7 +17,7 @@ import { router }                from "./example.routes";
  *   DELETE /api/v1/examples/:id    Delete an example
  */
 export const exampleModule: ModuleDefinition = {
-  path:   "/examples",
+  path: '/examples',
   router,
-  auth:   "required",
+  auth: 'required',
 };

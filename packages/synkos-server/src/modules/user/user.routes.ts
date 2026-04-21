@@ -1,8 +1,8 @@
-import { Router, type IRouter } from "express";
-import multer from "multer";
-import rateLimit from "express-rate-limit";
-import { authenticate } from "@/middleware/authenticate";
-import { UserController } from "./user.controller";
+import { Router, type IRouter } from 'express';
+import multer from 'multer';
+import rateLimit from 'express-rate-limit';
+import { authenticate } from '@/middleware/authenticate';
+import { UserController } from './user.controller';
 
 const router: IRouter = Router();
 
@@ -17,7 +17,10 @@ const profileLimiter = rateLimit({
   max: 30,
   message: {
     success: false,
-    error: { code: "TOO_MANY_REQUESTS", message: "Too many profile update attempts, try again later." },
+    error: {
+      code: 'TOO_MANY_REQUESTS',
+      message: 'Too many profile update attempts, try again later.',
+    },
   },
   standardHeaders: true,
   legacyHeaders: false,
@@ -29,7 +32,10 @@ const usernameLimiter = rateLimit({
   max: 10,
   message: {
     success: false,
-    error: { code: "TOO_MANY_REQUESTS", message: "Too many username change attempts, try again later." },
+    error: {
+      code: 'TOO_MANY_REQUESTS',
+      message: 'Too many username change attempts, try again later.',
+    },
   },
   standardHeaders: true,
   legacyHeaders: false,
@@ -41,7 +47,10 @@ const passwordLimiter = rateLimit({
   max: 5,
   message: {
     success: false,
-    error: { code: "TOO_MANY_REQUESTS", message: "Too many password change attempts, try again later." },
+    error: {
+      code: 'TOO_MANY_REQUESTS',
+      message: 'Too many password change attempts, try again later.',
+    },
   },
   standardHeaders: true,
   legacyHeaders: false,
@@ -53,21 +62,21 @@ const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB — enforced again in StorageService
   fileFilter: (_req, file, cb) => {
-    if (file.mimetype.startsWith("image/")) {
+    if (file.mimetype.startsWith('image/')) {
       cb(null, true);
     } else {
-      cb(new Error("Only image files are accepted."));
+      cb(new Error('Only image files are accepted.'));
     }
   },
 });
 
 // ── Routes ────────────────────────────────────────────────────────────────────
 
-router.patch("/name",       profileLimiter,  UserController.patchName);
-router.patch("/username",   usernameLimiter, UserController.patchUsername);
-router.patch("/photo",      profileLimiter,  upload.single("photo"), UserController.patchPhoto);
-router.patch("/password",   passwordLimiter, UserController.patchPassword);
-router.patch("/push-token",  profileLimiter, UserController.patchPushToken);
-router.delete("/push-token", profileLimiter, UserController.deletePushToken);
+router.patch('/name', profileLimiter, UserController.patchName);
+router.patch('/username', usernameLimiter, UserController.patchUsername);
+router.patch('/photo', profileLimiter, upload.single('photo'), UserController.patchPhoto);
+router.patch('/password', passwordLimiter, UserController.patchPassword);
+router.patch('/push-token', profileLimiter, UserController.patchPushToken);
+router.delete('/push-token', profileLimiter, UserController.deletePushToken);
 
 export default router;

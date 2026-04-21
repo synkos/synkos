@@ -1,7 +1,7 @@
-import { createLogger } from "@/utils/logger";
-import { AuditLog, type AuditEventType } from "./audit-log.model";
+import { createLogger } from '@/utils/logger';
+import { AuditLog, type AuditEventType } from './audit-log.model';
 
-const log = createLogger("audit");
+const log = createLogger('audit');
 
 export interface AuditEvent {
   userId: string;
@@ -21,6 +21,6 @@ export function logAuditEvent(event: AuditEvent): void {
     oldValue: event.oldValue,
     newValue: event.newValue,
   }).catch((err) => {
-    log.error({ err, event }, "Failed to write audit log");
+    log.error({ err, event }, 'Failed to write audit log');
   });
 }

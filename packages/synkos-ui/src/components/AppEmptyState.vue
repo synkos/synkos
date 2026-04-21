@@ -81,6 +81,8 @@ defineProps<{
   transition: opacity $transition-quick;
   -webkit-tap-highlight-color: transparent;
 
-  &:active { opacity: 0.85; }
+  &:active {
+    opacity: 0.85;
+  }
 }
 </style>

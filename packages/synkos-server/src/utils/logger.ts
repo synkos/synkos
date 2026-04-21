@@ -1,8 +1,8 @@
-import pino from "pino";
-import { env } from "@/config/env";
-import { getRequestContext } from "@/context/request-context";
+import pino from 'pino';
+import { env } from '@/config/env';
+import { getRequestContext } from '@/context/request-context';
 
-const isDev = env.NODE_ENV !== "production";
+const isDev = env.NODE_ENV !== 'production';
 
 /**
  * Root application logger.
@@ -16,7 +16,7 @@ const isDev = env.NODE_ENV !== "production";
  */
 export const logger = pino(
   {
-    level: isDev ? "debug" : "info",
+    level: isDev ? 'debug' : 'info',
 
     // Automatically inject requestId + userId from AsyncLocalStorage into every log line.
     // Works for all child loggers (createLogger) with zero changes in services.
@@ -32,30 +32,30 @@ export const logger = pino(
     // Redact sensitive fields before any log line is emitted
     redact: {
       paths: [
-        "req.headers.authorization",
-        "req.headers.cookie",
-        "req.body.password",
-        "req.body.newPassword",
-        "req.body.token",
-        "req.body.refreshToken",
-        "req.body.idToken",
-        "password",
-        "passwordHash",
-        "token",
-        "refreshToken",
+        'req.headers.authorization',
+        'req.headers.cookie',
+        'req.body.password',
+        'req.body.newPassword',
+        'req.body.token',
+        'req.body.refreshToken',
+        'req.body.idToken',
+        'password',
+        'passwordHash',
+        'token',
+        'refreshToken',
       ],
-      censor: "[REDACTED]",
+      censor: '[REDACTED]',
     },
   },
   isDev
     ? pino.transport({
-        target: "pino-pretty",
+        target: 'pino-pretty',
         options: {
           colorize: true,
-          translateTime: "HH:MM:ss.l",
-          ignore: "pid,hostname",
-          messageFormat: "{if module}[{module}] {end}{msg}",
-          errorLikeObjectKeys: ["err", "error"],
+          translateTime: 'HH:MM:ss.l',
+          ignore: 'pid,hostname',
+          messageFormat: '{if module}[{module}] {end}{msg}',
+          errorLikeObjectKeys: ['err', 'error'],
         },
       })
     : undefined

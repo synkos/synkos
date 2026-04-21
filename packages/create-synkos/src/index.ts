@@ -34,11 +34,10 @@ async function main(): Promise<void> {
     const cdPath = opts.outDir;
 
     p.note(
-      [
-        `  cd ${cdPath}`,
-        opts.template !== 'frontend' ? `  ${pmRun} dev` : `  quasar dev`,
-      ].join('\n'),
-      'Next steps',
+      [`  cd ${cdPath}`, opts.template !== 'frontend' ? `  ${pmRun} dev` : `  quasar dev`].join(
+        '\n'
+      ),
+      'Next steps'
     );
 
     p.outro(pc.green('Happy hacking! 🚀'));

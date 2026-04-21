@@ -1,7 +1,7 @@
-import type { Document} from "mongoose";
-import { Schema } from "mongoose";
+import type { Document } from 'mongoose';
+import { Schema } from 'mongoose';
 
-export type AuthProvider = "local" | "google" | "apple";
+export type AuthProvider = 'local' | 'google' | 'apple';
 
 export interface IAuthProvider {
   provider: AuthProvider;
@@ -9,7 +9,7 @@ export interface IAuthProvider {
   email?: string;
 }
 
-export type DeletionStatus = "active" | "pending_deletion";
+export type DeletionStatus = 'active' | 'pending_deletion';
 
 /**
  * Base user interface — fields owned by the core.
@@ -36,7 +36,7 @@ export interface IUser extends Document {
   passwordHash?: string;
   providers: IAuthProvider[];
   isEmailVerified: boolean;
-  role: "user" | "admin";
+  role: 'user' | 'admin';
   isActive: boolean;
   lastLoginAt?: Date;
   // Account deletion
@@ -66,7 +66,7 @@ export interface IUser extends Document {
 
 const AuthProviderSchema = new Schema<IAuthProvider>(
   {
-    provider: { type: String, enum: ["local", "google", "apple"], required: true },
+    provider: { type: String, enum: ['local', 'google', 'apple'], required: true },
     providerId: { type: String, required: true },
     email: { type: String },
   },
@@ -98,14 +98,14 @@ export const userSchema = new Schema<IUser>(
     passwordHash: { type: String, select: false },
     providers: [AuthProviderSchema],
     isEmailVerified: { type: Boolean, default: false },
-    role: { type: String, enum: ["user", "admin"], default: "user" },
+    role: { type: String, enum: ['user', 'admin'], default: 'user' },
     isActive: { type: Boolean, default: true },
     lastLoginAt: { type: Date },
     // Account deletion
     deletionStatus: {
       type: String,
-      enum: ["active", "pending_deletion"],
-      default: "active",
+      enum: ['active', 'pending_deletion'],
+      default: 'active',
       index: true,
     },
     deletionRequestedAt: { type: Date },
@@ -132,4 +132,4 @@ export const userSchema = new Schema<IUser>(
 );
 
 // Compound index for OAuth lookups
-userSchema.index({ "providers.provider": 1, "providers.providerId": 1 });
+userSchema.index({ 'providers.provider': 1, 'providers.providerId': 1 });

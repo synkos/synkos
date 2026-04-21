@@ -23,7 +23,12 @@ export const appConfig = defineAppConfig({
   name: 'My App',
   version: '1.0.0',
   bundleId: 'com.company.myapp',
-  company: { name: 'My Company', legalName: 'My Company Ltd.', country: 'US', jurisdiction: 'Delaware' },
+  company: {
+    name: 'My Company',
+    legalName: 'My Company Ltd.',
+    country: 'US',
+    jurisdiction: 'Delaware',
+  },
   storageKeys: {
     settings: 'myapp-settings',
     pushToken: 'myapp-push-token',
@@ -97,15 +102,17 @@ export default defineRouter(() => {
     routes,
   });
 
-  Router.beforeEach(createAuthGuard({
-    loginRoute: 'auth-login',
-    homeRoute: 'home',
-    publicRoutes: ['auth-register'],       // optional extra public routes
-    getState: async () => {
-      const { useAuthStore } = await import('src/stores/auth.store');
-      return useAuthStore();               // must expose isAuthenticated, isGuest, isEmailVerified
-    },
-  }));
+  Router.beforeEach(
+    createAuthGuard({
+      loginRoute: 'auth-login',
+      homeRoute: 'home',
+      publicRoutes: ['auth-register'], // optional extra public routes
+      getState: async () => {
+        const { useAuthStore } = await import('src/stores/auth.store');
+        return useAuthStore(); // must expose isAuthenticated, isGuest, isEmailVerified
+      },
+    })
+  );
 
   return Router;
 });

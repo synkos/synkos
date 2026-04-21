@@ -1,6 +1,6 @@
-import { z } from "zod";
-import { baseEnvSchema } from "@synkos/server/config";
-import { parseEnv }      from "@synkos/server/utils";
+import { z } from 'zod';
+import { baseEnvSchema } from '@synkos/server/config';
+import { parseEnv } from '@synkos/server/utils';
 
 /**
  * Project-level environment schema.
@@ -24,4 +24,4 @@ const envSchema = baseEnvSchema.extend({
 });
 
 export const env = parseEnv(envSchema, process.env);
-export type Env  = z.infer<typeof envSchema>;
+export type Env = z.infer<typeof envSchema>;

@@ -45,20 +45,17 @@ export function isAppError(err: unknown): err is AppError {
 // ── Common error factories ────────────────────────────────────────────────────
 
 export const Errors = {
-  badRequest: (message: string, code = 'BAD_REQUEST') =>
-    new AppError(400, code, message),
+  badRequest: (message: string, code = 'BAD_REQUEST') => new AppError(400, code, message),
 
   unauthorized: (message = 'Unauthorized', code = 'UNAUTHORIZED') =>
     new AppError(401, code, message),
 
-  forbidden: (message = 'Forbidden', code = 'FORBIDDEN') =>
-    new AppError(403, code, message),
+  forbidden: (message = 'Forbidden', code = 'FORBIDDEN') => new AppError(403, code, message),
 
   notFound: (resource = 'Resource', code = 'NOT_FOUND') =>
     new AppError(404, code, `${resource} not found`),
 
-  conflict: (message: string, code = 'CONFLICT') =>
-    new AppError(409, code, message),
+  conflict: (message: string, code = 'CONFLICT') => new AppError(409, code, message),
 
   tooManyRequests: (message = 'Too many requests', code = 'RATE_LIMITED') =>
     new AppError(429, code, message),

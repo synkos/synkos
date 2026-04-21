@@ -1,4 +1,4 @@
-import type { HttpRequestRecord, MetricsPort } from "@/ports/metrics.port";
+import type { HttpRequestRecord, MetricsPort } from '@/ports/metrics.port';
 
 /**
  * Noop metrics adapter — default when no metrics provider is configured.
@@ -7,7 +7,7 @@ import type { HttpRequestRecord, MetricsPort } from "@/ports/metrics.port";
  * Zero overhead — no counters, no histograms, no memory allocation.
  */
 export class NoopMetricsAdapter implements MetricsPort {
-  readonly contentType = "text/plain";
+  readonly contentType = 'text/plain';
 
   recordHttpRequest(_record: HttpRequestRecord): void {
     // no-op

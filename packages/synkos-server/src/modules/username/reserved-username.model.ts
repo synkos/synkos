@@ -1,7 +1,7 @@
-import type { Document} from "mongoose";
-import mongoose, { Schema } from "mongoose";
+import type { Document } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 
-export type ReservationReason = "deleted" | "changed";
+export type ReservationReason = 'deleted' | 'changed';
 
 export interface IReservedUsername extends Document {
   username: string;
@@ -18,8 +18,8 @@ const ReservedUsernameSchema = new Schema<IReservedUsername>(
     username: { type: String, required: true, trim: true },
     usernameNormalized: { type: String, required: true, trim: true, index: true },
     reservedUntil: { type: Date, default: null },
-    reason: { type: String, enum: ["deleted", "changed"], required: true },
-    userId: { type: Schema.Types.ObjectId, ref: "User" },
+    reason: { type: String, enum: ['deleted', 'changed'], required: true },
+    userId: { type: Schema.Types.ObjectId, ref: 'User' },
   },
   { timestamps: true }
 );
@@ -28,6 +28,6 @@ const ReservedUsernameSchema = new Schema<IReservedUsername>(
 ReservedUsernameSchema.index({ usernameNormalized: 1, reservedUntil: 1 });
 
 export const ReservedUsername = mongoose.model<IReservedUsername>(
-  "ReservedUsername",
+  'ReservedUsername',
   ReservedUsernameSchema
 );
