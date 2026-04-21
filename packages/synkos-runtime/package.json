@@ -1,6 +1,6 @@
 {
   "name": "@synkos/runtime",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Synkos shared runtime: plugin system, lifecycle hooks, config helpers",
   "license": "MIT",
   "type": "module",
@@ -14,7 +14,9 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist/"],
+  "files": [
+    "dist/"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -32,5 +34,11 @@
   "publishConfig": {
     "access": "public"
   },
-  "keywords": ["synkos", "runtime", "plugins", "hooks", "lifecycle"]
+  "keywords": [
+    "synkos",
+    "runtime",
+    "plugins",
+    "hooks",
+    "lifecycle"
+  ]
 }
