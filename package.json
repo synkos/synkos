@@ -12,7 +12,7 @@
     "build": "pnpm -r --filter './packages/*' build",
     "dev": "pnpm -r --parallel --filter './packages/*' dev",
     "dev:backend": "pnpm --filter backend dev",
-    "dev:frontend": "pnpm --dir templates/frontend dev",
+    "dev:frontend": "pnpm --filter frontend dev",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
