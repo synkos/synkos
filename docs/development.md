@@ -30,6 +30,10 @@ La clave del monorepo es que `apps/backend` usa `@synkos/server: workspace:*` �
 
 ```bash
 pnpm install
+
+# El frontend no está en el workspace — instalar sus deps por separado
+cd templates/frontend && pnpm install --ignore-workspace && cd ../..
+
 pnpm build        # compilar todos los paquetes una vez antes de empezar
 ```
 
