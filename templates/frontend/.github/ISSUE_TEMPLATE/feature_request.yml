@@ -1,0 +1,62 @@
+name: Feature Request
+description: Propose a new feature or improvement for the app
+labels: [enhancement, needs-triage]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have an idea to improve the app? Describe it below.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / Motivation
+      description: What problem does this feature solve? What use case does it address?
+      placeholder: 'As a user, I want to... so that...'
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the feature or improvement you'd like to see.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Target Platform
+      multiple: true
+      options:
+        - Web
+        - iOS
+        - Android
+        - All platforms
+    validations:
+      required: false
+
+  - type: textarea
+    id: mockup
+    attributes:
+      label: Mockup / Design Notes (optional)
+      description: Any sketches, wireframes, or design references that help illustrate the idea.
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Any alternative approaches you've considered?
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+    validations:
+      required: false

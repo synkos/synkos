@@ -1,0 +1,104 @@
+// ─── 1. Foundation ────────────────────────────────────────────────────────────
+// position: fixed on html/body prevents WKWebView (Capacitor iOS) from doing
+// rubber-band scroll on the window, which would visually shift the fixed header
+// and footer. overscroll-behavior: none is ignored by WKWebView's Safari engine,
+// so this is the correct cross-platform approach.
+
+html,
+body {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  // Smooth font rendering on macOS/iOS WebKit
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  // Match the nav/tab bar glass background so any WKWebView render gap
+  // at position:fixed boundaries is invisible against the chrome.
+  background: rgb(28, 28, 30);
+}
+
+// The Vue root element must fill the fixed body
+#q-app {
+  height: 100%;
+}
+
+// ─── 2. Page Container ────────────────────────────────────────────────────────
+// q-page-container sits between header and footer. We make it fill the
+// available height and hide overflow so that the inner .slide-wrapper can use
+// position:absolute transitions without creating scroll runoff.
+
+.q-page-container {
+  height: 100vh;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+// ─── 3. Global Page Defaults ──────────────────────────────────────────────────
+// Every q-page gets the black iOS background and fills its container.
+// Pages that need a different background (e.g. ScanPage with transparent bg,
+// or pages using display:flex) still declare their own rule — it will override
+// the color while inheriting or ignoring min-height as needed.
+
+.q-page {
+  background: #000000;
+  min-height: 100%;
+}
+
+// ─── 4. Quasar Overrides ──────────────────────────────────────────────────────
+// Global Quasar component overrides that cannot live inside a scoped block.
+
+// AppMenuDrawer: The right-side dialog must fill the full screen height on iOS
+// devices with a home indicator / notch. Quasar adds body.q-ios-padding which
+// insets the inner dialog panel — we remove that inset so the drawer can apply
+// its own safe-area padding independently.
+body.q-ios-padding .q-dialog__inner--right {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+
+  > div {
+    max-height: 100dvh !important;
+    height: 100dvh !important;
+  }
+}
+
+// ─── 5. Shared Animations ─────────────────────────────────────────────────────
+// Defined globally so that multiple scoped components can reference the same
+// keyframe by name without duplicating the declaration.
+
+// Skeleton shimmer — used by CollectionPage, CatalogPage, CardsPage
+@keyframes shimmer {
+  0% {
+    background-position: -300px 0;
+  }
+  100% {
+    background-position: 300px 0;
+  }
+}
+
+// Pull-to-refresh spinner — used by CollectionPage, CatalogPage
+@keyframes ptr-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ─── 6. Shared Vue Transition Utilities ───────────────────────────────────────
+// Generic opacity fade used by multiple pages and dialogs.
+// Applied as a non-scoped class so any component can reference it with
+// <Transition name="fade"> without needing its own keyframe.
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}

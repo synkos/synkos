@@ -1,0 +1,130 @@
+// ─── Quasar Semantic Colors ───────────────────────────────────────────────────
+// Required by Quasar — drives component palette (buttons, icons, badges…)
+// Values follow the iOS Human Interface Guidelines color system.
+
+$primary: #0a84ff; // iOS blue
+$secondary: #30d158; // iOS green
+$accent: #ff9f0a; // iOS orange
+
+$dark: #1c1c1e; // iOS dark surface
+$dark-page: #000000; // iOS pure-black page background
+
+$positive: #30d158; // success / positive feedback
+$negative: #ff453a; // error / destructive
+$info: #64d2ff; // informational
+$warning: #ffd60a; // caution
+
+// ─── Surface System ───────────────────────────────────────────────────────────
+// Layered surface tokens for cards, list groups, and interactive containers.
+// Built on rgba(white, x) so they work on any dark background.
+
+$surface-bg: #000000; // Page / root background
+$surface-1: rgba(255, 255, 255, 0.05); // Subtle cards, stat rows
+$surface-1-border: rgba(255, 255, 255, 0.08); // Border for surface-1
+$surface-2: rgba(255, 255, 255, 0.06); // List groups, elevated cards
+$surface-2-border: rgba(255, 255, 255, 0.08); // Border for surface-2
+$surface-press: rgba(255, 255, 255, 0.04); // Tap / active state overlay
+$surface-search: rgba(118, 118, 128, 0.24); // iOS search field background
+
+// ─── Glass Morphism ───────────────────────────────────────────────────────────
+// Frosted-glass layer used by the navigation bar, tab bar, and bottom sheets.
+
+$glass-bg: rgba(28, 28, 30, 0.82);
+$glass-blur: saturate(180%) blur(20px); // Use with backdrop-filter
+$glass-blur-heavy: saturate(180%) blur(40px); // Bottom sheets (more blur)
+$glass-border: rgba(255, 255, 255, 0.12);
+
+// ─── Text Hierarchy ───────────────────────────────────────────────────────────
+// Seven levels from primary to hint — matches iOS label/secondary/tertiary/…
+
+$text-primary: rgba(255, 255, 255, 0.95); // Headings, main labels
+$text-secondary: rgba(255, 255, 255, 0.9); // Body, row labels
+$text-muted: rgba(255, 255, 255, 0.75); // Nav icons, secondary actions
+$text-disabled: rgba(255, 255, 255, 0.55); // Disabled / read-only
+$text-label: rgba(235, 235, 245, 0.45); // Section headers (ALL CAPS)
+$text-secondary-ios: rgba(235, 235, 245, 0.55); // iOS secondary label
+$text-tertiary: rgba(235, 235, 245, 0.38); // Hints, placeholders
+$text-quaternary: rgba(235, 235, 245, 0.28); // Legal / version text
+
+// ─── Separators & Borders ─────────────────────────────────────────────────────
+
+$separator: rgba(255, 255, 255, 0.07); // Inset row dividers
+$separator-strong: rgba(255, 255, 255, 0.12); // Header/footer borders
+$border-subtle: rgba(255, 255, 255, 0.08); // Card / list-group borders
+$border-medium: rgba(255, 255, 255, 0.1); // Modal / sheet borders
+$border-strong: rgba(255, 255, 255, 0.15); // Focused / highlighted borders
+
+// ─── Typography Scale ─────────────────────────────────────────────────────────
+// Mirrors the iOS Dynamic Type stops used throughout the app.
+
+$font-xs: 10px; // Badge labels, "coming soon"
+$font-sm: 11px; // Tab labels, stat labels
+$font-caption: 12px; // Section headers, copyright, hints
+$font-body-sm: 13px; // Secondary text, hints, legal body
+$font-body: 15px; // Primary body, list rows, buttons
+$font-body-lg: 17px; // Nav title, inputs, search field
+$font-title-sm: 20px; // Sheet titles, dialog headers
+$font-title: 22px; // Page titles (profile, stats)
+$font-display: 34px; // Large display titles (home, grade center)
+
+// ─── Letter Spacing ───────────────────────────────────────────────────────────
+
+$ls-tighter: -0.5px; // Display titles
+$ls-tight: -0.3px; // Card names, section titles
+$ls-base: -0.2px; // Nav title, back label
+$ls-normal: -0.1px; // Body text, hints
+$ls-label: 0.6px; // Section headers (ALL CAPS)
+$ls-caps: 0.2px; // Badge labels, "coming soon"
+
+// ─── Line Heights ─────────────────────────────────────────────────────────────
+
+$lh-tight: 1.1;
+$lh-base: 1.4;
+$lh-relaxed: 1.5;
+$lh-loose: 1.65;
+
+// ─── Spacing Scale ────────────────────────────────────────────────────────────
+// 4-based scale aligned with the iOS 8pt grid.
+
+$space-1: 2px;
+$space-2: 4px;
+$space-3: 6px;
+$space-4: 8px;
+$space-5: 10px;
+$space-6: 12px;
+$space-7: 14px;
+$space-8: 16px;
+$space-10: 20px;
+$space-12: 24px;
+$space-16: 32px;
+$space-20: 40px;
+$space-24: 48px;
+
+// ─── Border Radius ────────────────────────────────────────────────────────────
+
+$radius-xs: 6px; // Small badges, chips
+$radius-sm: 8px; // Icon wrappers, small cards
+$radius-md: 10px; // Search bar
+$radius-lg: 12px; // Input fields, retention box
+$radius-xl: 14px; // List groups, buttons
+$radius-2xl: 16px; // Stats row, card items
+$radius-3xl: 18px; // Collection cards
+$radius-4xl: 20px; // Bottom sheets, segment control parent
+$radius-full: 9999px; // Pills, badges, rounded chips
+
+// ─── Transitions ──────────────────────────────────────────────────────────────
+
+$transition-quick: 0.15s ease;
+$transition-base: 0.2s ease;
+$transition-spring: 0.32s cubic-bezier(0.36, 0.66, 0.04, 1);
+$transition-ios: 0.28s cubic-bezier(0.36, 0.66, 0.04, 1); // iOS push
+$transition-bounce: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); // Bounce-in
+
+// ─── Z-Index Scale ────────────────────────────────────────────────────────────
+
+$z-below: -1;
+$z-base: 0;
+$z-raised: 10;
+$z-overlay: 100;
+$z-modal: 1000;
+$z-splash: 9999;
