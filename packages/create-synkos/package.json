@@ -1,6 +1,6 @@
 {
   "name": "create-synkos",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "CLI scaffolding tool for the Synkos framework",
   "type": "module",
   "bin": {
@@ -9,15 +9,31 @@
   "exports": {
     ".": "./dist/index.js"
   },
-  "files": ["dist/"],
+  "files": [
+    "dist/",
+    "templates/"
+  ],
   "scripts": {
+    "prebuild": "node scripts/copy-templates.mjs",
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist templates"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.9.1",
+    "picocolors": "^1.1.1"
   },
   "publishConfig": {
     "access": "public"
   },
-  "keywords": ["synkos", "cli", "scaffolding", "create"]
+  "keywords": [
+    "synkos",
+    "cli",
+    "scaffolding",
+    "create"
+  ],
+  "devDependencies": {
+    "@types/node": "^25.6.0"
+  }
 }

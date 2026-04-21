@@ -1,13 +1,14 @@
 {
   "name": "@synkos/runtime",
-  "version": "0.0.1",
-  "description": "Synkos shared runtime: plugin system, lifecycle hooks, config loader",
+  "version": "0.1.0",
+  "description": "Synkos shared runtime: plugin system, lifecycle hooks, config helpers",
+  "license": "MIT",
   "type": "module",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     }
   },
   "main": "./dist/index.cjs",
@@ -20,8 +21,16 @@
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
+  "devDependencies": {
+    "@types/node": "^25.3.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "publishConfig": {
     "access": "public"
   },
-  "keywords": ["synkos", "runtime", "plugins", "hooks"]
+  "keywords": ["synkos", "runtime", "plugins", "hooks", "lifecycle"]
 }

@@ -1,8 +1,84 @@
-# SYNKOS — Framework Specification (v1)
+# Synkos
 
-Framework fullstack moderno (frontend + backend + CLI) diseñado con foco en:
-- Escalabilidad
-- Rendimiento
+A fullstack framework ecosystem for building mobile apps with **Quasar + Vue 3 + Capacitor** on the frontend and **Express + Mongoose** on the backend.
+
+```bash
+pnpm create synkos
+```
+
+---
+
+## What you get
+
+When you scaffold a project, Synkos gives you a production-ready codebase with:
+
+- **Frontend** — Quasar 2 + Vue 3 + Pinia + Capacitor 8. JWT auth, push notifications, biometrics, i18n (en/es), iOS-styled dark UI.
+- **Backend** — Express 5 + Mongoose 9 + Zod 4. Auth (JWT + refresh), user/account/notifications modules, adapters for email, storage, cache, queue, APNs, metrics.
+- **Fullstack** — both, wired together with matching env vars.
+
+## Templates
+
+| Template | Description |
+|---|---|
+| `fullstack` | frontend + backend |
+| `frontend` | Quasar + Vue 3 + Capacitor only |
+| `backend` | Express + Mongoose + @synkos/server only |
+
+## Packages
+
+| Package | Description |
+|---|---|
+| [`create-synkos`](./packages/create-synkos/) | CLI scaffolder (`pnpm create synkos`) |
+| [`synkos`](./packages/synkos/) | Frontend core — `defineAppConfig`, `createSynkosPlugin`, `createAuthGuard` |
+| [`@synkos/ui`](./packages/synkos-ui/) | Component library — iOS-styled Vue 3 + Quasar components |
+| [`@synkos/server`](./packages/synkos-server/) | Backend framework — Express + Mongoose + adapters |
+| [`@synkos/runtime`](./packages/synkos-runtime/) | Shared plugin/lifecycle system (isomorphic) |
+| [`@synkos/utils`](./packages/synkos-utils/) | Zero-dep utilities — types, string, object, error, env |
+| [`@synkos/config`](./packages/synkos-config/) | Shared ESLint, Prettier, TypeScript configs |
+
+## Monorepo structure
+
+```
+synkos/
+├── packages/
+│   ├── create-synkos/       # CLI
+│   ├── synkos/              # frontend core
+│   ├── synkos-ui/           # @synkos/ui component library
+│   ├── synkos-server/       # @synkos/server backend framework
+│   ├── synkos-runtime/      # @synkos/runtime
+│   ├── synkos-utils/        # @synkos/utils
+│   └── synkos-config/       # @synkos/config
+├── templates/
+│   ├── frontend/
+│   └── backend/
+└── apps/
+    └── playground/          # development sandbox
+```
+
+## Development
+
+```bash
+pnpm install
+pnpm build       # build all packages
+pnpm dev         # watch mode
+pnpm typecheck   # type-check all
+```
+
+## Contributing
+
+1. Fork and create a branch.
+2. Make changes and add a changeset: `pnpm changeset`
+3. Open a PR — CI runs lint, typecheck, build.
+
+Versioning is managed by [Changesets](https://github.com/changesets/changesets). Each package is versioned independently.
+
+## License
+
+MIT
+
+---
+
+<!-- Original spec below — kept for reference during active development -->
 - Developer Experience (DX)
 - Modularidad y mantenibilidad
 

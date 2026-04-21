@@ -1,0 +1,108 @@
+// ─── Quasar Semantic Colors ───────────────────────────────────────────────────
+$primary   : #0A84FF;
+$secondary : #30D158;
+$accent    : #FF9F0A;
+$dark      : #1C1C1E;
+$dark-page : #000000;
+$positive  : #30D158;
+$negative  : #FF453A;
+$info      : #64D2FF;
+$warning   : #FFD60A;
+
+// ─── Surface System ───────────────────────────────────────────────────────────
+$surface-bg         : #000000;
+$surface-1          : rgba(255, 255, 255, 0.05);
+$surface-1-border   : rgba(255, 255, 255, 0.08);
+$surface-2          : rgba(255, 255, 255, 0.06);
+$surface-2-border   : rgba(255, 255, 255, 0.08);
+$surface-press      : rgba(255, 255, 255, 0.04);
+$surface-search     : rgba(118, 118, 128, 0.24);
+
+// ─── Glass Morphism ───────────────────────────────────────────────────────────
+$glass-bg           : rgba(28, 28, 30, 0.82);
+$glass-blur         : saturate(180%) blur(20px);
+$glass-blur-heavy   : saturate(180%) blur(40px);
+$glass-border       : rgba(255, 255, 255, 0.12);
+
+// ─── Text Hierarchy ───────────────────────────────────────────────────────────
+$text-primary       : rgba(255, 255, 255, 0.95);
+$text-secondary     : rgba(255, 255, 255, 0.90);
+$text-muted         : rgba(255, 255, 255, 0.75);
+$text-disabled      : rgba(255, 255, 255, 0.55);
+$text-label         : rgba(235, 235, 245, 0.45);
+$text-secondary-ios : rgba(235, 235, 245, 0.55);
+$text-tertiary      : rgba(235, 235, 245, 0.38);
+$text-quaternary    : rgba(235, 235, 245, 0.28);
+
+// ─── Separators & Borders ─────────────────────────────────────────────────────
+$separator          : rgba(255, 255, 255, 0.07);
+$separator-strong   : rgba(255, 255, 255, 0.12);
+$border-subtle      : rgba(255, 255, 255, 0.08);
+$border-medium      : rgba(255, 255, 255, 0.10);
+$border-strong      : rgba(255, 255, 255, 0.15);
+
+// ─── Typography Scale ─────────────────────────────────────────────────────────
+$font-xs            : 10px;
+$font-sm            : 11px;
+$font-caption       : 12px;
+$font-body-sm       : 13px;
+$font-body          : 15px;
+$font-body-lg       : 17px;
+$font-title-sm      : 20px;
+$font-title         : 22px;
+$font-display       : 34px;
+
+// ─── Letter Spacing ───────────────────────────────────────────────────────────
+$ls-tighter         : -0.5px;
+$ls-tight           : -0.3px;
+$ls-base            : -0.2px;
+$ls-normal          : -0.1px;
+$ls-label           :  0.6px;
+$ls-caps            :  0.2px;
+
+// ─── Line Heights ─────────────────────────────────────────────────────────────
+$lh-tight           : 1.1;
+$lh-base            : 1.4;
+$lh-relaxed         : 1.5;
+$lh-loose           : 1.65;
+
+// ─── Spacing Scale ────────────────────────────────────────────────────────────
+$space-1            : 2px;
+$space-2            : 4px;
+$space-3            : 6px;
+$space-4            : 8px;
+$space-5            : 10px;
+$space-6            : 12px;
+$space-7            : 14px;
+$space-8            : 16px;
+$space-10           : 20px;
+$space-12           : 24px;
+$space-16           : 32px;
+$space-20           : 40px;
+$space-24           : 48px;
+
+// ─── Border Radius ────────────────────────────────────────────────────────────
+$radius-xs          : 6px;
+$radius-sm          : 8px;
+$radius-md          : 10px;
+$radius-lg          : 12px;
+$radius-xl          : 14px;
+$radius-2xl         : 16px;
+$radius-3xl         : 18px;
+$radius-4xl         : 20px;
+$radius-full        : 9999px;
+
+// ─── Transitions ──────────────────────────────────────────────────────────────
+$transition-quick   : 0.15s ease;
+$transition-base    : 0.2s ease;
+$transition-spring  : 0.32s cubic-bezier(0.36, 0.66, 0.04, 1);
+$transition-ios     : 0.28s cubic-bezier(0.36, 0.66, 0.04, 1);
+$transition-bounce  : 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+// ─── Z-Index Scale ────────────────────────────────────────────────────────────
+$z-below            : -1;
+$z-base             : 0;
+$z-raised           : 10;
+$z-overlay          : 100;
+$z-modal            : 1000;
+$z-splash           : 9999;

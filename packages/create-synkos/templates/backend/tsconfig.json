@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+
+    "strict": true,
+    "noImplicitAny": true,
+
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+
+    "resolveJsonModule": true,
+
+    "types": ["node"],
+
+    "sourceMap": true,
+
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
+    // IDE and tsc --noEmit only — actual build uses tsconfig.build.json
+    "noEmit": true
+  },
+  "include": ["src", "tests"],
+  "exclude": ["node_modules", "dist"]
+}

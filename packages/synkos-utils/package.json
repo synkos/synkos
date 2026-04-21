@@ -1,13 +1,19 @@
 {
   "name": "@synkos/utils",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Shared utilities for the Synkos ecosystem",
+  "license": "MIT",
   "type": "module",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
+    },
+    "./env": {
+      "types": "./dist/env/index.d.ts",
+      "import": "./dist/env/index.js",
+      "require": "./dist/env/index.cjs"
     }
   },
   "main": "./dist/index.cjs",
@@ -20,8 +26,19 @@
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
+  "dependencies": {
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "publishConfig": {
     "access": "public"
   },
-  "keywords": ["synkos", "utils", "shared", "utilities"]
+  "keywords": ["synkos", "utils", "shared", "utilities", "typescript"]
 }
