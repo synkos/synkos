@@ -1,0 +1,17 @@
+# Build artifacts
+**/dist/**
+**/coverage/**
+
+# Capacitor generated output (minified HTML, not source)
+**/src-capacitor/www/**
+**/src-capacitor/ios/**
+**/src-capacitor/android/**
+
+# CLI bundled templates (checked separately)
+packages/create-synkos/templates/**
+
+# Quasar generated files
+**/.quasar/**
+
+# pnpm
+pnpm-lock.yaml
