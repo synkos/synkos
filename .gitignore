@@ -33,9 +33,10 @@ coverage/
 .tmp/
 temp/
 
-# Changesets
-.changeset/*.md
-!.changeset/config.json
+# Turbo (if added later)
+
+# Changesets — track .md files so CI can detect pending releases
+# (config.json is always tracked)
 
 # Turbo (if added later)
 .turbo/
