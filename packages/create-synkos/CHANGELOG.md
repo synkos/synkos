@@ -1,5 +1,11 @@
 # create-synkos
 
+## 0.2.2
+
+### Patch Changes
+
+- dfd4636: fix: strip .git dirs and un-dot dotfiles when bundling templates so npm pack includes all template files
+
 ## 0.2.1
 
 ### Patch Changes
