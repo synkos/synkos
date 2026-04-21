@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import type { Request, Response, NextFunction } from "express";
 import { runWithRequestContext } from "@/context/request-context";
 import { getMetricsAdapter } from "@/adapters/metrics/metrics.registry";
 

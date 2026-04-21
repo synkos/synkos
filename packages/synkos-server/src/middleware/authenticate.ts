@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import type { Request, Response, NextFunction } from "express";
 import { User } from "@/modules/auth/user.model";
 import { AuthService } from "@/modules/auth/auth.service";
 import { getCache, CacheKeys } from "@/adapters/cache/cache.registry";

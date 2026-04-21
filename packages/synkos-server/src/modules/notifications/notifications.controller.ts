@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { z } from "zod";
 import { User } from "@/modules/auth/user.model";
 import { getNotificationAdapter } from "@/adapters/notification/notification.registry";

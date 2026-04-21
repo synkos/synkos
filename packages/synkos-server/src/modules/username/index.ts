@@ -1,4 +1,4 @@
-import { ModuleDefinition } from "@/types/module.types";
+import type { ModuleDefinition } from "@/types/module.types";
 import router from "./username.routes";
 
 export const usernameModule: ModuleDefinition = {

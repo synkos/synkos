@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
-import express, { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
+import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
@@ -7,7 +8,7 @@ import pinoHttp from "pino-http";
 import mongoose from "mongoose";
 import { env } from "@/config/env";
 import { logger } from "@/utils/logger";
-import { ModuleDefinition } from "@/types/module.types";
+import type { ModuleDefinition } from "@/types/module.types";
 import { requestContextMiddleware } from "@/middleware/request-context.middleware";
 import { getMetricsAdapter } from "@/adapters/metrics/metrics.registry";
 import { connectDatabase } from "@/config/database";

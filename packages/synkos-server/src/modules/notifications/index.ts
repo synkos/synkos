@@ -1,4 +1,4 @@
-import { ModuleDefinition } from "@/types/module.types";
+import type { ModuleDefinition } from "@/types/module.types";
 import router from "./notifications.routes";
 
 export const notificationsModule: ModuleDefinition = {

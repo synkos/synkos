@@ -10,7 +10,7 @@ async function main(): Promise<void> {
   const args = process.argv.slice(2);
 
   if (args.includes('--version') || args.includes('-v')) {
-    console.log(VERSION);
+    process.stdout.write(VERSION + '\n');
     process.exit(0);
   }
 

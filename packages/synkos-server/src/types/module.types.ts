@@ -1,4 +1,4 @@
-import { Router } from "express";
+import type { Router } from "express";
 
 /**
  * Contract that every module (core or feature) must export.

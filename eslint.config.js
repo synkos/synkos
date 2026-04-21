@@ -9,6 +9,9 @@ export default [
       '**/coverage/**',
       'templates/**',
       'apps/**',
+      'packages/create-synkos/templates/**',
+      'packages/create-synkos/scripts/**',
+      '**/.quasar/**',
     ],
   },
 ];
