@@ -1,5 +1,11 @@
 # create-synkos
 
+## 0.2.3
+
+### Patch Changes
+
+- 41daa54: fix: update @synkos/server dependency in backend template to ^0.2.0
+
 ## 0.2.2
 
 ### Patch Changes
