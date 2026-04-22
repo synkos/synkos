@@ -1,0 +1,72 @@
+name: push-git
+description: Stage, commit, and push changes following Synkos monorepo conventions
+
+rules:
+
+  commit-message:
+    format: "<type>(<scope>): <description>"
+    types: [feat, fix, chore, docs, style, refactor, test, ci]
+    scope: affected package or area — e.g. create-synkos, synkos-server, apps/backend, ci, docs
+    description: lowercase, imperative, no period
+    body: only if WHY is non-obvious — never describe WHAT
+    co-author: always append "Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
+    example: |
+      fix(create-synkos): skip .git dirs when bundling templates
+
+      Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+  staging:
+    - stage specific files, never `git add -A` blindly
+    - never stage: .env, *.local, pnpm-lock.yaml (unless lockfile changed intentionally)
+    - always check `git status` before staging
+
+  changeset:
+    when: any change in packages/ that users will notice (fix, feat, breaking)
+    when-not: apps/, docs/, .github/, templates/ structure changes, style/format fixes
+    file: .changeset/<descriptive-slug>.md
+    bump-rules:
+      patch: bug fix, internal refactor, dep update
+      minor: new feature, new export, new component
+      major: breaking change in public API
+    format: |
+      ---
+      'package-name': patch|minor|major
+      ---
+      <one-line description for CHANGELOG>
+    multi-package: one changeset can cover multiple packages
+    commit: include changeset file in the same commit as the code change
+
+  push:
+    - always pull --rebase before push if rejected
+    - if unstaged changes block rebase: git stash → rebase → stash pop → push
+    - never force push to main
+    - after push: CI runs lint + format:check + typecheck + build + test
+    - after push with changeset: CI creates "chore: version packages" PR → user merges → npm publishes
+
+  phases:
+
+    - phase: pre-commit
+      steps:
+        - run: git status
+        - identify: which packages changed → need changeset?
+        - stage: specific files
+        - create changeset if needed (in same commit)
+
+    - phase: commit
+      steps:
+        - write message following format above
+        - use heredoc: git commit -m "$(cat <<'EOF' ... EOF)"
+
+    - phase: push
+      steps:
+        - git push origin main
+        - if rejected: git stash && git pull --rebase origin main && git stash pop && git push
+        - confirm push succeeded
+
+  decision-tree:
+    changed-only-apps-or-docs: "commit only, no changeset"
+    changed-packages-fix: "commit + changeset patch"
+    changed-packages-feature: "commit + changeset minor"
+    changed-packages-breaking: "commit + changeset major + warn user"
+    format-only: "commit style: no changeset"
+    multiple-packages: "one changeset listing all affected packages"
