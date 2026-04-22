@@ -9,11 +9,8 @@ rules:
     scope: affected package or area — e.g. create-synkos, synkos-server, apps/backend, ci, docs
     description: lowercase, imperative, no period
     body: only if WHY is non-obvious — never describe WHAT
-    co-author: always append "Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
     example: |
       fix(create-synkos): skip .git dirs when bundling templates
-
-      Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
 
   staging:
     - stage specific files, never `git add -A` blindly
