@@ -20,6 +20,7 @@
     "typecheck": "pnpm -r --filter './packages/*' typecheck",
     "test": "pnpm -r --filter './packages/*' test",
     "clean": "pnpm -r --filter './packages/*' clean",
+    "sync:templates": "node scripts/sync-templates.mjs",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "pnpm build && changeset publish"
