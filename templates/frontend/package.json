@@ -17,7 +17,7 @@
     "sync:ios": "quasar build -m capacitor -T ios --skip-pkg",
     "build:ios": "quasar build -m capacitor -T ios",
     "build:android": "quasar build -m capacitor -T android",
-    "postinstall": "quasar prepare"
+    "postinstall": "npm install --prefix src-capacitor && quasar prepare"
   },
   "dependencies": {
     "@capacitor/app": "^8.1.0",

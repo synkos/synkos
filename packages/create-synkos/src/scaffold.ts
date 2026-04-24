@@ -125,9 +125,20 @@ export function scaffold(opts: ProjectOptions): void {
     const cmd = getInstallCmd(packageManager);
     if (template === 'fullstack') {
       execSync(cmd, { cwd: path.join(outDir, 'frontend'), stdio: 'inherit' });
+      installCapacitorDeps(path.join(outDir, 'frontend'));
       execSync(cmd, { cwd: path.join(outDir, 'backend'), stdio: 'inherit' });
     } else {
       execSync(cmd, { cwd: outDir, stdio: 'inherit' });
+      if (template === 'frontend') {
+        installCapacitorDeps(outDir);
+      }
     }
+  }
+}
+
+function installCapacitorDeps(frontendDir: string): void {
+  const srcCapacitor = path.join(frontendDir, 'src-capacitor');
+  if (fs.existsSync(srcCapacitor)) {
+    execSync('npm install', { cwd: srcCapacitor, stdio: 'inherit' });
   }
 }

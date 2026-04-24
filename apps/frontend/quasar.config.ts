@@ -62,6 +62,16 @@ export default defineConfig((ctx) => {
       extendViteConf(viteConf) {
         if (!viteConf.resolve) viteConf.resolve = {};
         viteConf.resolve.preserveSymlinks = true;
+
+        // pnpm strict hoisting doesn't symlink transitive deps — force Vite
+        // to bundle them inline so they don't need to be resolved at runtime.
+        if (!viteConf.optimizeDeps) viteConf.optimizeDeps = {};
+        viteConf.optimizeDeps.include = [
+          ...(viteConf.optimizeDeps.include ?? []),
+          '@intlify/core-base',
+          '@intlify/shared',
+          '@intlify/message-compiler',
+        ];
       },
       // viteVuePluginOptions: {},
       vitePlugins: [

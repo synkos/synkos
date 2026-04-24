@@ -83,7 +83,7 @@ export function usePullToRefresh(onRefresh: () => Promise<void>) {
   }
 
   onMounted(() => {
-    scrollEl = document.querySelector('.slide-wrapper') as HTMLElement;
+    scrollEl = document.querySelector<HTMLElement>('.slide-wrapper');
   });
 
   return {
