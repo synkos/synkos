@@ -1,5 +1,11 @@
 # create-synkos
 
+## 0.2.6
+
+### Patch Changes
+
+- 981c9a2: fix dev:ios opening App.xcodeproj instead of App.xcworkspace in Xcode
+
 ## 0.2.5
 
 ### Patch Changes
