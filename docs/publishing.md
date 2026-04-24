@@ -77,6 +77,7 @@ pnpm build && changeset publish
 ```
 
 Esto:
+
 1. Compila todos los paquetes (`pnpm build`)
 2. Publica en npm los paquetes cuya versión en `package.json` sea mayor que la que hay en el registry
 
@@ -160,19 +161,19 @@ Lista todos los archivos que se incluirán en el tarball de npm.
 
 ## Paquetes del monorepo
 
-| Paquete | Descripción |
-|---|---|
-| `create-synkos` | CLI scaffolding (`pnpm create synkos`) |
-| `synkos` | Frontend core — config, plugin Vue, auth guard |
-| `@synkos/ui` | Librería de componentes iOS-styled |
-| `@synkos/server` | Framework backend Express + Mongoose |
-| `@synkos/runtime` | Sistema de plugins isomórfico |
-| `@synkos/utils` | Utilidades zero-dep |
-| `@synkos/config` | Configuraciones compartidas ESLint/TS |
+| Paquete           | Descripción                                    |
+| ----------------- | ---------------------------------------------- |
+| `create-synkos`   | CLI scaffolding (`pnpm create synkos`)         |
+| `synkos`          | Frontend core — config, plugin Vue, auth guard |
+| `@synkos/ui`      | Librería de componentes iOS-styled             |
+| `@synkos/server`  | Framework backend Express + Mongoose           |
+| `@synkos/runtime` | Sistema de plugins isomórfico                  |
+| `@synkos/utils`   | Utilidades zero-dep                            |
+| `@synkos/config`  | Configuraciones compartidas ESLint/TS          |
 
 ---
 
 ## Requisitos
 
-- **`NPM_TOKEN`** en GitHub Secrets — token de tipo *Classic Automation* en npmjs.com. Los tokens Granular no funcionan para publicar paquetes fuera del scope `@synkos`.
+- **`NPM_TOKEN`** en GitHub Secrets — token de tipo _Classic Automation_ en npmjs.com. Los tokens Granular no funcionan para publicar paquetes fuera del scope `@synkos`.
 - **GitHub Actions permissions** — en Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests" debe estar activado.

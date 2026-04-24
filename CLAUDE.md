@@ -46,11 +46,11 @@ apps/frontend  ──(pnpm sync:templates)──▶  templates/frontend  ──(
 
 ### Template variables
 
-| Variable | Real value (apps/) |
-|---|---|
+| Variable           | Real value (apps/)     |
+| ------------------ | ---------------------- |
 | `{{PROJECT_NAME}}` | `frontend` / `backend` |
-| `{{APP_NAME}}` | `Synkos Dev` |
-| `{{BUNDLE_ID}}` | `com.synkos.dev` |
+| `{{APP_NAME}}`     | `Synkos Dev`           |
+| `{{BUNDLE_ID}}`    | `com.synkos.dev`       |
 
 ---
 
@@ -82,14 +82,14 @@ pnpm release               # build + publish packages with changesets
 
 Only for changes in `packages/` that users will notice:
 
-| Situation | Changeset? | Bump |
-|---|---|---|
-| Fix bug in a package | Yes | patch |
-| New feature / export in a package | Yes | minor |
-| Breaking API change | Yes | major |
-| Change only in `apps/` | No | — |
-| Change only in `templates/` | No | — |
-| Docs / style / format | No | — |
+| Situation                         | Changeset? | Bump  |
+| --------------------------------- | ---------- | ----- |
+| Fix bug in a package              | Yes        | patch |
+| New feature / export in a package | Yes        | minor |
+| Breaking API change               | Yes        | major |
+| Change only in `apps/`            | No         | —     |
+| Change only in `templates/`       | No         | —     |
+| Docs / style / format             | No         | —     |
 
 Use `.claude/workflows/push-git.yaml` for the full git flow.
 
@@ -97,8 +97,8 @@ Use `.claude/workflows/push-git.yaml` for the full git flow.
 
 ## Workflows available
 
-| Workflow | When to use |
-|---|---|
-| `.claude/workflows/push-git.yaml` | Stage, commit, and push following monorepo conventions |
-| `.claude/workflows/sync-templates.yaml` | Sync apps/ → templates/ and push the update |
-| `.claude/workflows/plan-task.yaml` | Analyze a request and decide execution strategy |
+| Workflow                                | When to use                                            |
+| --------------------------------------- | ------------------------------------------------------ |
+| `.claude/workflows/push-git.yaml`       | Stage, commit, and push following monorepo conventions |
+| `.claude/workflows/sync-templates.yaml` | Sync apps/ → templates/ and push the update            |
+| `.claude/workflows/plan-task.yaml`      | Analyze a request and decide execution strategy        |

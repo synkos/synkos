@@ -30,14 +30,7 @@ const TEMPLATE_SUBSTITUTIONS = {
   'Synkos Dev': '{{APP_NAME}}',
 };
 
-const EXCLUDED_DIR_NAMES = new Set([
-  'node_modules',
-  '.quasar',
-  'dist',
-  'ios',
-  'android',
-  'www',
-]);
+const EXCLUDED_DIR_NAMES = new Set(['node_modules', '.quasar', 'dist', 'ios', 'android', 'www']);
 
 let synced = 0;
 let skipped = 0;
@@ -60,10 +53,7 @@ function syncDir(src, dest) {
 }
 
 console.log('Syncing src/...');
-syncDir(
-  path.join(APPS_FRONTEND, 'src'),
-  path.join(TPL_FRONTEND, 'src'),
-);
+syncDir(path.join(APPS_FRONTEND, 'src'), path.join(TPL_FRONTEND, 'src'));
 
 // ─── Sync capacitor.config.json ──────────────────────────────────────────────
 
@@ -86,17 +76,14 @@ const tplPkg = JSON.parse(fs.readFileSync(path.join(TPL_FRONTEND, 'package.json'
 
 function excludeWorkspace(deps = {}) {
   return Object.fromEntries(
-    Object.entries(deps).filter(([, v]) => !String(v).startsWith('workspace:')),
+    Object.entries(deps).filter(([, v]) => !String(v).startsWith('workspace:'))
   );
 }
 
 tplPkg.dependencies = excludeWorkspace(appsPkg.dependencies);
 tplPkg.devDependencies = excludeWorkspace(appsPkg.devDependencies);
 
-fs.writeFileSync(
-  path.join(TPL_FRONTEND, 'package.json'),
-  JSON.stringify(tplPkg, null, 2) + '\n',
-);
+fs.writeFileSync(path.join(TPL_FRONTEND, 'package.json'), JSON.stringify(tplPkg, null, 2) + '\n');
 synced++;
 
 // ─── Done ─────────────────────────────────────────────────────────────────────

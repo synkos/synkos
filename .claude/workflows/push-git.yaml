@@ -38,7 +38,7 @@ rules:
     - if unstaged changes block rebase: git stash → rebase → stash pop → push
     - never force push to main
     - after push: CI runs lint + format:check + typecheck + build + test
-    - after push with changeset: CI creates "chore: version packages" PR → user merges → npm publishes
+    - 'after push with changeset: CI creates "chore: version packages" PR → user merges → npm publishes'
 
   phases:
 

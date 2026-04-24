@@ -15,3 +15,9 @@ packages/create-synkos/templates/**
 
 # pnpm
 pnpm-lock.yaml
+
+# Claude Code internal files
+.claude/**
+
+# Quasar temp files
+**/*.temporary.compiled*.mjs
