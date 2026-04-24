@@ -9,6 +9,7 @@
  *       .gitignore    → gitignore
  *       .dockerignore → dockerignore
  *       .env.example  → env.example
+ *       .npmrc        → npmrc
  *     scaffold.ts renames them back when copying to the user's project.
  *
  * Exclusions applied to the frontend template:
@@ -35,6 +36,7 @@ const DOTFILE_RENAMES = {
   '.gitignore': 'gitignore',
   '.dockerignore': 'dockerignore',
   '.env.example': 'env.example',
+  '.npmrc': 'npmrc',
 };
 
 function shouldExclude(relativePath) {

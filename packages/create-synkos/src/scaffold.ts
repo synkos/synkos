@@ -12,6 +12,7 @@ const DOTFILE_RENAMES: Record<string, string> = {
   gitignore: '.gitignore',
   dockerignore: '.dockerignore',
   'env.example': '.env.example',
+  npmrc: '.npmrc',
 };
 
 const VARS_IN_CONTENT = new Set([
