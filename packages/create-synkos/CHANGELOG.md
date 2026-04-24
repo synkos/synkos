@@ -1,5 +1,12 @@
 # create-synkos
 
+## 0.2.4
+
+### Patch Changes
+
+- 46ca730: add missing @capacitor/core dependency to frontend template
+- 827371c: fix dev errors when running pnpm dev in a generated frontend project
+
 ## 0.2.3
 
 ### Patch Changes
