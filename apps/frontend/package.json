@@ -11,7 +11,7 @@
     "format": "prettier --write \"**/*.{js,ts,vue,css,scss,html,md,json}\" --ignore-path .gitignore",
     "test": "echo \"No test specified\" && exit 0",
     "dev": "quasar dev",
-    "dev:ios": "quasar dev -m capacitor -T ios",
+    "dev:ios": "node scripts/dev-ios.mjs",
     "dev:android": "quasar dev -m capacitor -T android",
     "build": "quasar build",
     "sync:ios": "quasar build -m capacitor -T ios --skip-pkg",

@@ -1,8 +1,8 @@
 {
-  "name": "my-app",
+  "name": "frontend",
   "version": "1.0.0",
-  "description": "A Quasar + Capacitor app template",
-  "author": "alexdeploy <applex0@icloud.com>",
+  "description": "Synkos frontend development app",
+  "author": "",
   "private": true,
   "dependencies": {
     "@capacitor/app": "^8.1.0",

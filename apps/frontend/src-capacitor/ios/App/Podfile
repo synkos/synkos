@@ -1,4 +1,4 @@
-require_relative '../../node_modules/.pnpm/@capacitor+ios@8.3.0_@capacitor+core@8.3.0/node_modules/@capacitor/ios/scripts/pods_helpers'
+require_relative '../../node_modules/@capacitor/ios/scripts/pods_helpers'
 
 platform :ios, '15.0'
 use_frameworks!
@@ -9,16 +9,16 @@ use_frameworks!
 install! 'cocoapods', :disable_input_output_paths => true
 
 def capacitor_pods
-  pod 'Capacitor', :path => '../../node_modules/.pnpm/@capacitor+ios@8.3.0_@capacitor+core@8.3.0/node_modules/@capacitor/ios'
-  pod 'CapacitorCordova', :path => '../../node_modules/.pnpm/@capacitor+ios@8.3.0_@capacitor+core@8.3.0/node_modules/@capacitor/ios'
-  pod 'CapacitorApp', :path => '../../node_modules/.pnpm/@capacitor+app@8.1.0_@capacitor+core@8.3.0/node_modules/@capacitor/app'
-  pod 'CapacitorHaptics', :path => '../../node_modules/.pnpm/@capacitor+haptics@8.0.2_@capacitor+core@8.3.0/node_modules/@capacitor/haptics'
-  pod 'CapacitorPreferences', :path => '../../node_modules/.pnpm/@capacitor+preferences@8.0.1_@capacitor+core@8.3.0/node_modules/@capacitor/preferences'
-  pod 'CapacitorPushNotifications', :path => '../../node_modules/.pnpm/@capacitor+push-notifications@8.0.3_@capacitor+core@8.3.0/node_modules/@capacitor/push-notifications'
-  pod 'CapacitorSplashScreen', :path => '../../node_modules/.pnpm/@capacitor+splash-screen@8.0.1_@capacitor+core@8.3.0/node_modules/@capacitor/splash-screen'
-  pod 'CapgoCameraPreview', :path => '../../node_modules/.pnpm/@capgo+camera-preview@8.3.1_@capacitor+core@8.3.0/node_modules/@capgo/camera-preview'
-  pod 'CapgoCapacitorNativeBiometric', :path => '../../node_modules/.pnpm/@capgo+capacitor-native-biometric@8.4.2_@capacitor+core@8.3.0/node_modules/@capgo/capacitor-native-biometric'
-  pod 'CapgoCapacitorSocialLogin', :path => '../../node_modules/.pnpm/@capgo+capacitor-social-login@8.3.11_@capacitor+core@8.3.0/node_modules/@capgo/capacitor-social-login'
+  pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'
+  pod 'CapacitorCordova', :path => '../../node_modules/@capacitor/ios'
+  pod 'CapacitorApp', :path => '../../node_modules/@capacitor/app'
+  pod 'CapacitorHaptics', :path => '../../node_modules/@capacitor/haptics'
+  pod 'CapacitorPreferences', :path => '../../node_modules/@capacitor/preferences'
+  pod 'CapacitorPushNotifications', :path => '../../node_modules/@capacitor/push-notifications'
+  pod 'CapacitorSplashScreen', :path => '../../node_modules/@capacitor/splash-screen'
+  pod 'CapgoCameraPreview', :path => '../../node_modules/@capgo/camera-preview'
+  pod 'CapgoCapacitorNativeBiometric', :path => '../../node_modules/@capgo/capacitor-native-biometric'
+  pod 'CapgoCapacitorSocialLogin', :path => '../../node_modules/@capgo/capacitor-social-login'
 end
 
 target 'App' do

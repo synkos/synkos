@@ -1,44 +1,52 @@
-/**
- * Wrapper for `quasar dev -m capacitor -T ios` that ensures Xcode opens
- * App.xcworkspace instead of App.xcodeproj.
- *
- * Quasar's findXcodeWorkspace iterates the ios/App directory and returns
- * the first file ending in .xcworkspace OR .xcodeproj. Since .xcodeproj
- * sorts before .xcworkspace alphabetically, Xcode always opens the project
- * file — which lacks CocoaPods and fails to build with "No such module Capacitor".
- *
- * This script detects when Quasar has opened the IDE and immediately opens
- * the correct workspace, which macOS switches to in the existing Xcode window.
- */
+import { spawn } from 'child_process';
+import { mkdirSync, writeFileSync, chmodSync, rmSync } from 'fs';
+import { join } from 'path';
+import { tmpdir } from 'os';
 
-import { spawn, execSync } from 'child_process';
-import { fileURLToPath } from 'url';
-import path from 'path';
+// Quasar's open-ide.js has a bug: it opens App.xcodeproj instead of
+// App.xcworkspace because readdirSync returns xcodeproj first alphabetically.
+// The `open` npm package resolves the `open` command via PATH, so we inject
+// a temporary wrapper that redirects any .xcodeproj → .xcworkspace call.
+const tmpDir = join(tmpdir(), `synkos-ios-${process.pid}`);
+mkdirSync(tmpDir, { recursive: true });
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const workspace = path.join(root, 'src-capacitor/ios/App/App.xcworkspace');
+writeFileSync(
+  join(tmpDir, 'open'),
+  `#!/bin/bash
+for arg in "$@"; do
+  if [[ "$arg" == *.xcodeproj ]]; then
+    workspace="\${arg%.xcodeproj}.xcworkspace"
+    exec /usr/bin/open "$workspace"
+  fi
+done
+exec /usr/bin/open "$@"
+`,
+);
+chmodSync(join(tmpDir, 'open'), 0o755);
 
-const dev = spawn('quasar', ['dev', '-m', 'capacitor', '-T', 'ios'], {
-  cwd: root,
-  stdio: ['inherit', 'pipe', 'inherit'],
+const child = spawn('quasar', ['dev', '-m', 'capacitor', '-T', 'ios'], {
+  env: { ...process.env, PATH: `${tmpDir}:${process.env.PATH}` },
+  stdio: 'inherit',
   shell: true,
 });
 
-let opened = false;
+const cleanup = () => {
+  try {
+    rmSync(tmpDir, { recursive: true, force: true });
+  } catch {}
+};
 
-dev.stdout.on('data', (data) => {
-  const text = data.toString();
-  process.stdout.write(text);
-
-  if (!opened && text.includes('Opening XCode')) {
-    opened = true;
-    setTimeout(() => execSync(`open "${workspace}"`), 1500);
-  }
+child.on('exit', (code) => {
+  cleanup();
+  process.exit(code ?? 0);
 });
 
 process.on('SIGINT', () => {
-  dev.kill('SIGINT');
+  cleanup();
   process.exit(0);
 });
 
-dev.on('exit', (code) => process.exit(code ?? 0));
+process.on('SIGTERM', () => {
+  cleanup();
+  process.exit(0);
+});
