@@ -1,5 +1,11 @@
 # create-synkos
 
+## 0.2.5
+
+### Patch Changes
+
+- 994b2d2: fix .npmrc not copied to generated project — npm excludes dotfiles starting with . when publishing, so .npmrc was renamed to npmrc during build and restored by scaffold
+
 ## 0.2.4
 
 ### Patch Changes
