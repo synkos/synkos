@@ -1,0 +1,64 @@
+name: plan-task
+description: Analyze a request and decide execution strategy
+
+phases:
+
+  - phase: analyze
+    steps:
+      - step: understand-request
+        action: |
+          Identify:
+          - goal
+          - scope
+          - constraints
+          - affected modules
+
+      - step: classify-task
+        action: |
+          Classify as:
+          - feature
+          - bug
+          - refactor
+          - mixed
+
+      - step: risk-assessment
+        action: |
+          Evaluate:
+          - complexity
+          - impact
+          - unclear areas
+
+  # ─────────────────────────────────────
+
+  - phase: plan
+    steps:
+      - step: define-strategy
+        action: |
+          Decide:
+          - which workflow(s) to use
+          - execution order
+
+      - step: split-work
+        action: |
+          If complex:
+          - break into smaller tasks
+          - ensure each is independently executable
+
+      - step: define-constraints
+        action: |
+          Specify:
+          - boundaries
+          - files affected
+          - risks to avoid
+
+  # ─────────────────────────────────────
+
+  - phase: output
+    steps:
+      - step: plan-summary
+        action: |
+          Output:
+          - task classification
+          - chosen workflow(s)
+          - execution steps
+          - potential risks
