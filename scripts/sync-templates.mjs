@@ -4,7 +4,6 @@
  *
  * What is synced:
  *   src/                              → full copy (identical between both)
- *   scripts/                          → full copy (identical between both)
  *   package.json deps/devDeps         → from apps/, workspace:* entries excluded
  *   src-capacitor/capacitor.config.json → synced with template var substitution
  *
@@ -55,9 +54,6 @@ function syncDir(src, dest) {
 
 console.log('Syncing src/...');
 syncDir(path.join(APPS_FRONTEND, 'src'), path.join(TPL_FRONTEND, 'src'));
-
-console.log('Syncing scripts/...');
-syncDir(path.join(APPS_FRONTEND, 'scripts'), path.join(TPL_FRONTEND, 'scripts'));
 
 // ─── Sync capacitor.config.json ──────────────────────────────────────────────
 
