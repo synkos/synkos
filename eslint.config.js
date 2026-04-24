@@ -1,7 +1,13 @@
 import synkosConfig from '@synkos/config/eslint';
+import globals from 'globals';
 
 export default [
   ...synkosConfig,
+  {
+    files: ['scripts/**'],
+    languageOptions: { globals: globals.node },
+    rules: { 'no-console': 'off' },
+  },
   {
     ignores: [
       '**/dist/**',
