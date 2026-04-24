@@ -49,6 +49,14 @@ rules:
         - stage: specific files
         - create changeset if needed (in same commit)
 
+    - phase: verify
+      steps:
+        - run: pnpm lint
+        - run: pnpm format:check
+        - if lint errors: fix them, re-stage affected files, re-run verify
+        - if format errors: run pnpm format, re-stage affected files, re-run verify
+        - do not proceed to commit until both pass
+
     - phase: commit
       steps:
         - write message following format above

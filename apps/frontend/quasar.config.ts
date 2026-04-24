@@ -71,6 +71,7 @@ export default defineConfig((ctx) => {
           '@intlify/core-base',
           '@intlify/shared',
           '@intlify/message-compiler',
+          '@vue/devtools-api',
         ];
       },
       // viteVuePluginOptions: {},
