@@ -51,11 +51,12 @@ rules:
 
     - phase: verify
       steps:
+        - run: pnpm format
         - run: pnpm lint
         - run: pnpm format:check
         - if lint errors: fix them, re-stage affected files, re-run verify
-        - if format errors: run pnpm format, re-stage affected files, re-run verify
-        - do not proceed to commit until both pass
+        - if format:check still fails after pnpm format: something is wrong — investigate
+        - do not proceed to commit until both lint and format:check pass
 
     - phase: commit
       steps:
