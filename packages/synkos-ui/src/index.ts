@@ -1,3 +1,4 @@
+export { default as AppButton } from './components/AppButton.vue';
 export { default as AppEmptyState } from './components/AppEmptyState.vue';
 export { default as AppListDivider } from './components/AppListDivider.vue';
 export { default as AppListRow } from './components/AppListRow.vue';

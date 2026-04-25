@@ -80,9 +80,9 @@
             </div>
           </Transition>
 
-          <button class="email-link-btn" @click="goTo('login')" :disabled="authStore.isLoading">
+          <AppButton variant="link" :disabled="authStore.isLoading" @click="goTo('login')">
             {{ t('pages.auth.continueEmail') }}
-          </button>
+          </AppButton>
 
           <button class="guest-btn" @click="handleGuest">
             {{ t('pages.auth.continueGuest') }}
@@ -138,14 +138,13 @@
             </div>
           </div>
 
-          <button
-            class="primary-btn"
-            :disabled="authStore.isLoading || !form.email || !form.password"
+          <AppButton
+            :loading="authStore.isLoading"
+            :disabled="!form.email || !form.password"
             @click="handleEmailLogin"
           >
-            <q-spinner v-if="authStore.isLoading" size="18px" color="white" />
-            <span v-else>{{ t('pages.auth.signIn') }}</span>
-          </button>
+            {{ t('pages.auth.signIn') }}
+          </AppButton>
 
           <p class="switch-text">
             {{ t('pages.auth.noAccount') }}
@@ -216,14 +215,13 @@
             </div>
           </div>
 
-          <button
-            class="primary-btn"
-            :disabled="authStore.isLoading || !canRegister"
+          <AppButton
+            :loading="authStore.isLoading"
+            :disabled="!canRegister"
             @click="handleRegister"
           >
-            <q-spinner v-if="authStore.isLoading" size="18px" color="white" />
-            <span v-else>{{ t('pages.auth.createAccountBtn') }}</span>
-          </button>
+            {{ t('pages.auth.createAccountBtn') }}
+          </AppButton>
 
           <p class="terms-text">
             {{ t('pages.auth.termsPrefix') }}
@@ -266,14 +264,13 @@
             </div>
           </div>
 
-          <button
-            class="primary-btn"
-            :disabled="authStore.isLoading || !forgotEmail"
-            @click="() => handleForgotPassword()"
+          <AppButton
+            :loading="authStore.isLoading"
+            :disabled="!forgotEmail"
+            @click="handleForgotPassword"
           >
-            <q-spinner v-if="authStore.isLoading" size="18px" color="white" />
-            <span v-else>{{ t('pages.auth.forgotSend') }}</span>
-          </button>
+            {{ t('pages.auth.forgotSend') }}
+          </AppButton>
         </div>
         <div v-else-if="mode === 'reset'" key="reset" class="form-block">
           <button class="back-btn" @click="handleResetBack">
@@ -400,14 +397,13 @@
                 </div>
               </div>
 
-              <button
-                class="primary-btn"
-                :disabled="authStore.isLoading || resetSuccess || !form.password"
+              <AppButton
+                :loading="authStore.isLoading"
+                :disabled="resetSuccess || !form.password"
                 @click="handleResetPassword"
               >
-                <q-spinner v-if="authStore.isLoading" size="18px" color="white" />
-                <span v-else>{{ t('pages.auth.resetSubmit') }}</span>
-              </button>
+                {{ t('pages.auth.resetSubmit') }}
+              </AppButton>
             </div>
           </Transition>
         </div>
@@ -556,14 +552,13 @@
             </div>
           </Transition>
 
-          <button
-            class="primary-btn"
-            :disabled="authStore.isLoading || usernameStatusType !== 'success'"
+          <AppButton
+            :loading="authStore.isLoading"
+            :disabled="usernameStatusType !== 'success'"
             @click="handleUsernameSubmit"
           >
-            <q-spinner v-if="authStore.isLoading" size="18px" color="white" />
-            <span v-else>{{ t('pages.usernamePicker.confirm') }}</span>
-          </button>
+            {{ t('pages.usernamePicker.confirm') }}
+          </AppButton>
         </div>
         <div v-else-if="mode === 'success'" key="success" class="form-block form-block--welcome">
           <div class="welcome-face-wrap">
@@ -609,12 +604,12 @@
         </div>
         <h3 class="biometric-title">{{ t('pages.auth.faceIdTitle') }}</h3>
         <p class="biometric-desc">{{ t('pages.auth.faceIdDesc') }}</p>
-        <button class="primary-btn biometric-enable-btn" @click="enableBiometricAuth">
+        <AppButton class="biometric-enable-btn" @click="enableBiometricAuth">
           {{ t('pages.auth.enableFaceId') }}
-        </button>
-        <button class="ghost-btn" @click="showBiometricPrompt = false">
+        </AppButton>
+        <AppButton variant="ghost" @click="showBiometricPrompt = false">
           {{ t('pages.auth.notNow') }}
-        </button>
+        </AppButton>
       </div>
     </q-dialog>
   </div>
@@ -630,6 +625,7 @@ import { AuthService } from 'src/services/auth.service';
 import { UsernameService } from 'src/services/username.service';
 import LegalBottomSheet from 'src/core/components/LegalBottomSheet.vue';
 import { appConfig } from 'src/app.config';
+import { AppButton } from '@synkos/ui';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -1763,30 +1759,6 @@ onMounted(() => {
 }
 
 // ── Buttons ───────────────────────────────────────────────────────────────────
-.email-link-btn {
-  background: none;
-  border: none;
-  color: #0a84ff;
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  padding: 8px;
-  text-align: center;
-  width: 100%;
-  -webkit-tap-highlight-color: transparent;
-  letter-spacing: -0.1px;
-  margin-top: 4px;
-
-  &:active {
-    opacity: 0.7;
-  }
-
-  &:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-}
-
 .forgot-btn {
   background: none;
   border: none;
@@ -1798,57 +1770,6 @@ onMounted(() => {
   align-self: flex-end;
   -webkit-tap-highlight-color: transparent;
   letter-spacing: -0.1px;
-
-  &:active {
-    opacity: 0.7;
-  }
-}
-
-.primary-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 50px;
-  background: #0a84ff;
-  color: #fff;
-  border: none;
-  border-radius: 14px;
-  font-size: 16px;
-  font-weight: 600;
-  letter-spacing: -0.2px;
-  cursor: pointer;
-  transition:
-    opacity 0.15s ease,
-    transform 0.1s ease;
-  -webkit-tap-highlight-color: transparent;
-  margin-top: 4px;
-
-  &:active:not(:disabled) {
-    opacity: 0.85;
-    transform: scale(0.98);
-  }
-
-  &:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-}
-
-.ghost-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 44px;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.5);
-  border: none;
-  border-radius: 14px;
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
 
   &:active {
     opacity: 0.7;
@@ -1991,7 +1912,6 @@ onMounted(() => {
 }
 
 .biometric-enable-btn {
-  width: 100%;
   margin-top: 8px;
 }
 
