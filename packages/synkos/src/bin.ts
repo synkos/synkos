@@ -29,7 +29,10 @@ function devIos(): void {
       'for arg in "$@"; do\n' +
       '  if [[ "$arg" == *.xcodeproj ]]; then\n' +
       '    workspace="${arg%.xcodeproj}.xcworkspace"\n' +
-      '    exec /usr/bin/open "$workspace"\n' +
+      '    if [[ -d "$workspace" ]]; then\n' +
+      '      exec /usr/bin/open "$workspace"\n' +
+      '    fi\n' +
+      '    break\n' +
       '  fi\n' +
       'done\n' +
       'exec /usr/bin/open "$@"\n'
