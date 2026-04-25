@@ -255,6 +255,9 @@ importers:
 
   packages/synkos:
     devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.17
       vue:
         specifier: ^3.5.32
         version: 3.5.32(typescript@5.9.3)

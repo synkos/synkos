@@ -4,8 +4,12 @@
  *
  * What is synced:
  *   src/                              → full copy (identical between both)
- *   package.json deps/devDeps         → from apps/, workspace:* entries excluded
+ *   package.json deps/devDeps         → from apps/, workspace:* entries handled below
  *   src-capacitor/capacitor.config.json → synced with template var substitution
+ *
+ * workspace:* dependency handling:
+ *   First-party published packages (FIRST_PARTY_PACKAGES) → converted to "^{version}"
+ *   Internal-only workspace packages (@synkos/ui, etc.)   → excluded from template
  *
  * What is NOT synced:
  *   package.json name/productName     → kept as {{PROJECT_NAME}} / {{APP_NAME}}
@@ -31,6 +35,12 @@ const TEMPLATE_SUBSTITUTIONS = {
 };
 
 const EXCLUDED_DIR_NAMES = new Set(['node_modules', '.quasar', 'dist', 'ios', 'android', 'www']);
+
+// First-party packages that are published to npm and should appear in the template
+// with their current version rather than being excluded as workspace-only deps.
+const FIRST_PARTY_PACKAGES = {
+  synkos: path.join(ROOT, 'packages', 'synkos', 'package.json'),
+};
 
 let synced = 0;
 let skipped = 0;
@@ -74,14 +84,24 @@ console.log('Syncing package.json dependencies...');
 const appsPkg = JSON.parse(fs.readFileSync(path.join(APPS_FRONTEND, 'package.json'), 'utf-8'));
 const tplPkg = JSON.parse(fs.readFileSync(path.join(TPL_FRONTEND, 'package.json'), 'utf-8'));
 
-function excludeWorkspace(deps = {}) {
-  return Object.fromEntries(
-    Object.entries(deps).filter(([, v]) => !String(v).startsWith('workspace:'))
-  );
+function processWorkspaceDeps(deps = {}) {
+  const result = {};
+  for (const [name, version] of Object.entries(deps)) {
+    if (!String(version).startsWith('workspace:')) {
+      result[name] = version;
+    } else if (name in FIRST_PARTY_PACKAGES) {
+      const { version: pkgVersion } = JSON.parse(
+        fs.readFileSync(FIRST_PARTY_PACKAGES[name], 'utf-8')
+      );
+      result[name] = `^${pkgVersion}`;
+    }
+    // workspace:* deps not in FIRST_PARTY_PACKAGES are internal-only → excluded
+  }
+  return result;
 }
 
-tplPkg.dependencies = excludeWorkspace(appsPkg.dependencies);
-tplPkg.devDependencies = excludeWorkspace(appsPkg.devDependencies);
+tplPkg.dependencies = processWorkspaceDeps(appsPkg.dependencies);
+tplPkg.devDependencies = processWorkspaceDeps(appsPkg.devDependencies);
 
 fs.writeFileSync(path.join(TPL_FRONTEND, 'package.json'), JSON.stringify(tplPkg, null, 2) + '\n');
 synced++;

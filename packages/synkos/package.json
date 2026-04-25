@@ -13,6 +13,9 @@
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "synkos": "./dist/bin.js"
+  },
   "files": [
     "dist/"
   ],
@@ -38,6 +41,7 @@
     "capacitor"
   ],
   "devDependencies": {
+    "@types/node": "^22.0.0",
     "vue": "^3.5.32",
     "vue-router": "^5.0.4"
   }

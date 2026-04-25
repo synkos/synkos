@@ -157,7 +157,7 @@ src/
 |           |                            |
 | --------- | -------------------------- |
 | Ubicación | `packages/synkos/`         |
-| Bundler   | tsup (ESM + CJS)           |
+| Bundler   | tsup (ESM + CJS + bin)     |
 | Watch     | `pnpm --filter synkos dev` |
 
 **API pública:**
@@ -167,10 +167,17 @@ src/
 - `useAppConfig()` — composable para acceder a la config en componentes
 - `createAuthGuard(options)` — navigation guard para vue-router
 
+**CLI (`synkos`):**
+
+- `synkos dev ios` — lanza Quasar dev para iOS corrigiendo el bug de apertura de Xcode
+
+Ver [docs/synkos-cli.md](synkos-cli.md) para detalles y cómo añadir comandos.
+
 **Archivos:**
 
 ```
 src/
+├── bin.ts         CLI (compilado a dist/bin.js, registrado en package.json#bin)
 ├── config.ts      defineAppConfig
 ├── plugin.ts      createSynkosPlugin + useAppConfig
 ├── router.ts      createAuthGuard
