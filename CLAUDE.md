@@ -82,15 +82,15 @@ pnpm release               # build + publish packages with changesets
 
 Only for changes in `packages/` that users will notice:
 
-| Situation                         | Changeset? | Bump  |
-| --------------------------------- | ---------- | ----- |
-| Fix bug in a package              | Yes        | patch |
-| New feature / export in a package | Yes        | minor |
-| Breaking API change               | Yes        | major |
-| Change only in `apps/`            | No         | —     |
-| Change only in `templates/`       | No         | —     |
+| Situation                         | Changeset?            | Bump  |
+| --------------------------------- | --------------------- | ----- |
+| Fix bug in a package              | Yes                   | patch |
+| New feature / export in a package | Yes                   | minor |
+| Breaking API change               | Yes                   | major |
+| Change only in `apps/`            | No                    | —     |
+| Change only in `templates/`       | No                    | —     |
 | templates/ change visible to user | Yes (`create-synkos`) | patch |
-| Docs / style / format             | No         | —     |
+| Docs / style / format             | No                    | —     |
 
 Use `.claude/workflows/push-git.yaml` for the full git flow.
 

@@ -19,7 +19,6 @@ rules:
 
   changeset:
     when: any change in packages/ that users will notice (fix, feat, breaking)
-    when-not: apps/, docs/, .github/, templates/ structure changes, style/format fixes
     file: .changeset/<descriptive-slug>.md
     bump-rules:
       patch: bug fix, internal refactor, dep update
@@ -33,6 +32,67 @@ rules:
     multi-package: one changeset can cover multiple packages
     commit: include changeset file in the same commit as the code change
 
+    # ── Package impact map ────────────────────────────────────────────────────
+    # Run `git diff --name-only` and map every changed path through this table.
+    # Collect ALL affected packages first, then write ONE changeset covering them.
+    package-impact-map:
+
+      'packages/synkos/**':
+        npm-package: synkos
+        bump: infer from change type
+
+      'packages/synkos-server/**':
+        npm-package: '@synkos/server'
+        bump: infer from change type
+
+      'packages/synkos-ui/**':
+        npm-package: '@synkos/ui'
+        bump: infer from change type
+
+      'packages/synkos-utils/**':
+        npm-package: '@synkos/utils'
+        bump: infer from change type
+
+      'packages/synkos-runtime/**':
+        npm-package: '@synkos/runtime'
+        bump: infer from change type
+
+      'packages/synkos-config/**':
+        npm-package: '@synkos/config'
+        bump: infer from change type
+
+      'packages/create-synkos/src/**':
+        npm-package: create-synkos
+        bump: infer from change type
+
+      'templates/**':
+        npm-package: create-synkos
+        bump: patch
+        reason: >
+          templates/ is bundled into create-synkos at build time (prebuild step).
+          Any user-visible change to templates/ requires a create-synkos patch so
+          the updated templates are included in the next published version.
+        exception: >
+          Skip if the only change is internal scaffolding structure that produces
+          identical output for the end user (e.g. a .gitignore tweak that was
+          already gitignored, or a comment-only change).
+
+      'apps/**':
+        npm-package: null
+        bump: none — apps/ is never published
+
+      'docs/**':
+        npm-package: null
+        bump: none
+
+      '.github/**':
+        npm-package: null
+        bump: none
+
+      'scripts/**':
+        npm-package: null
+        bump: none
+
   push:
     - always pull --rebase before push if rejected
     - if unstaged changes block rebase: git stash → rebase → stash pop → push
@@ -44,10 +104,11 @@ rules:
 
     - phase: pre-commit
       steps:
-        - run: git status
-        - identify: which packages changed → need changeset?
-        - stage: specific files
-        - create changeset if needed (in same commit)
+        - run: git diff --name-only HEAD (or git status for untracked files)
+        - map every changed path through package-impact-map above
+        - collect the full list of affected npm packages and their required bump types
+        - if any packages require a changeset → create ONE .changeset file listing all of them
+        - stage: specific files + changeset file (if created)
 
     - phase: verify
       steps:
@@ -74,5 +135,6 @@ rules:
     changed-packages-fix: "commit + changeset patch"
     changed-packages-feature: "commit + changeset minor"
     changed-packages-breaking: "commit + changeset major + warn user"
+    changed-templates: "commit + changeset patch for create-synkos"
+    changed-packages-and-templates: "commit + one changeset listing all affected packages"
     format-only: "commit style: no changeset"
-    multiple-packages: "one changeset listing all affected packages"
