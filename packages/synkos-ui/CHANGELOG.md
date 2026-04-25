@@ -1,5 +1,11 @@
 # @synkos/ui
 
+## 0.3.0
+
+### Minor Changes
+
+- 1c3e656: add AppButton component with primary, ghost, and link variants
+
 ## 0.2.0
 
 ### Minor Changes
