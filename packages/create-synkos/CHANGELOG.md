@@ -1,5 +1,11 @@
 # create-synkos
 
+## 0.2.8
+
+### Patch Changes
+
+- 5f58a33: pin synkos to ^0.2.0 in frontend template to ensure CLI binary is available
+
 ## 0.2.7
 
 ### Patch Changes
