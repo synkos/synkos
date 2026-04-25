@@ -1,5 +1,11 @@
 # synkos
 
+## 0.2.0
+
+### Minor Changes
+
+- fdeeef3: add `synkos` CLI with `synkos dev ios` command
+
 ## 0.1.0
 
 ### Minor Changes

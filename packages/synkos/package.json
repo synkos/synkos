@@ -1,6 +1,6 @@
 {
   "name": "synkos",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Synkos frontend framework core (Quasar + Capacitor)",
   "type": "module",
   "exports": {
