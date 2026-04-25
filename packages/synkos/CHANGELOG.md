@@ -1,5 +1,11 @@
 # synkos
 
+## 0.2.1
+
+### Patch Changes
+
+- 2fd46b6: fix synkos dev ios not opening Xcode when xcworkspace does not exist yet
+
 ## 0.2.0
 
 ### Minor Changes
