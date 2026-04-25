@@ -1,5 +1,11 @@
 # create-synkos
 
+## 0.2.9
+
+### Patch Changes
+
+- d26569b: add @synkos/ui to frontend template as default UI library
+
 ## 0.2.8
 
 ### Patch Changes
