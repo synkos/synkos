@@ -1,13 +1,14 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import dts from 'vite-plugin-dts';
+import cssInjectedByJs from 'vite-plugin-css-injected-by-js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
-  plugins: [vue(), dts({ include: ['src'], insertTypesEntry: true })],
+  plugins: [vue(), cssInjectedByJs(), dts({ include: ['src'], insertTypesEntry: true })],
   css: {
     preprocessorOptions: {
       scss: {

@@ -392,6 +392,9 @@ importers:
       vite:
         specifier: ^6.3.5
         version: 6.4.2(@types/node@25.6.0)(lightningcss@1.32.0)(sass-embedded@1.99.0)(sass@1.99.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3)
+      vite-plugin-css-injected-by-js:
+        specifier: ^5.0.1
+        version: 5.0.1(vite@6.4.2(@types/node@25.6.0)(lightningcss@1.32.0)(sass-embedded@1.99.0)(sass@1.99.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))
       vite-plugin-dts:
         specifier: ^4.5.4
         version: 4.5.4(@types/node@25.6.0)(rollup@4.60.2)(typescript@5.9.3)(vite@6.4.2(@types/node@25.6.0)(lightningcss@1.32.0)(sass-embedded@1.99.0)(sass@1.99.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))
@@ -5445,6 +5448,11 @@ packages:
         optional: true
       vue-tsc:
         optional: true
+
+  vite-plugin-css-injected-by-js@5.0.1:
+    resolution: {integrity: sha512-JSB0jjN4VCKqG7XTUdrwiIl5gA+z2yi/tAl9WHo0X4sdyJ1yrmbLOEjf95TDoDIIuKr4GJIc7lMJG0CT88eEUQ==}
+    peerDependencies:
+      vite: '>8.0.0-0'
 
   vite-plugin-dts@4.5.4:
     resolution: {integrity: sha512-d4sOM8M/8z7vRXHHq/ebbblfaxENjogAAekcfcDCCwAyvGqnPrc7f4NZbvItS+g4WTgerW0xDwSz5qz11JT3vg==}
@@ -11218,6 +11226,10 @@ snapshots:
       optionator: 0.9.4
       typescript: 5.9.3
       vue-tsc: 3.2.7(typescript@5.9.3)
+
+  vite-plugin-css-injected-by-js@5.0.1(vite@6.4.2(@types/node@25.6.0)(lightningcss@1.32.0)(sass-embedded@1.99.0)(sass@1.99.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3)):
+    dependencies:
+      vite: 6.4.2(@types/node@25.6.0)(lightningcss@1.32.0)(sass-embedded@1.99.0)(sass@1.99.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3)
 
   vite-plugin-dts@4.5.4(@types/node@25.6.0)(rollup@4.60.2)(typescript@5.9.3)(vite@6.4.2(@types/node@25.6.0)(lightningcss@1.32.0)(sass-embedded@1.99.0)(sass@1.99.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3)):
     dependencies:
