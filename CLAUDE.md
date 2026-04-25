@@ -89,6 +89,7 @@ Only for changes in `packages/` that users will notice:
 | Breaking API change               | Yes        | major |
 | Change only in `apps/`            | No         | —     |
 | Change only in `templates/`       | No         | —     |
+| templates/ change visible to user | Yes (`create-synkos`) | patch |
 | Docs / style / format             | No         | —     |
 
 Use `.claude/workflows/push-git.yaml` for the full git flow.
