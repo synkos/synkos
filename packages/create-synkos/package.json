@@ -1,6 +1,6 @@
 {
   "name": "create-synkos",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "CLI scaffolding tool for the Synkos framework",
   "type": "module",
   "bin": {

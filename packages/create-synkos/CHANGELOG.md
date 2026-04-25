@@ -1,5 +1,11 @@
 # create-synkos
 
+## 0.2.7
+
+### Patch Changes
+
+- 4a8fc66: update frontend template: use synkos dev ios instead of bundled dev-ios script
+
 ## 0.2.6
 
 ### Patch Changes
