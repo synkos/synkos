@@ -31,7 +31,7 @@
     "@capgo/capacitor-social-login": "^8.3.11",
     "@quasar/extras": "^1.16.4",
     "axios": "^1.14.0",
-    "synkos": "^0.1.0",
+    "synkos": "^0.2.0",
     "pinia": "^3.0.1",
     "quasar": "^2.16.0",
     "vue": "^3.5.22",
