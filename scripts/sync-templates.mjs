@@ -40,6 +40,7 @@ const EXCLUDED_DIR_NAMES = new Set(['node_modules', '.quasar', 'dist', 'ios', 'a
 // with their current version rather than being excluded as workspace-only deps.
 const FIRST_PARTY_PACKAGES = {
   synkos: path.join(ROOT, 'packages', 'synkos', 'package.json'),
+  '@synkos/ui': path.join(ROOT, 'packages', 'synkos-ui', 'package.json'),
 };
 
 let synced = 0;
