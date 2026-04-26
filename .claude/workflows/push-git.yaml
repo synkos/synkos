@@ -108,16 +108,25 @@ rules:
         - map every changed path through package-impact-map above
         - collect the full list of affected npm packages and their required bump types
         - if any packages require a changeset → create ONE .changeset file listing all of them
+        - if package.json deps changed in any package → stage pnpm-lock.yaml too
         - stage: specific files + changeset file (if created)
 
     - phase: verify
+      mandatory: true
+      no-exceptions: >
+        This phase MUST run before every single commit, regardless of how small or
+        trivial the change appears. Docs, cherry-picks, single-line fixes — all of
+        them. CI runs the exact same checks; failing to run them locally wastes a
+        full CI cycle and blocks the PR.
       steps:
         - run: pnpm format
+          note: always run — formats ALL staged files including docs, scripts, configs
         - run: pnpm lint
+          note: fix any errors before continuing; do not proceed with lint failures
         - run: pnpm format:check
-        - if lint errors: fix them, re-stage affected files, re-run verify
-        - if format:check still fails after pnpm format: something is wrong — investigate
-        - do not proceed to commit until both lint and format:check pass
+          note: must exit 0 — if it fails after pnpm format something is wrong, investigate
+        - re-stage any files that pnpm format modified
+        - BLOCK: do not advance to commit phase until both lint and format:check exit 0
 
     - phase: commit
       steps:
@@ -126,9 +135,19 @@ rules:
 
     - phase: push
       steps:
-        - git push origin main
-        - if rejected: git stash && git pull --rebase origin main && git stash pop && git push
+        - git push origin <branch>
+        - if rejected: git stash && git pull --rebase origin <branch> && git stash pop && git push
         - confirm push succeeded
+
+  ci-parity:
+    description: >
+      Local verify phase mirrors CI exactly. CI runs: lint → format:check → typecheck → build → test.
+      If verify passes locally, CI passes. If CI fails on something verify passed, the workflow
+      is broken — fix the workflow, not just the CI failure.
+    common-failures:
+      - forgot pnpm format on a docs/config file → always run pnpm format, not just on .ts/.vue
+      - pnpm-lock.yaml stale after adding deps → stage lockfile when package.json changes
+      - cherry-pick or merge brought in unformatted files → run pnpm format after every cherry-pick
 
   decision-tree:
     changed-only-apps-or-docs: "commit only, no changeset"
