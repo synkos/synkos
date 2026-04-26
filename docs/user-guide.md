@@ -10,7 +10,7 @@
 6. [Routing](#6-routing)
 7. [Internationalization (i18n)](#7-internationalization-i18n)
 8. [Styling and theming](#8-styling-and-theming)
-9. [Boot files](#9-boot-files)
+9. [Boot file](#9-boot-file)
 10. [Auth extensions](#10-auth-extensions)
 11. [Making API calls](#11-making-api-calls)
 12. [Native features](#12-native-features)
@@ -64,10 +64,7 @@ my-app/frontend/src/
 ├── app.config.ts          ← The only file you MUST edit to start
 │
 ├── boot/
-│   ├── auth.ts            ← Initializes auth + API client
-│   ├── i18n.ts            ← Loads translations
-│   ├── notifications.ts   ← Sets up push notifications
-│   └── splash.ts          ← Hides the native splash screen
+│   └── synkos.ts          ← Single boot file — initializes everything
 │
 ├── features/
 │   └── home/              ← Your app code goes here
@@ -75,12 +72,11 @@ my-app/frontend/src/
 │           └── HomePage.vue
 │
 ├── router/
-│   └── routes/
-│       ├── app.routes.ts  ← Your tabs and routes (edit this)
-│       ├── core.routes.ts ← Auth + profile (do not modify)
-│       └── settings.routes.ts  ← Settings (do not modify)
+│   ├── index.ts           ← Router setup (rarely needs editing)
+│   └── app.routes.ts      ← Your tabs and routes (edit this)
 │
 ├── i18n/
+│   ├── index.ts           ← Type augmentation only
 │   ├── en-US/index.ts     ← Your English strings
 │   └── es-ES/index.ts     ← Your Spanish strings
 │
@@ -89,7 +85,9 @@ my-app/frontend/src/
     └── quasar.variables.scss  ← Design tokens (colors, spacing, fonts)
 ```
 
-**The rule:** everything in `features/` is yours. Everything else is framework infrastructure that you customize via configuration, not by editing directly.
+That's the complete template — 16 files. Everything else (auth pages, settings, layouts, profile, navigation) lives inside `@synkos/client` and is invisible to you by design.
+
+**The rule:** your code lives in `features/`, `router/app.routes.ts`, `i18n/`, and `app.config.ts`. You don't need to touch anything else to build a full app.
 
 ---
 
@@ -238,36 +236,30 @@ const { t } = useI18n();
 ### Step 2 — Register the route
 
 ```typescript
-// src/router/routes/app.routes.ts
-import type { RouteRecordRaw } from 'vue-router';
+// src/router/app.routes.ts
+import type { AppTabRoute } from '@synkos/client';
 
-export const appTabRoutes: RouteRecordRaw[] = [
+export const appTabRoutes: AppTabRoute[] = [
   {
-    path: '',
+    path: '/',
     name: 'home',
+    icon: 'home',
+    labelKey: 'tabs.home',
     component: () => import('src/features/home/pages/HomePage.vue'),
   },
   {
-    path: 'dashboard',
+    path: '/dashboard',
     name: 'dashboard',
+    icon: 'dashboard',
+    labelKey: 'tabs.dashboard',
     component: () => import('src/features/dashboard/pages/DashboardPage.vue'),
   },
 ];
 ```
 
-### Step 3 — Add the tab to the tab bar
+The `icon` (Material icon name) and `labelKey` (i18n key) drive the tab bar automatically — no other file needs editing.
 
-Edit `src/core/layouts/MainLayout.vue` to add a tab:
-
-```typescript
-const tabs = computed(() => [
-  { path: '/', label: t('tabs.home'), icon: 'home' },
-  { path: '/dashboard', label: t('tabs.dashboard'), icon: 'dashboard' },
-  { path: '/profile', label: t('tabs.profile'), icon: 'person' },
-]);
-```
-
-### Step 4 — Add the translations
+### Step 3 — Add the translations
 
 ```typescript
 // src/i18n/en-US/index.ts
@@ -281,18 +273,11 @@ export default {
     dashboard: {
       title: 'Dashboard',
     },
-    // ...
   },
 };
 ```
 
-### Step 5 — (Optional) Cache the tab
-
-If your page fetches data on mount, add it to `cachedViews` in `MainLayout.vue` to avoid re-fetching on every tab switch:
-
-```typescript
-const cachedViews = ['HomePage', 'DashboardPage'];
-```
+That's it — your new tab appears in the tab bar with the correct icon and label.
 
 ---
 
@@ -310,13 +295,19 @@ There are three types of routes:
 
 ### Adding a full-screen route
 
-Full-screen routes use `AuthLayout` so there's no tab bar or nav bar. Good for camera, scanner, onboarding:
+Full-screen routes use `AuthLayout` (no tab bar, no nav bar). Import it from `@synkos/client`:
 
 ```typescript
-// src/router/routes/app.routes.ts
-export const appFullscreen: RouteRecordRaw = {
+// src/router/index.ts
+import { defineRouter } from '#q-app/wrappers';
+import { createSynkosRouter } from '@synkos/client';
+import type { RouteRecordRaw } from 'vue-router';
+import { appConfig } from 'src/app.config';
+import { appTabRoutes } from './app.routes';
+
+const appFullscreen: RouteRecordRaw = {
   path: '/app',
-  component: () => import('src/core/layouts/AuthLayout.vue'),
+  component: () => import('@synkos/client').then((m) => m.AuthLayout),
   children: [
     {
       path: 'camera',
@@ -325,21 +316,12 @@ export const appFullscreen: RouteRecordRaw = {
     },
   ],
 };
-```
 
-Then in `src/router/routes/index.ts`, include it:
-
-```typescript
-const routes = [
-  coreAuthRoute,
-  appFullscreen, // ← add this
-  {
-    path: '/',
-    component: () => import('src/core/layouts/MainLayout.vue'),
-    children: [...appTabRoutes, coreProfileRoute, ...coreSettingsRoutes],
-  },
-  { path: '/:catchAll(.*)*', component: () => import('src/pages/ErrorNotFound.vue') },
-];
+export default defineRouter(() =>
+  createSynkosRouter(appConfig, appTabRoutes, {
+    extraRoutes: [appFullscreen],
+  })
+);
 ```
 
 ### Navigation
@@ -367,7 +349,7 @@ To protect specific routes from guest users (i.e., require a real account):
 
 ```typescript
 {
-  path: 'checkout',
+  path: '/checkout',
   name: 'checkout',
   meta: { requiresAuth: true },  // guests cannot access this
   component: () => import('...'),
@@ -380,7 +362,7 @@ The iOS nav bar title and back button label are driven by i18n keys in route `me
 
 ```typescript
 {
-  path: 'product/:id',
+  path: '/product/:id',
   name: 'product-detail',
   meta: {
     titleKey: 'pages.product.title',        // i18n key → "Product"
@@ -396,7 +378,7 @@ The iOS nav bar title and back button label are driven by i18n keys in route `me
 
 ### App-specific strings
 
-Your strings live in `src/i18n/en-US/index.ts` and `src/i18n/es-ES/index.ts`. These are merged at boot time with the framework's core strings (auth, settings, profile, navigation).
+Your strings live in `src/i18n/en-US/index.ts` and `src/i18n/es-ES/index.ts`. Export a plain object — the framework's core strings (auth, settings, profile, navigation) are merged in automatically at boot time. No spreading required.
 
 ```typescript
 // src/i18n/en-US/index.ts
@@ -416,9 +398,34 @@ export default {
       empty: 'No data yet.',
       loadError: 'Could not load data. Try again.',
     },
+    profile: {
+      stats: {
+        stat1: 'Items',
+        stat2: 'Followers',
+        stat3: 'Following',
+      },
+    },
   },
 };
 ```
+
+Core strings (auth errors, settings labels, nav titles, etc.) are inherited from `@synkos/client` automatically — you only need to define what's specific to your app.
+
+### TypeScript autocompletion
+
+The `src/i18n/index.ts` file augments vue-i18n's type system so `t('...')` is fully type-safe:
+
+```typescript
+// src/i18n/index.ts — no changes needed, it's pre-configured
+import type { SynkosMessages } from '@synkos/client';
+import type enUS from './en-US';
+
+declare module 'vue-i18n' {
+  export interface DefineLocaleMessage extends SynkosMessages<typeof enUS> {}
+}
+```
+
+`SynkosMessages<T>` merges the core schema with your app schema at the type level — you get autocomplete for both.
 
 ### Using translations in components
 
@@ -448,14 +455,15 @@ t('pages.cart.items', { count: itemCount }, itemCount);
 ### Adding a new language
 
 1. Create `src/i18n/fr-FR/index.ts` with your French strings
-2. Pass it to `createI18nBoot` in `src/boot/i18n.ts`:
+2. Pass it to `createSynkosBoot` in `src/boot/synkos.ts`:
 
 ```typescript
-// src/boot/i18n.ts
+// src/boot/synkos.ts
 import frFR from 'src/i18n/fr-FR';
 
 export default defineBoot(
-  createI18nBoot({
+  createSynkosBoot({
+    config: appConfig,
     messages: {
       'en-US': enUS,
       'es-ES': esES,
@@ -465,15 +473,17 @@ export default defineBoot(
 );
 ```
 
-3. Add the language label in your i18n files:
+3. Add the language label in your i18n files so it appears in the Language settings page:
 
 ```typescript
 // en-US
-settings: {
-  languages: {
-    'en-US': 'English',
-    'es-ES': 'Español',
-    'fr-FR': 'Français',  // ← add this
+pages: {
+  settings: {
+    languages: {
+      'en-US': 'English',
+      'es-ES': 'Español',
+      'fr-FR': 'Français',  // ← add this
+    },
   },
 }
 ```
@@ -641,65 +651,47 @@ The `.fade-enter-active` / `.fade-leave-active` transition for `<Transition name
 
 ---
 
-## 9. Boot files
+## 9. Boot file
 
-Boot files are thin wrappers around the framework's initialization logic. They run in order when the app starts.
-
-### `boot/auth.ts`
-
-Initializes the API client and the auth store. Restores the session from the keychain on launch.
+The framework initializes in a single boot file: `src/boot/synkos.ts`. It handles everything in the right order — i18n, API client, auth session restore, push notifications, and splash screen — with one function call.
 
 ```typescript
-// src/boot/auth.ts
+// src/boot/synkos.ts
 import { defineBoot } from '#q-app/wrappers';
-import { createAuthBoot } from '@synkos/client';
+import { createSynkosBoot } from '@synkos/client';
 import { appConfig } from 'src/app.config';
-
-export default defineBoot(
-  createAuthBoot({
-    config: appConfig,
-    apiBaseUrl: import.meta.env.VITE_API_URL || 'http://localhost:3001/api/v1',
-
-    // Optional lifecycle hooks (see §10 — Auth Extensions)
-    onLogin: (user) => {
-      console.log('User logged in:', user.id);
-    },
-    onLogout: () => {
-      console.log('User logged out');
-    },
-  })
-);
-```
-
-### `boot/i18n.ts`
-
-Creates the vue-i18n instance, merges your strings with the framework's core strings, and reads the persisted language from storage.
-
-```typescript
-// src/boot/i18n.ts
-import { defineBoot } from '#q-app/wrappers';
-import { createI18nBoot } from '@synkos/client';
 import enUS from 'src/i18n/en-US';
 import esES from 'src/i18n/es-ES';
 
 export default defineBoot(
-  createI18nBoot({
+  createSynkosBoot({
+    config: appConfig,
     messages: { 'en-US': enUS, 'es-ES': esES },
+    // apiBaseUrl defaults to import.meta.env.VITE_API_URL
   })
 );
 ```
 
-### `boot/notifications.ts`
+### Options
 
-Requests push permission on launch and sets up handlers for foreground notifications and notification taps.
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `config` | `AppConfig` | required | Your `app.config.ts` export |
+| `messages` | `object` | `{}` | App i18n strings per locale |
+| `apiBaseUrl` | `string` | `VITE_API_URL` or `http://localhost:3001/api/v1` | Backend API URL |
+| `notifications.onNotification` | `fn` | logs to console | Handler for foreground notifications |
+| `notifications.onActionPerformed` | `fn` | navigates to `data.screen` | Handler for notification taps |
+| `onLogin` | `fn(user)` | — | Called after any successful login |
+| `onLogout` | `fn()` | — | Called after logout |
+
+### Custom notification handlers
 
 ```typescript
-// src/boot/notifications.ts
-import { defineBoot } from '#q-app/wrappers';
-import { createNotificationsBoot } from '@synkos/client';
+createSynkosBoot({
+  config: appConfig,
+  messages: { 'en-US': enUS, 'es-ES': esES },
 
-export default defineBoot(
-  createNotificationsBoot({
+  notifications: {
     // Called when a notification arrives while the app is open
     onNotification: (notification) => {
       console.log('Foreground notification:', notification.title);
@@ -710,67 +702,36 @@ export default defineBoot(
     onActionPerformed: (action) => {
       const data = action.notification.data as { screen?: string };
       if (data.screen) {
-        // router is not directly available here — use a global event or store
-        console.log('Navigate to:', data.screen);
+        // Default behavior: navigates to data.screen automatically.
+        // Override here only if you need custom logic.
       }
     },
-  })
-);
+  },
+})
 ```
 
-The default `onActionPerformed` handler reads `notification.data.screen`, `notification.data.params`, and `notification.data.query` and navigates using `router.push()`. Override it only if you need custom behavior.
+The default `onActionPerformed` reads `notification.data.screen`, `notification.data.params`, and `notification.data.query` and calls `router.push()` automatically. Override only if you need non-standard behavior.
 
-### `boot/splash.ts`
-
-Hides the native splash screen after the app has initialized. Must run last.
+### Auth lifecycle hooks
 
 ```typescript
-// src/boot/splash.ts — usually no changes needed
-import { defineBoot } from '#q-app/wrappers';
-import { createSplashBoot } from '@synkos/client';
-
-export default defineBoot(createSplashBoot());
-```
-
-### Boot order
-
-The order is defined in `quasar.config.ts`:
-
-```typescript
-// quasar.config.ts
-boot: ['i18n', 'auth', 'notifications', 'splash'],
-```
-
-`i18n` must run before `auth` (the auth store reads the current locale). `splash` must run last.
-
----
-
-## 10. Auth extensions
-
-### Reacting to login and logout
-
-Pass hooks to `createAuthBoot`:
-
-```typescript
-// src/boot/auth.ts
-createAuthBoot({
+createSynkosBoot({
   config: appConfig,
-  apiBaseUrl: import.meta.env.VITE_API_URL,
+  messages: { 'en-US': enUS, 'es-ES': esES },
 
   onLogin: (user) => {
-    // Track the user in your analytics service
-    analytics.identify(user.id, {
-      email: user.email,
-      name: user.displayName,
-    });
+    analytics.identify(user.id, { email: user.email, name: user.displayName });
   },
 
   onLogout: () => {
     analytics.reset();
-    // Clear any cached data from your stores
   },
-}),
+})
 ```
+
+---
+
+## 10. Auth extensions
 
 ### Reading auth state
 
@@ -848,7 +809,7 @@ const router = useRouter();
 
 ### The API client
 
-The API client (`axios` with token injection and 401 retry) is initialized by `createAuthBoot`. Access it via the service layer:
+The API client (`axios` with token injection and 401 retry) is initialized by `createSynkosBoot`. Access it via the service layer:
 
 ```typescript
 import { getApiClient } from '@synkos/client';
@@ -980,7 +941,7 @@ For production, set `VITE_API_URL` to your deployed API URL.
 
 ### Push notifications
 
-Push is handled automatically. When the user grants permission, the token is registered with your backend. You only need to configure the handlers in `boot/notifications.ts` (see §9).
+Push is handled automatically. When the user grants permission, the token is registered with your backend. Configure handlers in `boot/synkos.ts` (see §9).
 
 #### Sending a push from your backend
 
@@ -1327,31 +1288,15 @@ Router.beforeEach((to) => {
 
 ### What to edit for a new app
 
-| Task                       | File                                                 |
-| -------------------------- | ---------------------------------------------------- |
-| App name, bundle ID, links | `src/app.config.ts`                                  |
-| Your features              | `src/features/`                                      |
-| Your tabs and routes       | `src/router/routes/app.routes.ts`                    |
-| Tab bar labels             | `src/core/layouts/MainLayout.vue` (tabs computed)    |
-| Cached tabs                | `src/core/layouts/MainLayout.vue` (cachedViews)      |
-| Your translations          | `src/i18n/en-US/index.ts`, `src/i18n/es-ES/index.ts` |
-| Colors, fonts              | `src/css/quasar.variables.scss`                      |
-| API URL                    | `.env` → `VITE_API_URL`                              |
-| Auth hooks                 | `src/boot/auth.ts`                                   |
-| Notification handlers      | `src/boot/notifications.ts`                          |
-
-### What NOT to edit
-
-| File/Directory                         | Why                                                        |
-| -------------------------------------- | ---------------------------------------------------------- |
-| `src/core/`                            | Framework UI — auth, settings, profile, layouts            |
-| `src/stores/auth.store.ts`             | Re-exports from `@synkos/client` — logic is in the package |
-| `src/stores/settings.store.ts`         | Same                                                       |
-| `src/services/*.ts`                    | Same — re-exports from `@synkos/client`                    |
-| `src/router/routes/core.routes.ts`     | Core routes — managed by the framework                     |
-| `src/router/routes/settings.routes.ts` | Settings routes — managed by the framework                 |
-
-Editing these files is fine for customization, but changes may conflict with future framework updates. When in doubt, extend via configuration rather than direct modification.
+| Task                       | File                                |
+| -------------------------- | ----------------------------------- |
+| App name, bundle ID, links | `src/app.config.ts`                 |
+| Your features              | `src/features/`                     |
+| Your tabs and routes       | `src/router/app.routes.ts`          |
+| Your translations          | `src/i18n/en-US/`, `src/i18n/es-ES/` |
+| Colors, fonts              | `src/css/quasar.variables.scss`     |
+| API URL                    | `.env` → `VITE_API_URL`             |
+| Auth/notification hooks    | `src/boot/synkos.ts`                |
 
 ### Key imports
 
@@ -1379,4 +1324,29 @@ import { useAppConfig } from 'synkos';
 
 // UI components
 import { AppButton, AppListRow, AppListSection, AppEmptyState } from '@synkos/ui';
+
+// Route type for app.routes.ts
+import type { AppTabRoute } from '@synkos/client';
 ```
+
+### Framework-provided routes (built-in, no setup needed)
+
+| Route name                    | Path                            |
+| ----------------------------- | ------------------------------- |
+| `auth-login`                  | `/auth/login`                   |
+| `auth-username`               | `/auth/username`                |
+| `profile`                     | `/profile`                      |
+| `settings-account`            | `/settings/account`             |
+| `settings-account-edit`       | `/settings/account/edit`        |
+| `settings-account-password`   | `/settings/account/password`    |
+| `settings-account-username`   | `/settings/account/username`    |
+| `settings-account-delete`     | `/settings/account/delete`      |
+| `settings-preferences`        | `/settings/preferences`         |
+| `settings-preferences-language` | `/settings/preferences/language` |
+| `settings-notifications`      | `/settings/notifications`       |
+| `settings-security`           | `/settings/security`            |
+| `settings-billing`            | `/settings/billing`             |
+| `settings-support`            | `/settings/support`             |
+| `settings-support-help`       | `/settings/support/help`        |
+| `settings-legal`              | `/settings/legal`               |
+| `settings-about`              | `/settings/about`               |
