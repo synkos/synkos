@@ -674,15 +674,15 @@ export default defineBoot(
 
 ### Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `config` | `AppConfig` | required | Your `app.config.ts` export |
-| `messages` | `object` | `{}` | App i18n strings per locale |
-| `apiBaseUrl` | `string` | `VITE_API_URL` or `http://localhost:3001/api/v1` | Backend API URL |
-| `notifications.onNotification` | `fn` | logs to console | Handler for foreground notifications |
-| `notifications.onActionPerformed` | `fn` | navigates to `data.screen` | Handler for notification taps |
-| `onLogin` | `fn(user)` | — | Called after any successful login |
-| `onLogout` | `fn()` | — | Called after logout |
+| Option                            | Type        | Default                                          | Description                          |
+| --------------------------------- | ----------- | ------------------------------------------------ | ------------------------------------ |
+| `config`                          | `AppConfig` | required                                         | Your `app.config.ts` export          |
+| `messages`                        | `object`    | `{}`                                             | App i18n strings per locale          |
+| `apiBaseUrl`                      | `string`    | `VITE_API_URL` or `http://localhost:3001/api/v1` | Backend API URL                      |
+| `notifications.onNotification`    | `fn`        | logs to console                                  | Handler for foreground notifications |
+| `notifications.onActionPerformed` | `fn`        | navigates to `data.screen`                       | Handler for notification taps        |
+| `onLogin`                         | `fn(user)`  | —                                                | Called after any successful login    |
+| `onLogout`                        | `fn()`      | —                                                | Called after logout                  |
 
 ### Custom notification handlers
 
@@ -707,7 +707,7 @@ createSynkosBoot({
       }
     },
   },
-})
+});
 ```
 
 The default `onActionPerformed` reads `notification.data.screen`, `notification.data.params`, and `notification.data.query` and calls `router.push()` automatically. Override only if you need non-standard behavior.
@@ -726,7 +726,7 @@ createSynkosBoot({
   onLogout: () => {
     analytics.reset();
   },
-})
+});
 ```
 
 ---
@@ -1288,15 +1288,15 @@ Router.beforeEach((to) => {
 
 ### What to edit for a new app
 
-| Task                       | File                                |
-| -------------------------- | ----------------------------------- |
-| App name, bundle ID, links | `src/app.config.ts`                 |
-| Your features              | `src/features/`                     |
-| Your tabs and routes       | `src/router/app.routes.ts`          |
+| Task                       | File                                 |
+| -------------------------- | ------------------------------------ |
+| App name, bundle ID, links | `src/app.config.ts`                  |
+| Your features              | `src/features/`                      |
+| Your tabs and routes       | `src/router/app.routes.ts`           |
 | Your translations          | `src/i18n/en-US/`, `src/i18n/es-ES/` |
-| Colors, fonts              | `src/css/quasar.variables.scss`     |
-| API URL                    | `.env` → `VITE_API_URL`             |
-| Auth/notification hooks    | `src/boot/synkos.ts`                |
+| Colors, fonts              | `src/css/quasar.variables.scss`      |
+| API URL                    | `.env` → `VITE_API_URL`              |
+| Auth/notification hooks    | `src/boot/synkos.ts`                 |
 
 ### Key imports
 
@@ -1331,22 +1331,22 @@ import type { AppTabRoute } from '@synkos/client';
 
 ### Framework-provided routes (built-in, no setup needed)
 
-| Route name                    | Path                            |
-| ----------------------------- | ------------------------------- |
-| `auth-login`                  | `/auth/login`                   |
-| `auth-username`               | `/auth/username`                |
-| `profile`                     | `/profile`                      |
-| `settings-account`            | `/settings/account`             |
-| `settings-account-edit`       | `/settings/account/edit`        |
-| `settings-account-password`   | `/settings/account/password`    |
-| `settings-account-username`   | `/settings/account/username`    |
-| `settings-account-delete`     | `/settings/account/delete`      |
-| `settings-preferences`        | `/settings/preferences`         |
+| Route name                      | Path                             |
+| ------------------------------- | -------------------------------- |
+| `auth-login`                    | `/auth/login`                    |
+| `auth-username`                 | `/auth/username`                 |
+| `profile`                       | `/profile`                       |
+| `settings-account`              | `/settings/account`              |
+| `settings-account-edit`         | `/settings/account/edit`         |
+| `settings-account-password`     | `/settings/account/password`     |
+| `settings-account-username`     | `/settings/account/username`     |
+| `settings-account-delete`       | `/settings/account/delete`       |
+| `settings-preferences`          | `/settings/preferences`          |
 | `settings-preferences-language` | `/settings/preferences/language` |
-| `settings-notifications`      | `/settings/notifications`       |
-| `settings-security`           | `/settings/security`            |
-| `settings-billing`            | `/settings/billing`             |
-| `settings-support`            | `/settings/support`             |
-| `settings-support-help`       | `/settings/support/help`        |
-| `settings-legal`              | `/settings/legal`               |
-| `settings-about`              | `/settings/about`               |
+| `settings-notifications`        | `/settings/notifications`        |
+| `settings-security`             | `/settings/security`             |
+| `settings-billing`              | `/settings/billing`              |
+| `settings-support`              | `/settings/support`              |
+| `settings-support-help`         | `/settings/support/help`         |
+| `settings-legal`                | `/settings/legal`                |
+| `settings-about`                | `/settings/about`                |
