@@ -1,5 +1,11 @@
 # create-synkos
 
+## 0.2.10
+
+### Patch Changes
+
+- 0465cc2: add Vue runtime to @synkos/client: createSynkosRouter, createSynkosBoot, SynkosApp, auth/settings pages, layouts, composables, and SynkosMessages type; template reduced from 60+ files to 16
+
 ## 0.2.9
 
 ### Patch Changes
