@@ -1,5 +1,11 @@
 # create-synkos
 
+## 0.2.11
+
+### Patch Changes
+
+- 4e0d720: fix template package.json to reference @synkos/client@^0.2.0 and @synkos/ui@^0.3.1
+
 ## 0.2.10
 
 ### Patch Changes
