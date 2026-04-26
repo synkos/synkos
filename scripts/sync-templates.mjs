@@ -107,6 +107,18 @@ function syncPackageJsonDeps(appsDir, tplDir) {
   synced++;
 }
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+/** Copy a single root-level file from apps/ to templates/ with optional substitutions. */
+function syncFile(src, dest, substitutions = {}) {
+  let content = fs.readFileSync(src, 'utf-8');
+  for (const [real, tpl] of Object.entries(substitutions)) {
+    content = content.replaceAll(real, tpl);
+  }
+  fs.writeFileSync(dest, content);
+  synced++;
+}
+
 // ─── Frontend ─────────────────────────────────────────────────────────────────
 
 const APPS_FRONTEND = path.join(ROOT, 'apps', 'frontend');
@@ -114,6 +126,15 @@ const TPL_FRONTEND = path.join(ROOT, 'templates', 'frontend');
 
 console.log('Syncing frontend src/...');
 syncDir(path.join(APPS_FRONTEND, 'src'), path.join(TPL_FRONTEND, 'src'));
+
+// Root config files that must stay in sync with apps/frontend
+console.log('Syncing frontend root config files...');
+for (const file of ['quasar.config.ts', 'tsconfig.json', 'eslint.config.js']) {
+  const src = path.join(APPS_FRONTEND, file);
+  if (fs.existsSync(src)) {
+    syncFile(src, path.join(TPL_FRONTEND, file), TEMPLATE_SUBSTITUTIONS);
+  }
+}
 
 console.log('Syncing frontend src-capacitor/capacitor.config.json...');
 const capConfigPath = path.join(APPS_FRONTEND, 'src-capacitor', 'capacitor.config.json');
