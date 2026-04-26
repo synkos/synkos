@@ -63,6 +63,19 @@ export default defineConfig((ctx) => {
         if (!viteConf.resolve) viteConf.resolve = {};
         viteConf.resolve.preserveSymlinks = true;
 
+        // Guarantee a single instance of shared singletons across all packages
+        // (app code + workspace packages like @synkos/client). Without this,
+        // preserveSymlinks + pnpm strict hoisting can resolve the same package
+        // to two different paths → two module instances → broken singletons
+        // (e.g. Pinia's activePinia, Vue's app injection context).
+        viteConf.resolve.dedupe = [
+          ...(viteConf.resolve.dedupe ?? []),
+          'vue',
+          'vue-router',
+          'pinia',
+          'vue-i18n',
+        ];
+
         // pnpm strict hoisting doesn't symlink transitive deps — force Vite
         // to bundle them inline so they don't need to be resolved at runtime.
         if (!viteConf.optimizeDeps) viteConf.optimizeDeps = {};

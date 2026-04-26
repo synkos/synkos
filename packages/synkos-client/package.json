@@ -1,0 +1,55 @@
+{
+  "name": "@synkos/client",
+  "version": "0.1.0",
+  "description": "Synkos frontend client runtime (auth, API, stores, i18n, boot)",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "axios": "^1.14.0",
+    "synkos": "workspace:*"
+  },
+  "peerDependencies": {
+    "pinia": "^3.0.0",
+    "vue": "^3.0.0",
+    "vue-i18n": "^11.0.0",
+    "vue-router": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "pinia": "^3.0.1",
+    "tsup": "^8.0.0",
+    "typescript": "^5.9.0",
+    "vue": "^3.5.22",
+    "vue-i18n": "^11.3.0",
+    "vue-router": "^5.0.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "synkos",
+    "client",
+    "frontend",
+    "auth",
+    "vue",
+    "capacitor"
+  ]
+}

@@ -9,7 +9,7 @@
  *
  * workspace:* dependency handling:
  *   First-party published packages (FIRST_PARTY_PACKAGES) → converted to "^{version}"
- *   Internal-only workspace packages (@synkos/ui, etc.)   → excluded from template
+ *   Internal-only workspace packages                       → excluded from template
  *
  * What is NOT synced:
  *   package.json name/productName     → kept as {{PROJECT_NAME}} / {{APP_NAME}}
@@ -41,6 +41,7 @@ const EXCLUDED_DIR_NAMES = new Set(['node_modules', '.quasar', 'dist', 'ios', 'a
 const FIRST_PARTY_PACKAGES = {
   synkos: path.join(ROOT, 'packages', 'synkos', 'package.json'),
   '@synkos/ui': path.join(ROOT, 'packages', 'synkos-ui', 'package.json'),
+  '@synkos/client': path.join(ROOT, 'packages', 'synkos-client', 'package.json'),
 };
 
 let synced = 0;

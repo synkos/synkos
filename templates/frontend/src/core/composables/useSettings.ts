@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 import { useSettingsStore } from 'src/stores/settings.store';
 import { useAuthStore } from 'src/stores/auth.store';
 import { notificationsService } from 'src/services/notifications.service';
-import type { MessageLanguages } from 'src/boot/i18n';
+import type { MessageLanguages } from 'src/i18n';
 
 export function useSettings() {
   const { t } = useI18n();

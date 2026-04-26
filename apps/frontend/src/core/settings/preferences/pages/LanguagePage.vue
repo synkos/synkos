@@ -24,7 +24,7 @@
 import { useI18n } from 'vue-i18n';
 import { useSettings } from 'src/core/composables/useSettings';
 import SegmentControl from 'src/core/components/ui/SegmentControl.vue';
-import type { MessageLanguages } from 'src/boot/i18n';
+import type { MessageLanguages } from 'src/i18n';
 
 const { t } = useI18n();
 const { settingsStore, appLangs } = useSettings();
