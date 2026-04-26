@@ -16,9 +16,8 @@ export interface I18nBootOptions {
    */
   config?: AppConfig;
   /**
-   * App i18n messages. These should already include the core strings via spread
-   * (see the template's src/i18n/en-US/index.ts for the pattern). If omitted,
-   * only the bare core strings are used.
+   * App-specific i18n messages. Core strings are merged in automatically —
+   * no need to spread coreEnUS/coreEsES. Only provide app-specific keys.
    */
   messages?: {
     'en-US'?: AnyMessages;
@@ -55,12 +54,33 @@ export function createI18nBoot(options: I18nBootOptions = {}): ClientBootFn {
       locale = navigator.language.startsWith('en') ? 'en-US' : 'es-ES';
     }
 
-    // Use the app's messages directly. The app's i18n files spread from coreEnUS/coreEsES
-    // at build time (see src/i18n/en-US/index.ts), so they already contain all core strings.
-    // Fall back to the bare core if no app messages are provided.
+    // Auto-merge: core strings are the base, app messages override/extend.
+    // Apps no longer need to spread coreEnUS/coreEsES in their i18n files.
+    // For backward compat, if an app message already contains core keys it is
+    // still correct — the merge is idempotent.
+    function deepMerge(base: AnyMessages, override: AnyMessages): AnyMessages {
+      const result = { ...base };
+      for (const key of Object.keys(override)) {
+        const b = base[key];
+        const o = override[key];
+        if (b && o && typeof b === 'object' && typeof o === 'object' && !Array.isArray(b)) {
+          result[key] = deepMerge(b as AnyMessages, o as AnyMessages);
+        } else {
+          result[key] = o;
+        }
+      }
+      return result;
+    }
+
     const messages: Record<string, AnyMessages> = {
-      'en-US': (options.messages?.['en-US'] ?? coreEnUS) as AnyMessages,
-      'es-ES': (options.messages?.['es-ES'] ?? coreEsES) as AnyMessages,
+      'en-US': deepMerge(
+        coreEnUS as AnyMessages,
+        (options.messages?.['en-US'] ?? {}) as AnyMessages
+      ),
+      'es-ES': deepMerge(
+        coreEsES as AnyMessages,
+        (options.messages?.['es-ES'] ?? {}) as AnyMessages
+      ),
     };
 
     // Add any extra locales the app provides

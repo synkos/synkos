@@ -1,45 +1,52 @@
 {
   "name": "@synkos/client",
   "version": "0.1.0",
-  "description": "Synkos frontend client runtime (auth, API, stores, i18n, boot)",
+  "description": "Synkos frontend client runtime (auth, API, stores, i18n, boot, Vue components)",
   "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/synkos-client.js"
     }
   },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "module": "./dist/synkos-client.js",
   "types": "./dist/index.d.ts",
   "files": [
     "dist/"
   ],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit",
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "typecheck": "vue-tsc --noEmit",
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "@synkos/ui": "workspace:*",
     "axios": "^1.14.0",
     "synkos": "workspace:*"
   },
   "peerDependencies": {
     "pinia": "^3.0.0",
+    "quasar": "^2.0.0",
     "vue": "^3.0.0",
     "vue-i18n": "^11.0.0",
     "vue-router": "^5.0.0"
   },
   "devDependencies": {
+    "@quasar/vite-plugin": "^1.10.0",
     "@types/node": "^22.0.0",
+    "@vitejs/plugin-vue": "^5.2.3",
     "pinia": "^3.0.1",
-    "tsup": "^8.0.0",
+    "quasar": "^2.16.0",
+    "sass": "^1.87.0",
     "typescript": "^5.9.0",
+    "vite": "^6.3.5",
+    "vite-plugin-css-injected-by-js": "^5.0.1",
+    "vite-plugin-dts": "^4.5.4",
     "vue": "^3.5.22",
     "vue-i18n": "^11.3.0",
-    "vue-router": "^5.0.3"
+    "vue-router": "^5.0.3",
+    "vue-tsc": "^2.2.10"
   },
   "publishConfig": {
     "access": "public"
@@ -50,6 +57,7 @@
     "frontend",
     "auth",
     "vue",
+    "quasar",
     "capacitor"
   ]
 }

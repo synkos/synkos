@@ -9,7 +9,8 @@
       "import": "./dist/synkos-ui.js"
     },
     "./styles": "./dist/style.css",
-    "./variables.scss": "./src/styles/variables.scss"
+    "./variables.scss": "./src/styles/variables.scss",
+    "./package.json": "./package.json"
   },
   "module": "./dist/synkos-ui.js",
   "types": "./dist/index.d.ts",

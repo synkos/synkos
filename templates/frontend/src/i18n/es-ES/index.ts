@@ -1,27 +1,22 @@
-import { coreEsES } from '@synkos/client';
-
 export default {
-  ...coreEsES,
-
+  // ── Pestañas específicas de la app ────────────────────────────────────────
   tabs: {
     home: 'Inicio',
     profile: 'Perfil',
   },
 
+  // ── Páginas específicas de la app ─────────────────────────────────────────
   pages: {
-    ...coreEsES.pages,
-
     home: {
       title: 'Bienvenido',
       subtitle: 'Todo lo que necesitas,\nsiempre contigo.',
     },
 
     profile: {
-      ...coreEsES.pages.profile,
       stats: {
-        stat1: 'Stat 1',
-        stat2: 'Stat 2',
-        stat3: 'Stat 3',
+        stat1: 'Estadística 1',
+        stat2: 'Estadística 2',
+        stat3: 'Estadística 3',
       },
     },
   },

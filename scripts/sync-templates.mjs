@@ -51,6 +51,25 @@ let skipped = 0;
 
 function syncDir(src, dest) {
   fs.mkdirSync(dest, { recursive: true });
+
+  const srcEntries = new Set(
+    fs
+      .readdirSync(src, { withFileTypes: true })
+      .filter((e) => !EXCLUDED_DIR_NAMES.has(e.name))
+      .map((e) => e.name)
+  );
+
+  // Remove stale entries in dest that no longer exist in src
+  if (fs.existsSync(dest)) {
+    for (const entry of fs.readdirSync(dest, { withFileTypes: true })) {
+      if (EXCLUDED_DIR_NAMES.has(entry.name)) continue;
+      if (!srcEntries.has(entry.name)) {
+        const stalePath = path.join(dest, entry.name);
+        fs.rmSync(stalePath, { recursive: true, force: true });
+      }
+    }
+  }
+
   for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
     if (EXCLUDED_DIR_NAMES.has(entry.name)) continue;
     const srcPath = path.join(src, entry.name);

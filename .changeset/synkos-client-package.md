@@ -1,6 +1,7 @@
 ---
 '@synkos/client': minor
+'@synkos/ui': patch
 'create-synkos': patch
 ---
 
-add @synkos/client — frontend runtime package (auth store, API client, services, composables, boot factories, i18n)
+add Vue runtime to @synkos/client: createSynkosRouter, createSynkosBoot, SynkosApp, auth/settings pages, layouts, composables, and SynkosMessages type; template reduced from 60+ files to 16

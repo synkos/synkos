@@ -62,3 +62,24 @@ export interface OAuthDto {
   displayName?: string;
   deviceInfo?: DeviceInfo;
 }
+
+// ── Vue / Router ───────────────────────────────────────────────────────────────
+
+import type { Component } from 'vue';
+import type coreEnUS from './i18n/en-US.js';
+
+export interface AppTabRoute {
+  /** Route path — use '/' for the default/home tab */
+  path: string;
+  /** Vue Router route name */
+  name: string;
+  /** Material icon name for the tab bar */
+  icon: string;
+  /** i18n key resolved reactively in the tab bar (e.g. 'tabs.home') */
+  labelKey: string;
+  /** Lazy-loaded component factory */
+  component: () => Promise<{ default: Component }>;
+}
+
+/** Merge utility: produces a type that combines core i18n keys with app-specific keys */
+export type SynkosMessages<AppMessages> = typeof coreEnUS & AppMessages;
