@@ -1,11 +1,13 @@
 /**
- * Syncs apps/frontend → templates/frontend so the published template
- * stays in sync with the development workspace.
+ * Syncs apps/ → templates/ so the published templates stay in sync
+ * with the development workspaces.
  *
  * What is synced:
- *   src/                              → full copy (identical between both)
- *   package.json deps/devDeps         → from apps/, workspace:* entries handled below
- *   src-capacitor/capacitor.config.json → synced with template var substitution
+ *   Frontend src/                        → full mirror copy
+ *   Frontend src-capacitor/capacitor.config.json → with template var substitution
+ *   Frontend package.json deps/devDeps   → workspace:* entries resolved below
+ *   Backend src/                         → full mirror copy
+ *   Backend package.json deps/devDeps    → workspace:* entries resolved below
  *
  * workspace:* dependency handling:
  *   First-party published packages (FIRST_PARTY_PACKAGES) → converted to "^{version}"
@@ -25,8 +27,6 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
-const APPS_FRONTEND = path.join(ROOT, 'apps', 'frontend');
-const TPL_FRONTEND = path.join(ROOT, 'templates', 'frontend');
 
 // Values in apps/ that map to template vars in templates/
 const TEMPLATE_SUBSTITUTIONS = {
@@ -42,12 +42,12 @@ const FIRST_PARTY_PACKAGES = {
   synkos: path.join(ROOT, 'packages', 'synkos', 'package.json'),
   '@synkos/ui': path.join(ROOT, 'packages', 'synkos-ui', 'package.json'),
   '@synkos/client': path.join(ROOT, 'packages', 'synkos-client', 'package.json'),
+  '@synkos/server': path.join(ROOT, 'packages', 'synkos-server', 'package.json'),
 };
 
 let synced = 0;
-let skipped = 0;
 
-// ─── Sync src/ ───────────────────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function syncDir(src, dest) {
   fs.mkdirSync(dest, { recursive: true });
@@ -64,8 +64,7 @@ function syncDir(src, dest) {
     for (const entry of fs.readdirSync(dest, { withFileTypes: true })) {
       if (EXCLUDED_DIR_NAMES.has(entry.name)) continue;
       if (!srcEntries.has(entry.name)) {
-        const stalePath = path.join(dest, entry.name);
-        fs.rmSync(stalePath, { recursive: true, force: true });
+        fs.rmSync(path.join(dest, entry.name), { recursive: true, force: true });
       }
     }
   }
@@ -83,28 +82,6 @@ function syncDir(src, dest) {
   }
 }
 
-console.log('Syncing src/...');
-syncDir(path.join(APPS_FRONTEND, 'src'), path.join(TPL_FRONTEND, 'src'));
-
-// ─── Sync capacitor.config.json ──────────────────────────────────────────────
-
-console.log('Syncing src-capacitor/capacitor.config.json...');
-const capConfigPath = path.join(APPS_FRONTEND, 'src-capacitor', 'capacitor.config.json');
-const capConfigDest = path.join(TPL_FRONTEND, 'src-capacitor', 'capacitor.config.json');
-
-let capConfigContent = fs.readFileSync(capConfigPath, 'utf-8');
-for (const [real, tpl] of Object.entries(TEMPLATE_SUBSTITUTIONS)) {
-  capConfigContent = capConfigContent.replaceAll(real, tpl);
-}
-fs.writeFileSync(capConfigDest, capConfigContent);
-synced++;
-
-// ─── Sync package.json deps ───────────────────────────────────────────────────
-
-console.log('Syncing package.json dependencies...');
-const appsPkg = JSON.parse(fs.readFileSync(path.join(APPS_FRONTEND, 'package.json'), 'utf-8'));
-const tplPkg = JSON.parse(fs.readFileSync(path.join(TPL_FRONTEND, 'package.json'), 'utf-8'));
-
 function processWorkspaceDeps(deps = {}) {
   const result = {};
   for (const [name, version] of Object.entries(deps)) {
@@ -121,13 +98,52 @@ function processWorkspaceDeps(deps = {}) {
   return result;
 }
 
-tplPkg.dependencies = processWorkspaceDeps(appsPkg.dependencies);
-tplPkg.devDependencies = processWorkspaceDeps(appsPkg.devDependencies);
+function syncPackageJsonDeps(appsDir, tplDir) {
+  const appsPkg = JSON.parse(fs.readFileSync(path.join(appsDir, 'package.json'), 'utf-8'));
+  const tplPkg = JSON.parse(fs.readFileSync(path.join(tplDir, 'package.json'), 'utf-8'));
+  tplPkg.dependencies = processWorkspaceDeps(appsPkg.dependencies);
+  tplPkg.devDependencies = processWorkspaceDeps(appsPkg.devDependencies);
+  fs.writeFileSync(path.join(tplDir, 'package.json'), JSON.stringify(tplPkg, null, 2) + '\n');
+  synced++;
+}
 
-fs.writeFileSync(path.join(TPL_FRONTEND, 'package.json'), JSON.stringify(tplPkg, null, 2) + '\n');
+// ─── Frontend ─────────────────────────────────────────────────────────────────
+
+const APPS_FRONTEND = path.join(ROOT, 'apps', 'frontend');
+const TPL_FRONTEND = path.join(ROOT, 'templates', 'frontend');
+
+console.log('Syncing frontend src/...');
+syncDir(path.join(APPS_FRONTEND, 'src'), path.join(TPL_FRONTEND, 'src'));
+
+console.log('Syncing frontend src-capacitor/capacitor.config.json...');
+const capConfigPath = path.join(APPS_FRONTEND, 'src-capacitor', 'capacitor.config.json');
+const capConfigDest = path.join(TPL_FRONTEND, 'src-capacitor', 'capacitor.config.json');
+let capConfigContent = fs.readFileSync(capConfigPath, 'utf-8');
+for (const [real, tpl] of Object.entries(TEMPLATE_SUBSTITUTIONS)) {
+  capConfigContent = capConfigContent.replaceAll(real, tpl);
+}
+fs.writeFileSync(capConfigDest, capConfigContent);
 synced++;
+
+console.log('Syncing frontend package.json dependencies...');
+syncPackageJsonDeps(APPS_FRONTEND, TPL_FRONTEND);
+
+// ─── Backend ──────────────────────────────────────────────────────────────────
+
+const APPS_BACKEND = path.join(ROOT, 'apps', 'backend');
+const TPL_BACKEND = path.join(ROOT, 'templates', 'backend');
+
+if (fs.existsSync(APPS_BACKEND) && fs.existsSync(TPL_BACKEND)) {
+  console.log('Syncing backend src/...');
+  syncDir(path.join(APPS_BACKEND, 'src'), path.join(TPL_BACKEND, 'src'));
+
+  console.log('Syncing backend package.json dependencies...');
+  syncPackageJsonDeps(APPS_BACKEND, TPL_BACKEND);
+} else {
+  console.log('Skipping backend (apps/backend or templates/backend not found)');
+}
 
 // ─── Done ─────────────────────────────────────────────────────────────────────
 
-console.log(`✓ Synced ${synced} files (${skipped} skipped)`);
-console.log('  Remember to run pnpm install in templates/frontend if deps changed.');
+console.log(`✓ Synced ${synced} files`);
+console.log('  Remember to run pnpm install in the template dirs if deps changed.');
