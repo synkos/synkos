@@ -1,5 +1,11 @@
 # create-synkos
 
+## 0.2.12
+
+### Patch Changes
+
+- afe9089: fix quasar.config.ts in template (boot array, remove obsolete plugins); sync script now covers root config files
+
 ## 0.2.11
 
 ### Patch Changes
