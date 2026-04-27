@@ -30,7 +30,7 @@ const EXCLUDED_DIRS = new Set([
   path.join('frontend', 'src-capacitor', 'android'),
 ]);
 
-const EXCLUDED_DIR_NAMES = new Set(['.git', '.quasar']);
+const EXCLUDED_DIR_NAMES = new Set(['.git', '.quasar', '.claude', '.github', 'docs']);
 
 const DOTFILE_RENAMES = {
   '.gitignore': 'gitignore',

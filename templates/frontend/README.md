@@ -1,43 +1,29 @@
-# TGC App (tgc-app)
+# {{APP_NAME}}
 
-A Quasar Project
+A fullstack mobile/web app built with [Synkos](https://github.com/synkos/synkos), Quasar, and Vue 3.
 
-## Install the dependencies
-
-```bash
-yarn
-# or
-npm install
-```
-
-### Start the app in development mode (hot-code reloading, error reporting, etc.)
+## Setup
 
 ```bash
-quasar dev
+pnpm install
 ```
 
-### Lint the files
+## Development
 
 ```bash
-yarn lint
-# or
-npm run lint
+# Web
+pnpm dev
+
+# iOS (requires Xcode)
+pnpm dev:ios
 ```
 
-### Format the files
+## Build
 
 ```bash
-yarn format
-# or
-npm run format
+# Web
+pnpm build
+
+# iOS
+pnpm build:ios
 ```
-
-### Build the app for production
-
-```bash
-quasar build
-```
-
-### Customize the configuration
-
-See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
