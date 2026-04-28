@@ -1,96 +1,95 @@
 # Skill: Performance
 
-## Core Principles
+> **Scope**: Principalmente backend (Node/Express). Los principios de async y paralelismo aplican también al frontend.
 
-- Never block the event loop
-- Prefer async I/O
-- Run independent operations in parallel
-- Move heavy work out of request path
-- Optimize hot paths with caching
-- Minimize memory footprint
+## Principios universales
 
----
-
-## Database Rules
-
-- Always use `.lean()` on read queries
-- Select only required fields
-- Index every frequently filtered field
-- Avoid full collection scans
-- Use compound indexes for pagination
-- Run independent queries with `Promise.all()`
+- Nunca bloquear el event loop
+- Preferir async I/O
+- Ejecutar operaciones independientes en paralelo
+- Mover trabajo pesado fuera del request path
+- Minimizar el footprint de memoria
 
 ---
 
-## Caching
+## Base de datos
 
-- Cache only read operations
-- Use short TTL (≤ 5 minutes for user data)
-- Always invalidate cache on writes
-- Use consistent keys: `{zone}:{entity}:{id}`
-
----
-
-## Request Path Constraints
-
-- No CPU-heavy operations
-- No external calls (email, storage, etc.)
-- No synchronous crypto
-- Response must be fast and deterministic
+- Seleccionar solo los campos necesarios — nunca fetch el registro completo si solo necesitas 3 campos
+- Indexar todo campo que se filtra o ordena frecuentemente
+- Evitar full table scans — los filtros deben usar índices
+- Usar índices compuestos para queries con múltiples campos o paginación
+- Ejecutar queries independientes con `Promise.all()`, nunca await secuencial
 
 ---
 
-## Background Jobs
+## Caché
 
-- Use queue for:
+- Cachear solo operaciones de lectura
+- TTL corto (≤ 5 minutos para datos de usuario)
+- Siempre invalidar caché en escrituras
+- Keys consistentes: `{zona}:{entidad}:{id}`
+
+---
+
+## Request path
+
+- Sin operaciones CPU-intensivas
+- Sin llamadas externas inline (email, storage, etc.)
+- Sin crypto síncrono
+- La respuesta debe ser rápida y determinista
+
+---
+
+## Background jobs
+
+- Usar cola para:
   - emails
-  - file processing
-  - heavy computation
-- Request handlers must only enqueue jobs
+  - procesamiento de archivos
+  - cómputo pesado
+- Los request handlers solo encolan — no procesan
 
 ---
 
-## File Handling
+## Archivos
 
-- Always enforce size limits
-- Validate MIME types
-- Large processing must be async (queue)
-
----
-
-## Concurrency
-
-- Never await sequentially if operations are independent
-- Prefer batching over multiple queries
+- Siempre validar tamaño máximo
+- Validar MIME types
+- Procesamiento de archivos grandes: siempre async (cola)
 
 ---
 
-## Metrics
+## Concurrencia
 
-Track:
-- request duration
-- DB latency (>100ms)
-- cache hit/miss
-- queue depth
+- Nunca await secuencial si las operaciones son independientes
+- Preferir batching sobre múltiples queries individuales
+
+---
+
+## Métricas a monitorear
+
+- Duración de requests
+- Latencia de DB (alertar si >100ms)
+- Cache hit/miss ratio
+- Profundidad de la cola de jobs
 
 ---
 
 ## Anti-Patterns
 
-- Missing `.lean()` on reads
-- Sequential awaits
-- No DB indexes
-- Heavy logic in controllers
-- Long cache TTLs on mutable data
-- Inline email/file processing
+- Queries sin filtros indexados
+- Awaits secuenciales en operaciones independientes
+- Lógica pesada en controllers
+- TTL largo en datos mutables
+- Procesamiento inline de email/archivos en el request handler
+- Fetch de registros completos cuando solo se necesitan algunos campos
 
 ---
 
 ## Checklist
 
-- Reads use `.lean()`
-- Queries are indexed
-- Parallelizable ops use `Promise.all`
-- Heavy work moved to queue
-- Cache used on hot paths
-- No blocking operations in request flow
+- Queries filtran por campos indexados
+- Operaciones paralelizables usan `Promise.all`
+- Trabajo pesado movido a cola
+- Caché en hot paths de lectura
+- Sin operaciones bloqueantes en el request flow
+- Solo campos necesarios seleccionados en queries

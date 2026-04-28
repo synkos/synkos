@@ -1,5 +1,32 @@
 # Synkos — Project Context for Claude
 
+## Protocolo de orquestación — Comportamiento automático
+
+> Aplica a **toda** tarea. Clasifica antes de ejecutar. No esperes instrucción explícita.
+
+### Clasificación
+
+| Tipo         | Señales                                                                | Pipeline                                      |
+| ------------ | ---------------------------------------------------------------------- | --------------------------------------------- |
+| **Simple**   | 1-3 archivos, mismo módulo, sin nueva API pública                      | Ejecutar directo                              |
+| **Medio**    | Multi-archivo, un paquete, posible sync templates                      | Análisis breve → ejecutar                     |
+| **Complejo** | Multi-paquete, nueva API pública, +10 archivos, decisión arquitectural | `architect` → `coder` → `reviewer` → `tester` |
+
+### Checklist post-implementación (siempre, sin que te lo pidan)
+
+1. ¿Se modificó `apps/frontend/src/` o `apps/backend/src/`? → proponer `pnpm sync:templates` (sincroniza ambos)
+2. ¿Se modificó `packages/`? → evaluar changeset (ver tabla más abajo)
+3. ¿Hay commits pendientes? → seguir workflow `push-git`
+
+### Reglas de orquestación
+
+- Tarea **Compleja**: spawnear agente `architect` antes de tocar ningún archivo. Esperar su plan.
+- Tarea **Compleja** con módulos independientes: spawnear múltiples agentes `coder` en paralelo.
+- El agente `reviewer` siempre revisa antes de commitear en tarea Compleja.
+- El agente `tester` ejecuta verificación final antes del push.
+
+---
+
 ## What is this project?
 
 Synkos is a **framework and scaffolding CLI** for building fullstack mobile/web apps with Vue + Capacitor (frontend) and Node/Express (backend). The main deliverable is the `create-synkos` npm package: users run `pnpm create synkos` and get a ready-to-use project.

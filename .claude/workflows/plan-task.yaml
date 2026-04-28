@@ -1,55 +1,65 @@
 name: plan-task
-description: Analyze a request and decide execution strategy
+description: Classify a task and orchestrate the appropriate pipeline automatically
 
 phases:
 
-  - phase: analyze
+  - phase: classify
     steps:
-      - step: understand-request
+      - step: identify-scope
         action: |
-          Identify:
-          - goal
-          - scope
-          - constraints
-          - affected modules
+          Before touching any file, determine:
+          - Goal of the task
+          - Modules affected (apps/, packages/, templates/)
+          - Whether public API changes are involved
+          - Whether a changeset will be needed
+          - Whether template sync will be needed
 
-      - step: classify-task
+      - step: classify-complexity
         action: |
-          Classify as:
-          - feature
-          - bug
-          - refactor
-          - mixed
+          Assign one of:
+
+          SIMPLE   — 1-3 files, single module, no new public API, no template sync needed
+          MEDIO    — multi-file, single package, possible template sync, possible changeset
+          COMPLEJO — multi-package, new public API, 10+ files, architectural decision
 
       - step: risk-assessment
         action: |
-          Evaluate:
-          - complexity
-          - impact
-          - unclear areas
+          Identify:
+          - Breaking changes to existing API consumers
+          - Cross-package dependencies that could break
+          - Ambiguities that must be clarified before implementation
 
   # ─────────────────────────────────────
 
-  - phase: plan
+  - phase: pipeline-selection
     steps:
-      - step: define-strategy
+      - step: select-pipeline
         action: |
-          Decide:
-          - which workflow(s) to use
-          - execution order
+          Based on classification, select and execute the pipeline:
 
-      - step: split-work
-        action: |
-          If complex:
-          - break into smaller tasks
-          - ensure each is independently executable
+          SIMPLE:
+            → Execute directly
+            → Apply post-implementation checklist when done
 
-      - step: define-constraints
+          MEDIO:
+            → Brief impact analysis (list affected files and reason)
+            → Execute
+            → Apply post-implementation checklist
+
+          COMPLEJO:
+            → Spawn `architect` agent — wait for its plan before writing any code
+            → Spawn `coder` agent(s) based on architect's plan
+               • Spawn multiple coders in parallel if modules are independent
+            → Spawn `reviewer` agent — must APPROVE before committing
+            → Spawn `tester` agent — must report LISTO PARA COMMIT: SÍ
+            → Apply post-implementation checklist
+
+      - step: post-checklist
         action: |
-          Specify:
-          - boundaries
-          - files affected
-          - risks to avoid
+          After ANY implementation, always check (without being asked):
+          1. Was apps/frontend/src/ modified? → propose: pnpm sync:templates
+          2. Was packages/ modified? → evaluate changeset need (see CLAUDE.md table)
+          3. Are there uncommitted changes? → follow push-git workflow
 
   # ─────────────────────────────────────
 
@@ -57,8 +67,9 @@ phases:
     steps:
       - step: plan-summary
         action: |
-          Output:
-          - task classification
-          - chosen workflow(s)
-          - execution steps
-          - potential risks
+          Report before executing:
+          - Classification (Simple / Medio / Complejo)
+          - Pipeline chosen
+          - Agents to spawn (if Complejo), with their inputs
+          - Workflows to follow
+          - Post-checklist items that will apply

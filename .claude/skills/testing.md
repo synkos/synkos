@@ -1,78 +1,95 @@
 # Skill: Testing
 
-## Core Principles
+> **Scope**: Backend (Node/Express) y Frontend (Vue/Quasar). Lee la sección correspondiente según el contexto del cambio.
+
+## Principios universales
 
 - Test behavior, not implementation
-- Prefer integration tests over mocks
-- Tests must be deterministic and isolated
-- Each test must be independent
-- Cover both success and failure paths
+- Tests deben ser deterministas e independientes entre sí
+- Cubrir tanto el happy path como los casos de error
+- Sin dependencias de orden de ejecución
 
 ---
 
-## Scope
+## Backend — Node/Express (vitest + integración real)
 
+### Filosofía
+- Preferir integration tests sobre mocks — probar el stack real evita divergencias
+- La base de datos/estado se resetea entre tests — nunca compartir estado mutable
+
+### Scope
 Test:
-- business logic (services)
-- HTTP behavior (controllers)
-- auth and critical flows
+- Lógica de negocio (services)
+- Comportamiento HTTP (controllers + routes)
+- Flujos críticos (auth, permisos, validación de inputs)
 
-Do not test:
-- type definitions
-- infrastructure utilities
-- third-party internals
+No test:
+- Definiciones de tipos
+- Utilidades de infraestructura de terceros
+- Internals de @synkos/server
 
----
+### Estructura
+- Cada test configura su propio estado/datos
+- Estado reseteado antes de cada test
+- Sin estado global compartido entre tests
+- Sin dependencia de orden de ejecución
 
-## Structure
+### Assertions
+- Siempre assert: status code + estructura de respuesta
+- Para errores: assert el código de error (`error.code`)
+- Para éxito: assert los campos clave del `data`
 
-- Each test sets up its own data
-- Database is reset between tests
-- No shared mutable state
-- No reliance on execution order
-
----
-
-## Assertions
-
-- Always assert status codes
-- Always assert response structure
-- For errors: assert error codes
-- For success: assert key data fields
+### Async
+- Solo async/await — sin callbacks ni timers
+- Manejar explícitamente las promise rejections
 
 ---
 
-## Isolation
+## Frontend — Vue/Quasar (vitest + @vue/test-utils)
 
-- Reset state before each test
-- No cross-test dependencies
-- No hidden global state
+### Filosofía
+- Testear comportamiento observable: qué ve el usuario, qué emite el componente
+- Mocks aceptables para: @synkos/client stores, router, APIs externas
+- No testear internals de Quasar ni de @synkos/ui
+
+### Scope
+Test:
+- Interacciones de usuario (clicks, inputs, formularios)
+- Lógica de composables (valores retornados, efectos secundarios)
+- Renderizado condicional basado en props/estado
+
+No test:
+- Estilos o clases CSS (frágil, no describe comportamiento)
+- Internals de librerías (Quasar, @synkos/ui)
+- Animaciones o transiciones
+
+### Estructura
+- Montar el componente con `mount()` de @vue/test-utils
+- Proveer mocks de stores via `createTestingPinia()`
+- Limpiar entre tests (unmount + limpiar mocks)
+
+### Assertions
+- `wrapper.text()` o `wrapper.find()` para contenido visible
+- `wrapper.emitted()` para eventos
+- `store.method` para efectos en stores
 
 ---
 
-## Async
+## Anti-Patterns (universales)
 
-- Use async/await only
-- No callbacks or timers
-- Handle promise rejections explicitly
-
----
-
-## Anti-Patterns
-
-- Mocking core behavior instead of testing it
-- Tests that always pass without meaningful assertions
-- Shared data between tests
-- Testing implementation details instead of outcomes
-- Ignoring error paths
+- Mocks del comportamiento core en lugar de testear el real
+- Tests que siempre pasan sin assertions significativas
+- Estado compartido entre tests
+- Testear detalles de implementación en lugar de resultados
+- Ignorar los casos de error
 
 ---
 
 ## Checklist
 
-- Happy path covered
-- Error cases covered
-- Tests are independent
-- No hidden state
-- Assertions are meaningful
-- New logic is tested
+- Happy path cubierto
+- Casos de error cubiertos
+- Tests son independientes
+- Sin estado oculto compartido
+- Assertions son significativas
+- Lógica nueva tiene tests
