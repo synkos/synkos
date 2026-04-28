@@ -139,35 +139,6 @@ export default defineConfig(() => {
       open: true, // opens browser window automatically
     },
 
-    // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#framework
-    framework: {
-      config: {
-        dark: true,
-      },
-
-      // iconSet: 'material-icons', // Quasar icon set
-      // lang: 'en-US', // Quasar language pack
-
-      // Components used inside @synkos/client (pre-built package, not scanned by auto-import)
-      components: [
-        'QBtn',
-        'QCircularProgress',
-        'QDialog',
-        'QFooter',
-        'QHeader',
-        'QIcon',
-        'QLayout',
-        'QPage',
-        'QPageContainer',
-        'QSpinner',
-      ],
-
-      // Quasar plugins
-      plugins: ['Notify'],
-    },
-
-    // animations: 'all', // --- includes all animations
-    // https://v2.quasar.dev/options/animations
     animations: [],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#sourcefiles

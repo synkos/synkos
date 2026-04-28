@@ -67,7 +67,6 @@ function showLegal(type: 'terms' | 'privacy'): void {
 </script>
 
 <style lang="scss" scoped>
-// q-page background and min-height are handled globally in app.scss
 .legal-scroll {
   padding-top: $space-4;
 }

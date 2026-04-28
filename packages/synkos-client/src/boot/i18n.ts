@@ -11,7 +11,7 @@ type AnyMessages = Record<string, unknown>;
 export interface I18nBootOptions {
   /**
    * App configuration. Required when i18n runs before auth in the boot order
-   * (the default Quasar order is i18n → auth). Calling setClientConfig early
+   * (boot order: i18n runs before auth). Calling setClientConfig early
    * here ensures every subsequent boot and store can call getClientConfig().
    */
   config?: AppConfig;

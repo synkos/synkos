@@ -70,11 +70,11 @@ export type {
   BuiltInSettingsSection,
 } from './navigation/router.js';
 
-// setupSynkosRouter + synkosSettingsRoutes — Quasar-style routing (full control)
+// setupSynkosRouter + synkosSettingsRoutes — headless routing (full control)
 export { setupSynkosRouter, synkosSettingsRoutes } from './navigation/router.js';
 export type { SynkosSetupOptions } from './navigation/router.js';
 
-// ── Layout components (for Quasar-style route definitions) ───────────────────
+// ── Layout components ─────────────────────────────────────────────────────────
 export { default as MainLayout } from './navigation/layouts/MainLayout.vue';
 export { default as AuthLayout } from './navigation/layouts/AuthLayout.vue';
 

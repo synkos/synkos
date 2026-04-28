@@ -69,7 +69,6 @@ const currentYear = new Date().getFullYear();
 </script>
 
 <style lang="scss" scoped>
-// q-page background and min-height are handled globally in app.scss
 .about-scroll {
   padding-top: $space-4;
   padding-bottom: $space-16;

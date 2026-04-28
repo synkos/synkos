@@ -215,7 +215,6 @@ function goHome() {
 </script>
 
 <style lang="scss" scoped>
-// q-page background and min-height handled globally; keep flex layout for step containers
 .delete-page {
   display: flex;
   flex-direction: column;

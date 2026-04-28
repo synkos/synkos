@@ -299,7 +299,7 @@ function buildRoutes(appTabRoutes: AppTabRoute[], opts: SynkosRouterOptions): Ro
       component: () => import('./layouts/MainLayout.vue'),
       children: [
         // User-defined tab routes
-        ...appTabRoutes.map(({ path, name, component }) => ({ path, name, component })),
+        ...appTabRoutes.map(({ path, name, component }) => ({ path, name, component: component! })),
 
         // Core profile tab (always present)
         {
@@ -444,7 +444,7 @@ export function synkosSettingsRoutes(config?: SettingsConfig): RouteRecordRaw[] 
 
 // ── setupSynkosRouter ─────────────────────────────────────────────────────────
 //
-// Alternative to createSynkosRouter for Quasar-style routing.
+// Alternative to createSynkosRouter for headless routing.
 // Takes a fully-constructed Vue Router and wires up Synkos:
 //   - Auto-discovers tabs from routes with meta.tab
 //   - Registers settings config for AppMenuDrawer

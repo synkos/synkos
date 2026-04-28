@@ -18,7 +18,6 @@ const { t } = useI18n();
 </script>
 
 <style lang="scss" scoped>
-// q-page background handled globally; keep centering layout
 .home-page {
   display: flex;
   align-items: center;

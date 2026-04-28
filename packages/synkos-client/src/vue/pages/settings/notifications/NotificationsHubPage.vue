@@ -60,7 +60,6 @@ const { t } = useI18n();
 </script>
 
 <style lang="scss" scoped>
-// q-page background and min-height are handled globally in app.scss
 .notifications-scroll {
   padding-top: $space-4;
 }

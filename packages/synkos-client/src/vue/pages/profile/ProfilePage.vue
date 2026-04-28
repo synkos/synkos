@@ -51,7 +51,6 @@ function goToLogin() {
 </script>
 
 <style lang="scss" scoped>
-// q-page background is handled globally; this class exists only for specificity
 // if a page-level override is ever needed.
 .profile-scroll {
   padding-bottom: $space-16;

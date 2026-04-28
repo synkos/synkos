@@ -28,7 +28,7 @@
               </button>
             </div>
 
-            <AppSpinner v-if="photoLoading" size="18px" color="primary" class="q-ml-auto" />
+            <AppSpinner v-if="photoLoading" size="18px" color="primary" style="margin-left: auto" />
           </div>
 
           <p v-if="photoError" class="field-error">{{ photoError }}</p>

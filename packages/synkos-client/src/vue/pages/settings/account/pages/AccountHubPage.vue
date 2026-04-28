@@ -74,7 +74,6 @@ const {
 </script>
 
 <style lang="scss" scoped>
-// q-page background and min-height are handled globally in app.scss
 .account-scroll {
   padding-top: $space-4;
 }

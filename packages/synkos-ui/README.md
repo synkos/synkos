@@ -1,6 +1,6 @@
 # @synkos/ui
 
-iOS-styled Vue 3 + Quasar component library for Synkos apps.
+iOS-styled Vue 3 component library for Synkos apps.
 
 ## Install
 
@@ -90,7 +90,7 @@ iOS large-title page header with optional right slot.
 ```vue
 <AppPageLargeTitle title="Settings" subtitle="Manage your account">
   <template #right>
-    <q-btn flat icon="edit" @click="handleEdit" />
+    <AppButton icon="edit" @click="handleEdit" />
   </template>
 </AppPageLargeTitle>
 ```

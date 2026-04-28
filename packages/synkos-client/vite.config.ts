@@ -14,8 +14,6 @@ const synkosUiRoot = path.dirname(_require.resolve('@synkos/ui/package.json'));
 export default defineConfig({
   plugins: [
     vue({ template: { transformAssetUrls } }),
-    // Quasar plugin: auto-imports q-* components used in our SFCs as named imports
-    // from 'quasar' (which is external — not bundled, provided by the consuming app).
     quasar({ autoImportComponentCase: 'pascal' }),
     cssInjectedByJs(),
     dts({ include: ['src'], insertTypesEntry: true }),

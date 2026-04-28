@@ -5,7 +5,6 @@
 </template>
 
 <script setup lang="ts">
-// Drop-in replacement for q-page.
 // Fills its container and applies the themed page background.
 </script>
 

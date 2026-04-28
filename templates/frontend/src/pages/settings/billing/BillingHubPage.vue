@@ -59,7 +59,6 @@ const { t } = useI18n();
 </script>
 
 <style lang="scss" scoped>
-// q-page background and min-height are handled globally in app.scss
 .billing-scroll {
   padding-top: $space-4;
 }
