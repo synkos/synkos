@@ -82,6 +82,16 @@ export { default as AuthLayout } from './navigation/layouts/AuthLayout.vue';
 export { default as SynkosApp } from './vue/SynkosApp.vue';
 export { default as LegalBottomSheet } from './vue/components/LegalBottomSheet.vue';
 
+// ── Auth UI components (for user-owned auth pages) ────────────────────────────
+export { default as OtpInput } from './vue/components/auth/OtpInput.vue';
+export { default as AuthFieldGroup } from './vue/components/auth/AuthFieldGroup.vue';
+export { default as AuthFieldRow } from './vue/components/auth/AuthFieldRow.vue';
+export { default as AuthFeedback } from './vue/components/auth/AuthFeedback.vue';
+
+// ── Auth composables ──────────────────────────────────────────────────────────
+export { usePasswordStrength } from './composables/usePasswordStrength.js';
+export type { PasswordStrength, StrengthLevel } from './composables/usePasswordStrength.js';
+
 // ── Internal config access (needed by user-owned auth pages) ──────────────────
 export { getClientConfig } from './internal/app-config.js';
 

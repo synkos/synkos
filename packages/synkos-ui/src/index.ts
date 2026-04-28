@@ -8,6 +8,7 @@ export { default as AppCircularProgress } from './components/feedback/AppCircula
 
 // ── Forms ─────────────────────────────────────────────────────────────────────
 export { default as SegmentControl } from './components/forms/SegmentControl.vue';
+export { default as PasswordStrengthBar } from './components/forms/PasswordStrengthBar.vue';
 
 // ── Layout ────────────────────────────────────────────────────────────────────
 export { default as AppPage } from './components/layout/AppPage.vue';

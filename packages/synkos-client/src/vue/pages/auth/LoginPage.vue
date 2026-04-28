@@ -1,6 +1,6 @@
 <template>
   <div class="auth-root">
-    <!-- ── Loading overlay (app initialization) ──────────────────────────── -->
+    <!-- ── Splash (app initialization) ──────────────────────────────────────── -->
     <Transition name="fade">
       <div v-if="!authStore.isInitialized" class="splash-overlay">
         <div class="splash-logo">
@@ -18,9 +18,9 @@
       </div>
     </Transition>
 
-    <!-- ── Main auth screen ───────────────────────────────────────────────── -->
+    <!-- ── Auth screen ───────────────────────────────────────────────────────── -->
     <div class="auth-screen">
-      <!-- Logo block — always visible, outside the form transition -->
+      <!-- App identity -->
       <div class="auth-header">
         <div class="auth-app-icon">
           <AppIcon name="style" size="38px" style="color: #fff" />
@@ -29,14 +29,14 @@
         <p class="app-tagline">{{ t('pages.auth.tagline') }}</p>
       </div>
 
-      <!-- ── Form area — transitions between social / login / register ─────── -->
+      <!-- Form area — transitions between modes -->
       <Transition :name="transitionName" mode="out-in" @after-enter="onFormAfterEnter">
-        <!-- ── Social mode ────────────────────────────────────────────────── -->
+        <!-- ── Social ── -->
         <div v-if="mode === 'social'" key="social" class="form-block form-block--social">
           <button
             class="social-btn social-btn--apple"
-            @click="handleApple"
             :disabled="authStore.isLoading"
+            @click="handleApple"
           >
             <svg class="social-icon" viewBox="0 0 24 24" fill="currentColor">
               <path
@@ -48,8 +48,8 @@
 
           <button
             class="social-btn social-btn--google"
-            @click="handleGoogle"
             :disabled="authStore.isLoading"
+            @click="handleGoogle"
           >
             <svg class="social-icon" viewBox="0 0 24 24">
               <path
@@ -72,7 +72,6 @@
             {{ t('pages.auth.continueGoogle') }}
           </button>
 
-          <!-- Global error -->
           <Transition name="fade">
             <div v-if="globalError" class="global-error">
               <AppIcon name="error_outline" size="16px" />
@@ -83,61 +82,43 @@
           <AppButton variant="link" :disabled="authStore.isLoading" @click="goTo('login')">
             {{ t('pages.auth.continueEmail') }}
           </AppButton>
-
           <button class="guest-btn" @click="handleGuest">
             {{ t('pages.auth.continueGuest') }}
           </button>
         </div>
+
+        <!-- ── Login ── -->
         <div v-else-if="mode === 'login'" key="login" class="form-block">
           <button class="back-btn" @click="goTo('social')">
-            <AppIcon name="chevron_left" size="22px" />
-            {{ t('nav.back') }}
+            <AppIcon name="chevron_left" size="22px" />{{ t('nav.back') }}
           </button>
-
           <p class="form-subtitle">{{ t('pages.auth.loginSubtitle') }}</p>
-
-          <div class="field-group">
-            <div class="field-wrap" :class="{ 'field-wrap--error': errors.email }">
-              <input
-                v-model="form.email"
-                type="email"
-                class="field-input"
-                :placeholder="t('pages.auth.emailPlaceholder')"
-                autocomplete="email"
-                inputmode="email"
-                @input="errors.email = ''"
-              />
-            </div>
-            <div class="field-separator" />
-            <div class="field-wrap" :class="{ 'field-wrap--error': errors.password }">
-              <input
-                v-model="form.password"
-                :type="showPassword ? 'text' : 'password'"
-                class="field-input"
-                :placeholder="t('pages.auth.passwordPlaceholder')"
-                autocomplete="current-password"
-                @input="errors.password = ''"
-              />
-              <button class="field-eye" @click="showPassword = !showPassword" tabindex="-1">
-                <AppIcon :name="showPassword ? 'visibility_off' : 'visibility'" size="18px" />
-              </button>
-            </div>
-          </div>
-
+          <AuthFieldGroup>
+            <AuthFieldRow
+              v-model="form.email"
+              type="email"
+              :placeholder="t('pages.auth.emailPlaceholder')"
+              :error="!!errors.email"
+              autocomplete="email"
+              inputmode="email"
+              @input="errors.email = ''"
+            />
+            <AuthFieldRow
+              v-model="form.password"
+              type="password"
+              :placeholder="t('pages.auth.passwordPlaceholder')"
+              :error="!!errors.password"
+              autocomplete="current-password"
+              @input="errors.password = ''"
+            />
+          </AuthFieldGroup>
           <button class="forgot-btn" @click="goTo('forgot')">
             {{ t('pages.auth.forgotPassword') }}
           </button>
-
-          <div class="feedback-area">
-            <div v-if="errors.email || errors.password" class="error-text">
-              {{ errors.email || errors.password }}
-            </div>
-            <div v-else-if="globalError" class="global-error">
-              <AppIcon name="error_outline" size="16px" />
-              {{ globalError }}
-            </div>
-          </div>
-
+          <AuthFeedback
+            :field-error="errors.email || errors.password"
+            :global-error="globalError"
+          />
           <AppButton
             :loading="authStore.isLoading"
             :disabled="!form.email || !form.password"
@@ -145,7 +126,6 @@
           >
             {{ t('pages.auth.signIn') }}
           </AppButton>
-
           <p class="switch-text">
             {{ t('pages.auth.noAccount') }}
             <button class="switch-link" @click="goTo('register')">
@@ -153,68 +133,45 @@
             </button>
           </p>
         </div>
+
+        <!-- ── Register ── -->
         <div v-else-if="mode === 'register'" key="register" class="form-block">
           <button class="back-btn" @click="goTo('login')">
-            <AppIcon name="chevron_left" size="22px" />
-            {{ t('pages.auth.backToLogin') }}
+            <AppIcon name="chevron_left" size="22px" />{{ t('pages.auth.backToLogin') }}
           </button>
-
           <p class="form-subtitle">{{ t('pages.auth.createSubtitle') }}</p>
-
-          <div class="field-group">
-            <div class="field-wrap" :class="{ 'field-wrap--error': errors.email }">
-              <input
-                v-model="form.email"
-                type="email"
-                class="field-input"
-                :placeholder="t('pages.auth.emailPlaceholder')"
-                autocomplete="email"
-                inputmode="email"
-                @input="errors.email = ''"
-              />
-            </div>
-            <div class="field-separator" />
-            <div class="field-wrap" :class="{ 'field-wrap--error': errors.password }">
-              <input
-                v-model="form.password"
-                :type="showPassword ? 'text' : 'password'"
-                class="field-input"
-                :placeholder="t('pages.auth.newPasswordPlaceholder')"
-                autocomplete="new-password"
-                @input="
-                  errors.password = '';
-                  validatePassword();
-                "
-              />
-              <button class="field-eye" @click="showPassword = !showPassword" tabindex="-1">
-                <AppIcon :name="showPassword ? 'visibility_off' : 'visibility'" size="18px" />
-              </button>
-            </div>
-          </div>
-
-          <div v-if="form.password" class="password-strength">
-            <div class="strength-bar">
-              <div
-                class="strength-fill"
-                :style="{ width: passwordStrength.pct + '%' }"
-                :class="`strength-fill--${passwordStrength.level}`"
-              />
-            </div>
-            <span class="strength-label" :class="`strength-label--${passwordStrength.level}`">
-              {{ t(`pages.auth.passwordStrength.${passwordStrength.level}`) }}
-            </span>
-          </div>
-
-          <div class="feedback-area">
-            <div v-if="errors.email || errors.password" class="error-text">
-              {{ errors.email || errors.password }}
-            </div>
-            <div v-else-if="globalError" class="global-error">
-              <AppIcon name="error_outline" size="16px" />
-              {{ globalError }}
-            </div>
-          </div>
-
+          <AuthFieldGroup>
+            <AuthFieldRow
+              v-model="form.email"
+              type="email"
+              :placeholder="t('pages.auth.emailPlaceholder')"
+              :error="!!errors.email"
+              autocomplete="email"
+              inputmode="email"
+              @input="errors.email = ''"
+            />
+            <AuthFieldRow
+              v-model="form.password"
+              type="password"
+              :placeholder="t('pages.auth.newPasswordPlaceholder')"
+              :error="!!errors.password"
+              autocomplete="new-password"
+              @input="
+                errors.password = '';
+                validatePassword();
+              "
+            />
+          </AuthFieldGroup>
+          <PasswordStrengthBar
+            v-if="form.password"
+            :level="passwordStrength.level"
+            :pct="passwordStrength.pct"
+            :labels="strengthLabels"
+          />
+          <AuthFeedback
+            :field-error="errors.email || errors.password"
+            :global-error="globalError"
+          />
           <AppButton
             :loading="authStore.isLoading"
             :disabled="!canRegister"
@@ -222,7 +179,6 @@
           >
             {{ t('pages.auth.createAccountBtn') }}
           </AppButton>
-
           <p class="terms-text">
             {{ t('pages.auth.termsPrefix') }}
             <button class="switch-link" @click="showLegal('terms')">
@@ -234,94 +190,58 @@
             </button>
           </p>
         </div>
+
+        <!-- ── Forgot password ── -->
         <div v-else-if="mode === 'forgot'" key="forgot" class="form-block">
           <button class="back-btn" @click="goTo('login')">
-            <AppIcon name="chevron_left" size="22px" />
-            {{ t('nav.back') }}
+            <AppIcon name="chevron_left" size="22px" />{{ t('nav.back') }}
           </button>
-
           <p class="form-subtitle">{{ t('pages.auth.forgotSubtitle') }}</p>
-
-          <div class="field-group">
-            <div class="field-wrap" :class="{ 'field-wrap--error': errors.email }">
-              <input
-                v-model="forgotEmail"
-                type="email"
-                class="field-input"
-                :placeholder="t('pages.auth.emailPlaceholder')"
-                autocomplete="email"
-                inputmode="email"
-                @input="errors.email = ''"
-              />
-            </div>
-          </div>
-
-          <div class="feedback-area">
-            <div v-if="errors.email" class="error-text">{{ errors.email }}</div>
-            <div v-else-if="globalError" class="global-error">
-              <AppIcon name="error_outline" size="16px" />
-              {{ globalError }}
-            </div>
-          </div>
-
+          <AuthFieldGroup>
+            <AuthFieldRow
+              v-model="forgotEmail"
+              type="email"
+              :placeholder="t('pages.auth.emailPlaceholder')"
+              :error="!!errors.email"
+              autocomplete="email"
+              inputmode="email"
+              @input="errors.email = ''"
+            />
+          </AuthFieldGroup>
+          <AuthFeedback :field-error="errors.email" :global-error="globalError" />
           <AppButton
             :loading="authStore.isLoading"
             :disabled="!forgotEmail"
-            @click="handleForgotPassword"
+            @click="handleForgotPassword()"
           >
             {{ t('pages.auth.forgotSend') }}
           </AppButton>
         </div>
+
+        <!-- ── Reset password (OTP → new password) ── -->
         <div v-else-if="mode === 'reset'" key="reset" class="form-block">
           <button class="back-btn" @click="handleResetBack">
-            <AppIcon name="chevron_left" size="22px" />
-            {{ t('nav.back') }}
+            <AppIcon name="chevron_left" size="22px" />{{ t('nav.back') }}
           </button>
 
           <Transition :name="resetStepTransition" mode="out-in" @after-enter="onFormAfterEnter">
-            <!-- ── Step 1: código ── -->
             <div v-if="resetStep === 'code'" key="reset-code" class="reset-step">
               <p class="form-subtitle">
                 {{ t('pages.auth.resetSubtitle') }} <strong>{{ forgotEmail }}</strong>
               </p>
-
-              <div
-                class="otp-row"
-                :class="{ 'otp-row--error': errors.email, 'otp-row--shake': otpShake }"
-                @animationend="otpShake = false"
-              >
-                <input
-                  v-for="(_, i) in resetDigits"
-                  :key="i"
-                  :ref="
-                    (el) => {
-                      if (el) resetRefs[i] = el as HTMLInputElement;
-                    }
-                  "
-                  :value="resetDigits[i]"
-                  type="text"
-                  inputmode="numeric"
-                  pattern="[0-9]*"
-                  autocomplete="one-time-code"
-                  class="otp-cell"
-                  :class="{ 'otp-cell--filled': resetDigits[i] !== '' }"
-                  @keydown="(e) => onOtpKeydown(e, i, resetDigits, resetRefs)"
-                  @input="(e) => onOtpInput(e, i, resetDigits, resetRefs, handleValidateResetCode)"
-                  @paste="(e) => onOtpPaste(e, resetDigits, resetRefs, handleValidateResetCode)"
-                />
-              </div>
-
-              <div class="feedback-area">
-                <div v-if="authStore.isLoading" class="otp-verifying">
-                  <AppSpinner size="18px" color="white" />
-                </div>
-                <div v-else-if="errors.email" class="error-text">{{ errors.email }}</div>
-                <div v-else-if="globalError" class="global-error">
-                  <AppIcon name="error_outline" size="16px" />
-                  {{ globalError }}
-                </div>
-              </div>
-
+              <OtpInput
+                ref="resetOtpRef"
+                v-model="resetDigits"
+                :error="!!errors.email"
+                :shake="otpShake"
+                @complete="handleValidateResetCode"
+                @shake-end="otpShake = false"
+              />
+              <AuthFeedback
+                :loading="authStore.isLoading"
+                :field-error="errors.email"
+                :global-error="globalError"
+              />
               <div class="verify-footer">
                 <Transition name="fade" mode="out-in">
                   <p
@@ -337,8 +257,8 @@
                 </Transition>
                 <button
                   class="switch-link"
-                  @click="() => handleForgotPassword(true)"
                   :disabled="authStore.isLoading || resetResendCooldown > 0"
+                  @click="() => handleForgotPassword(true)"
                 >
                   {{
                     resetResendCooldown > 0
@@ -349,54 +269,32 @@
               </div>
             </div>
 
-            <!-- ── Step 2: nueva contraseña ── -->
             <div v-else key="reset-password" class="reset-step">
               <p class="form-subtitle">{{ t('pages.auth.resetPasswordSubtitle') }}</p>
-
-              <div class="field-group">
-                <div class="field-wrap" :class="{ 'field-wrap--error': errors.password }">
-                  <input
-                    v-model="form.password"
-                    :type="showPassword ? 'text' : 'password'"
-                    class="field-input"
-                    :placeholder="t('pages.auth.resetNewPassword')"
-                    autocomplete="new-password"
-                    @input="
-                      errors.password = '';
-                      validatePassword();
-                    "
-                  />
-                  <button class="field-eye" @click="showPassword = !showPassword" tabindex="-1">
-                    <AppIcon :name="showPassword ? 'visibility_off' : 'visibility'" size="18px" />
-                  </button>
-                </div>
-              </div>
-
-              <div v-if="form.password" class="password-strength">
-                <div class="strength-bar">
-                  <div
-                    class="strength-fill"
-                    :style="{ width: passwordStrength.pct + '%' }"
-                    :class="`strength-fill--${passwordStrength.level}`"
-                  />
-                </div>
-                <span class="strength-label" :class="`strength-label--${passwordStrength.level}`">
-                  {{ t(`pages.auth.passwordStrength.${passwordStrength.level}`) }}
-                </span>
-              </div>
-
-              <div class="feedback-area">
-                <div v-if="resetSuccess" class="success-text">
-                  <AppIcon name="check_circle_outline" size="16px" />
-                  {{ t('pages.auth.resetSuccessHint') }}
-                </div>
-                <div v-else-if="errors.password" class="error-text">{{ errors.password }}</div>
-                <div v-else-if="globalError" class="global-error">
-                  <AppIcon name="error_outline" size="16px" />
-                  {{ globalError }}
-                </div>
-              </div>
-
+              <AuthFieldGroup>
+                <AuthFieldRow
+                  v-model="form.password"
+                  type="password"
+                  :placeholder="t('pages.auth.resetNewPassword')"
+                  :error="!!errors.password"
+                  autocomplete="new-password"
+                  @input="
+                    errors.password = '';
+                    validatePassword();
+                  "
+                />
+              </AuthFieldGroup>
+              <PasswordStrengthBar
+                v-if="form.password"
+                :level="passwordStrength.level"
+                :pct="passwordStrength.pct"
+                :labels="strengthLabels"
+              />
+              <AuthFeedback
+                :field-error="errors.password"
+                :global-error="globalError"
+                :success="resetSuccess ? t('pages.auth.resetSuccessHint') : ''"
+              />
               <AppButton
                 :loading="authStore.isLoading"
                 :disabled="resetSuccess || !form.password"
@@ -407,67 +305,41 @@
             </div>
           </Transition>
         </div>
+
+        <!-- ── Email verification ── -->
         <div v-else-if="mode === 'verify'" key="verify" class="form-block">
           <button class="back-btn" @click="handleVerifyBack">
-            <AppIcon name="chevron_left" size="22px" />
-            {{ t('nav.back') }}
+            <AppIcon name="chevron_left" size="22px" />{{ t('nav.back') }}
           </button>
-
           <p class="form-subtitle">
             {{ t('pages.auth.verifySubtitle') }} <strong>{{ authStore.user?.email }}</strong>
           </p>
-
-          <div
-            class="otp-row"
-            :class="{ 'otp-row--error': errors.email, 'otp-row--shake': otpShake }"
-            @animationend="otpShake = false"
-          >
-            <input
-              v-for="(_, i) in verifyDigits"
-              :key="i"
-              :ref="
-                (el) => {
-                  if (el) verifyRefs[i] = el as HTMLInputElement;
-                }
-              "
-              :value="verifyDigits[i]"
-              type="text"
-              inputmode="numeric"
-              pattern="[0-9]*"
-              autocomplete="one-time-code"
-              class="otp-cell"
-              :class="{ 'otp-cell--filled': verifyDigits[i] !== '' }"
-              @keydown="(e) => onOtpKeydown(e, i, verifyDigits, verifyRefs)"
-              @input="(e) => onOtpInput(e, i, verifyDigits, verifyRefs, handleVerifyEmail)"
-              @paste="(e) => onOtpPaste(e, verifyDigits, verifyRefs, handleVerifyEmail)"
-            />
-          </div>
-
-          <div class="feedback-area">
-            <div v-if="authStore.isLoading" class="otp-verifying">
-              <AppSpinner size="18px" color="white" />
-            </div>
-            <div v-else-if="errors.email" class="error-text">{{ errors.email }}</div>
-            <div v-else-if="globalError" class="global-error">
-              <AppIcon name="error_outline" size="16px" />
-              {{ globalError }}
-            </div>
-          </div>
-
+          <OtpInput
+            ref="verifyOtpRef"
+            v-model="verifyDigits"
+            :error="!!errors.email"
+            :shake="otpShake"
+            @complete="handleVerifyEmail"
+            @shake-end="otpShake = false"
+          />
+          <AuthFeedback
+            :loading="authStore.isLoading"
+            :field-error="errors.email"
+            :global-error="globalError"
+          />
           <div class="verify-footer">
             <Transition name="fade" mode="out-in">
               <p v-if="verifyResent" key="resent" class="verify-resent">
-                <AppIcon name="check_circle_outline" size="14px" />
-                {{ t('pages.auth.verifyResent') }}
+                <AppIcon name="check_circle_outline" size="14px" />{{
+                  t('pages.auth.verifyResent')
+                }}
               </p>
-              <p v-else key="valid" class="verify-countdown">
-                {{ t('pages.auth.verifyValid') }}
-              </p>
+              <p v-else key="valid" class="verify-countdown">{{ t('pages.auth.verifyValid') }}</p>
             </Transition>
             <button
               class="switch-link"
-              @click="handleResendVerification"
               :disabled="authStore.isLoading || verifyResendCooldown > 0"
+              @click="handleResendVerification"
             >
               {{
                 verifyResendCooldown > 0
@@ -477,63 +349,50 @@
             </button>
           </div>
         </div>
-        <!-- ── Username picker ────────────────────────────────────────────── -->
+
+        <!-- ── Username picker ── -->
         <div v-else-if="mode === 'username'" key="username" class="form-block">
           <p class="form-subtitle">{{ t('pages.usernamePicker.subtitle') }}</p>
-
-          <div class="field-group">
-            <div
-              class="field-wrap username-field-wrap"
-              :class="{
-                'field-wrap--error': usernameStatusType === 'error',
-                'field-wrap--success': usernameStatusType === 'success',
-              }"
+          <AuthFieldGroup>
+            <AuthFieldRow
+              ref="usernameFieldRef"
+              v-model="usernameInput"
+              type="text"
+              :placeholder="t('pages.usernamePicker.placeholder')"
+              :error="usernameStatusType === 'error'"
+              autocomplete="username"
+              autocapitalize="none"
+              spellcheck="false"
+              maxlength="20"
+              @input="onUsernameInput"
             >
-              <span class="username-at">@</span>
-              <input
-                ref="usernameInputRef"
-                v-model="usernameInput"
-                type="text"
-                class="field-input"
-                :placeholder="t('pages.usernamePicker.placeholder')"
-                autocomplete="username"
-                autocapitalize="none"
-                spellcheck="false"
-                maxlength="20"
-                @input="onUsernameInput"
-              />
-              <div class="username-status-icon">
-                <AppSpinner v-if="usernameIsChecking" size="16px" color="white" />
-                <AppIcon
-                  v-else-if="usernameStatusType === 'success'"
-                  name="check_circle"
-                  size="18px"
-                  style="color: var(--color-positive)"
-                />
-                <AppIcon
-                  v-else-if="usernameStatusType === 'error'"
-                  name="cancel"
-                  size="18px"
-                  style="color: var(--color-negative)"
-                />
-              </div>
-            </div>
-          </div>
-
+              <template #prefix><span class="username-at">@</span></template>
+              <template #suffix>
+                <div class="username-status-icon">
+                  <AppSpinner v-if="usernameIsChecking" size="16px" color="white" />
+                  <AppIcon
+                    v-else-if="usernameStatusType === 'success'"
+                    name="check_circle"
+                    size="18px"
+                    style="color: var(--color-positive)"
+                  />
+                  <AppIcon
+                    v-else-if="usernameStatusType === 'error'"
+                    name="cancel"
+                    size="18px"
+                    style="color: var(--color-negative)"
+                  />
+                </div>
+              </template>
+            </AuthFieldRow>
+          </AuthFieldGroup>
           <p v-if="!usernameInput" class="username-rules-hint">
             {{ t('pages.usernamePicker.rulesHint') }}
           </p>
-
-          <div class="feedback-area">
-            <Transition name="fade" mode="out-in">
-              <div v-if="usernameErrorMsg" key="err" class="error-text">{{ usernameErrorMsg }}</div>
-              <div v-else-if="usernameStatusType === 'success'" key="ok" class="success-text">
-                <AppIcon name="check_circle_outline" size="16px" />
-                {{ t('pages.usernamePicker.available') }}
-              </div>
-            </Transition>
-          </div>
-
+          <AuthFeedback
+            :field-error="usernameErrorMsg"
+            :success="usernameStatusType === 'success' ? t('pages.usernamePicker.available') : ''"
+          />
           <Transition name="fade">
             <div v-if="usernameSuggestions.length > 0" class="username-suggestions">
               <p class="username-suggestions-label">
@@ -551,7 +410,6 @@
               </div>
             </div>
           </Transition>
-
           <AppButton
             :loading="authStore.isLoading"
             :disabled="usernameStatusType !== 'success'"
@@ -560,6 +418,8 @@
             {{ t('pages.usernamePicker.confirm') }}
           </AppButton>
         </div>
+
+        <!-- ── Success / welcome ── -->
         <div v-else-if="mode === 'success'" key="success" class="form-block form-block--welcome">
           <div class="welcome-face-wrap">
             <svg class="welcome-face" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
@@ -578,7 +438,6 @@
               />
             </svg>
           </div>
-
           <div class="welcome-copy">
             <h2 class="welcome-title">
               {{
@@ -593,10 +452,10 @@
       </Transition>
     </div>
 
-    <!-- ── Legal sheets ───────────────────────────────────────────────────── -->
+    <!-- ── Legal sheets ───────────────────────────────────────────────────────── -->
     <LegalBottomSheet v-model:show="showLegalSheet" :type="legalSheetType" />
 
-    <!-- ── Face ID prompt (post-login) ───────────────────────────────────── -->
+    <!-- ── Biometric prompt ───────────────────────────────────────────────────── -->
     <AppBottomSheet v-model="showBiometricPrompt" seamless>
       <div class="biometric-sheet">
         <div class="biometric-icon">
@@ -604,12 +463,12 @@
         </div>
         <h3 class="biometric-title">{{ t('pages.auth.faceIdTitle') }}</h3>
         <p class="biometric-desc">{{ t('pages.auth.faceIdDesc') }}</p>
-        <AppButton class="biometric-enable-btn" @click="enableBiometricAuth">
-          {{ t('pages.auth.enableFaceId') }}
-        </AppButton>
-        <AppButton variant="ghost" @click="showBiometricPrompt = false">
-          {{ t('pages.auth.notNow') }}
-        </AppButton>
+        <AppButton class="biometric-enable-btn" @click="enableBiometricAuth">{{
+          t('pages.auth.enableFaceId')
+        }}</AppButton>
+        <AppButton variant="ghost" @click="showBiometricPrompt = false">{{
+          t('pages.auth.notNow')
+        }}</AppButton>
       </div>
     </AppBottomSheet>
   </div>
@@ -624,15 +483,33 @@ import { useAuthStore } from '../../../auth/store.js';
 import { AuthService } from '../../../auth/services/auth.service.js';
 import { UsernameService } from '../../../auth/services/username.service.js';
 import LegalBottomSheet from '../../components/LegalBottomSheet.vue';
+import OtpInput from '../../components/auth/OtpInput.vue';
+import AuthFieldGroup from '../../components/auth/AuthFieldGroup.vue';
+import AuthFieldRow from '../../components/auth/AuthFieldRow.vue';
+import AuthFeedback from '../../components/auth/AuthFeedback.vue';
 import { getClientConfig } from '../../../internal/app-config.js';
-const appConfig = getClientConfig();
-import { AppBottomSheet, AppIcon, AppSpinner, AppButton } from '@synkos/ui';
+import { usePasswordStrength } from '../../../composables/usePasswordStrength.js';
+import {
+  AppBottomSheet,
+  AppIcon,
+  AppSpinner,
+  AppButton,
+  AppCircularProgress,
+  PasswordStrengthBar,
+} from '@synkos/ui';
 
+const appConfig = getClientConfig();
 const { t } = useI18n();
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
 const appName = appConfig.name;
+
+// ── Template refs ─────────────────────────────────────────────────────────────
+
+const verifyOtpRef = ref<InstanceType<typeof OtpInput> | null>(null);
+const resetOtpRef = ref<InstanceType<typeof OtpInput> | null>(null);
+const usernameFieldRef = ref<InstanceType<typeof AuthFieldRow> | null>(null);
 
 // ── State ─────────────────────────────────────────────────────────────────────
 
@@ -640,27 +517,19 @@ const mode = ref<
   'social' | 'login' | 'register' | 'forgot' | 'reset' | 'verify' | 'username' | 'success'
 >('social');
 const transitionName = ref('slide-left');
-const showPassword = ref(false);
 const showBiometricPrompt = ref(false);
 const showLegalSheet = ref(false);
 const legalSheetType = ref<'terms' | 'privacy'>('terms');
 const globalError = ref('');
 const activeProvider = ref<'apple' | 'google' | 'email' | 'register' | null>(null);
+const otpShake = ref(false);
 
-const form = ref({
-  email: '',
-  password: '',
-});
+const form = ref({ email: '', password: '' });
+const errors = ref({ email: '', password: '' });
 
-const errors = ref({
-  email: '',
-  password: '',
-});
-
-// Forgot / reset flow state (independent from login/register form)
+// Forgot / reset flow
 const forgotEmail = ref('');
 const resetDigits = ref(['', '', '', '', '', '']);
-const resetRefs: HTMLInputElement[] = [];
 const resetSuccess = ref(false);
 const resetStep = ref<'code' | 'password'>('code');
 const resetStepTransition = ref('slide-left');
@@ -669,23 +538,13 @@ const resetCountdownTimer = ref<ReturnType<typeof setInterval> | null>(null);
 const resetResendCooldown = ref(0);
 const resetResendCooldownTimer = ref<ReturnType<typeof setInterval> | null>(null);
 
-// Email verification state
+// Email verification
 const verifyDigits = ref(['', '', '', '', '', '']);
-const verifyRefs: HTMLInputElement[] = [];
-
-// OTP shake animation state
-const otpShake = ref(false);
-function triggerOtpShake() {
-  otpShake.value = false;
-  void nextTick(() => {
-    otpShake.value = true;
-  });
-}
 const verifyResent = ref(false);
 const verifyResendCooldown = ref(0);
 const verifyResendCooldownTimer = ref<ReturnType<typeof setInterval> | null>(null);
 
-// Username picker state
+// Username picker
 const usernameInput = ref('');
 const usernameIsChecking = ref(false);
 const usernameStatusType = ref<'idle' | 'success' | 'error'>('idle');
@@ -693,7 +552,8 @@ const usernameErrorMsg = ref('');
 const usernameSuggestions = ref<string[]>([]);
 let usernameDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
-// Derived code strings (read-only computed from digit arrays)
+// ── Computed ──────────────────────────────────────────────────────────────────
+
 const verifyCode = computed(() => verifyDigits.value.join(''));
 const resetCode = computed(() => resetDigits.value.join(''));
 
@@ -703,7 +563,20 @@ const resetCountdownFormatted = computed(() => {
   return `${m}:${s.toString().padStart(2, '0')}`;
 });
 
-// ── Navigation between modes ──────────────────────────────────────────────────
+const canRegister = computed(
+  () => form.value.email.includes('@') && form.value.password.length >= 8
+);
+
+const passwordStrength = usePasswordStrength(computed(() => form.value.password));
+
+const strengthLabels = computed(() => ({
+  weak: t('pages.auth.passwordStrength.weak'),
+  fair: t('pages.auth.passwordStrength.fair'),
+  good: t('pages.auth.passwordStrength.good'),
+  strong: t('pages.auth.passwordStrength.strong'),
+}));
+
+// ── Navigation ────────────────────────────────────────────────────────────────
 
 const modeOrder: Record<typeof mode.value, number> = {
   social: 0,
@@ -719,7 +592,6 @@ const modeOrder: Record<typeof mode.value, number> = {
 async function goTo(next: typeof mode.value) {
   await Haptics.impact({ style: ImpactStyle.Light }).catch(() => undefined);
   if (mode.value === 'reset') stopResetCountdown();
-  // Carry email from login into forgot so the field is pre-filled
   if (next === 'forgot') forgotEmail.value = form.value.email;
   transitionName.value = modeOrder[next] > modeOrder[mode.value] ? 'slide-left' : 'slide-right';
   globalError.value = '';
@@ -728,27 +600,6 @@ async function goTo(next: typeof mode.value) {
   resetSuccess.value = false;
   mode.value = next;
 }
-
-// ── Computed ──────────────────────────────────────────────────────────────────
-
-const canRegister = computed(
-  () => form.value.email.includes('@') && form.value.password.length >= 8
-);
-
-const passwordStrength = computed(() => {
-  const p = form.value.password;
-  let score = 0;
-  if (p.length >= 8) score++;
-  if (p.length >= 12) score++;
-  if (/[A-Z]/.test(p)) score++;
-  if (/[0-9]/.test(p)) score++;
-  if (/[^A-Za-z0-9]/.test(p)) score++;
-
-  if (score <= 1) return { level: 'weak', pct: 25 };
-  if (score <= 2) return { level: 'fair', pct: 50 };
-  if (score <= 3) return { level: 'good', pct: 75 };
-  return { level: 'strong', pct: 100 };
-});
 
 // ── Validation ────────────────────────────────────────────────────────────────
 
@@ -788,7 +639,7 @@ function validateRegisterForm(): boolean {
   return !errors.value.password;
 }
 
-// ── Resend cooldown (60s — shared logic) ─────────────────────────────────────
+// ── Timers ────────────────────────────────────────────────────────────────────
 
 function startResendCooldown(
   cooldown: { value: number },
@@ -798,24 +649,20 @@ function startResendCooldown(
   if (timer.value) clearInterval(timer.value);
   cooldown.value = seconds;
   timer.value = setInterval(() => {
-    if (cooldown.value > 0) {
-      cooldown.value--;
-    } else {
+    if (cooldown.value > 0) cooldown.value--;
+    else {
       clearInterval(timer.value!);
       timer.value = null;
     }
   }, 1000);
 }
 
-// ── Reset countdown (15 min) ──────────────────────────────────────────────────
-
 function startResetCountdown(seconds = 900) {
   if (resetCountdownTimer.value) clearInterval(resetCountdownTimer.value);
   resetCountdown.value = seconds;
   resetCountdownTimer.value = setInterval(() => {
-    if (resetCountdown.value > 0) {
-      resetCountdown.value--;
-    } else {
+    if (resetCountdown.value > 0) resetCountdown.value--;
+    else {
       clearInterval(resetCountdownTimer.value!);
       resetCountdownTimer.value = null;
     }
@@ -829,88 +676,10 @@ function stopResetCountdown() {
   }
 }
 
-// ── OTP helpers ───────────────────────────────────────────────────────────────
-
-function onOtpKeydown(e: KeyboardEvent, i: number, digits: string[], refs: HTMLInputElement[]) {
-  if (/^[0-9]$/.test(e.key)) {
-    // Clear the DOM value so replacing an existing digit works correctly
-    (e.target as HTMLInputElement).value = '';
-    return; // let the browser insert the digit and fire the input event normally
-  }
-
-  if (e.key === 'Backspace') {
-    e.preventDefault();
-    if (digits[i] !== '') {
-      digits[i] = '';
-    } else if (i > 0) {
-      digits[i - 1] = '';
-      refs[i - 1]?.focus();
-    }
-  } else if (e.key === 'ArrowLeft' && i > 0) {
-    e.preventDefault();
-    refs[i - 1]?.focus();
-  } else if (e.key === 'ArrowRight' && i < digits.length - 1) {
-    e.preventDefault();
-    refs[i + 1]?.focus();
-  }
-}
-
-function onOtpInput(
-  e: Event,
-  i: number,
-  digits: string[],
-  refs: HTMLInputElement[],
-  onComplete?: () => void | Promise<void>
-) {
-  const input = e.target as HTMLInputElement;
-  const raw = input.value.replace(/[^0-9]/g, '');
-
-  if (raw.length > 1) {
-    // iOS autofill or paste via input event — distribute all digits
-    const chars = raw.slice(0, 6).split('');
-    chars.forEach((ch, idx) => {
-      if (idx < digits.length) digits[idx] = ch;
-    });
-    void nextTick(() => {
-      const nextEmpty = digits.findIndex((d) => d === '');
-      const focusIdx = nextEmpty === -1 ? digits.length - 1 : nextEmpty;
-      refs[focusIdx]?.focus();
-      if (nextEmpty === -1 && onComplete) void onComplete();
-    });
-    return;
-  }
-
-  const val = raw.slice(-1);
-  digits[i] = val;
-  input.value = val;
-
-  if (val && i < digits.length - 1) {
-    void nextTick(() => refs[i + 1]?.focus());
-  } else if (val && i === digits.length - 1 && onComplete) {
-    if (digits.every((d) => d !== '')) void onComplete();
-  }
-}
-
-function onOtpPaste(
-  e: ClipboardEvent,
-  digits: string[],
-  refs: HTMLInputElement[],
-  onComplete?: () => void | Promise<void>
-) {
-  e.preventDefault();
-  const text = e.clipboardData?.getData('text') ?? '';
-  const nums = text
-    .replace(/[^0-9]/g, '')
-    .slice(0, 6)
-    .split('');
-  nums.forEach((n, idx) => {
-    if (idx < digits.length) digits[idx] = n;
-  });
+function triggerOtpShake() {
+  otpShake.value = false;
   void nextTick(() => {
-    const nextEmpty = digits.findIndex((d) => d === '');
-    const focusIdx = nextEmpty === -1 ? digits.length - 1 : nextEmpty;
-    refs[focusIdx]?.focus();
-    if (nextEmpty === -1 && onComplete) void onComplete();
+    otpShake.value = true;
   });
 }
 
@@ -950,10 +719,7 @@ async function handleRegister() {
   }
   globalError.value = '';
   try {
-    await authStore.register({
-      email: form.value.email,
-      password: form.value.password,
-    });
+    await authStore.register({ email: form.value.email, password: form.value.password });
     await Haptics.notification({ type: NotificationType.Success }).catch(() => undefined);
     void afterAuth('register');
   } catch (err: unknown) {
@@ -996,10 +762,7 @@ async function handleApple() {
   try {
     const { SocialLogin } = await import('@capgo/capacitor-social-login');
     await SocialLogin.initialize({
-      apple: {
-        clientId: import.meta.env.VITE_APPLE_CLIENT_ID ?? '',
-        redirectUrl: '',
-      },
+      apple: { clientId: import.meta.env.VITE_APPLE_CLIENT_ID ?? '', redirectUrl: '' },
     });
     const result = await SocialLogin.login({
       provider: 'apple',
@@ -1026,7 +789,7 @@ async function handleApple() {
     if (
       msg.includes('cancel') ||
       msg.includes('Cancel') ||
-      msg === 'The operation couldn\u2019t be completed.'
+      msg === 'The operation couldn’t be completed.'
     )
       return;
     globalError.value = t('pages.auth.errors.appleFailed');
@@ -1048,7 +811,7 @@ async function handleValidateResetCode() {
     errors.value.email = t('pages.auth.errors.resetFailed');
     triggerOtpShake();
     resetDigits.value = ['', '', '', '', '', ''];
-    void nextTick(() => resetRefs[0]?.focus());
+    void nextTick(() => resetOtpRef.value?.focus(0));
   } finally {
     authStore.isLoading = false;
   }
@@ -1081,9 +844,8 @@ async function handleForgotPassword(force = false) {
     form.value = { email: '', password: '' };
     mode.value = 'reset';
     startResetCountdown(secondsLeft);
-    if (cooldownLeft > 0) {
+    if (cooldownLeft > 0)
       startResendCooldown(resetResendCooldown, resetResendCooldownTimer, cooldownLeft);
-    }
   } catch (err: unknown) {
     await Haptics.notification({ type: NotificationType.Error }).catch(() => undefined);
     const status = (err as { response?: { status?: number } })?.response?.status;
@@ -1119,7 +881,6 @@ async function handleResetPassword() {
     await Haptics.notification({ type: NotificationType.Success }).catch(() => undefined);
     stopResetCountdown();
     resetSuccess.value = true;
-    // Navigate back to login after a short delay so the user sees the success message
     setTimeout(() => {
       void goTo('login');
     }, 1800);
@@ -1137,22 +898,19 @@ async function handleGuest() {
   void router.replace({ name: 'home' });
 }
 
-// ── Username picker ────────────────────────────────────────────────────��──────
+// ── Username picker ───────────────────────────────────────────────────────────
 
 function onUsernameInput() {
   usernameStatusType.value = 'idle';
   usernameErrorMsg.value = '';
   usernameSuggestions.value = [];
-
   const raw = usernameInput.value.trim();
   if (!raw) {
     usernameIsChecking.value = false;
     return;
   }
-
   if (usernameDebounceTimer) clearTimeout(usernameDebounceTimer);
   usernameIsChecking.value = true;
-
   usernameDebounceTimer = setTimeout(() => {
     void checkUsernameAvailability(raw);
   }, 400);
@@ -1161,7 +919,7 @@ function onUsernameInput() {
 async function checkUsernameAvailability(raw: string) {
   try {
     const result = await UsernameService.check(raw);
-    if (usernameInput.value.trim() !== raw) return; // stale response
+    if (usernameInput.value.trim() !== raw) return;
     if (result.available) {
       usernameStatusType.value = 'success';
       usernameErrorMsg.value = '';
@@ -1197,7 +955,6 @@ async function handleUsernameSubmit() {
     await Haptics.notification({ type: NotificationType.Error }).catch(() => undefined);
     const status = (err as { response?: { status?: number } })?.response?.status;
     if (status === 409) {
-      // Someone grabbed it in the window between check and submit — re-check
       usernameStatusType.value = 'error';
       usernameErrorMsg.value = t('pages.usernamePicker.errors.taken');
       void checkUsernameAvailability(usernameInput.value.trim());
@@ -1208,6 +965,8 @@ async function handleUsernameSubmit() {
     authStore.isLoading = false;
   }
 }
+
+// ── Auth flow ─────────────────────────────────────────────────────────────────
 
 async function continueAfterUsername() {
   transitionName.value = 'slide-left';
@@ -1222,7 +981,6 @@ async function continueAfterUsername() {
 }
 
 function afterAuth(provider: typeof activeProvider.value = 'email') {
-  // Local auth users must verify their email before accessing the app
   if (!authStore.user?.isEmailVerified) {
     verifyDigits.value = ['', '', '', '', '', ''];
     globalError.value = '';
@@ -1231,10 +989,8 @@ function afterAuth(provider: typeof activeProvider.value = 'email') {
     mode.value = 'verify';
     return;
   }
-  // User has no username yet — must pick one before reaching the app
   if (!authStore.user?.username) {
     activeProvider.value = provider;
-    // Pre-fill from displayName and kick off an availability check
     const base = (authStore.user?.displayName ?? '')
       .toLowerCase()
       .replace(/[^a-z0-9]/g, '')
@@ -1251,7 +1007,6 @@ function afterAuth(provider: typeof activeProvider.value = 'email') {
     mode.value = 'username';
     return;
   }
-  // Show success screen before navigating
   activeProvider.value = provider;
   void continueAfterUsername();
 }
@@ -1314,8 +1069,6 @@ async function enableBiometricAuth() {
   void router.replace({ name: 'home' });
 }
 
-// ── Autofocus first OTP cell after transition completes ───────────────────────
-
 function handleResetBack() {
   if (resetStep.value === 'password') {
     resetStepTransition.value = 'slide-right';
@@ -1326,20 +1079,16 @@ function handleResetBack() {
   }
 }
 
-const usernameInputRef = ref<HTMLInputElement | null>(null);
-
 function onFormAfterEnter() {
-  if (mode.value === 'verify') verifyRefs[0]?.focus();
-  if (mode.value === 'reset' && resetStep.value === 'code') resetRefs[0]?.focus();
-  if (mode.value === 'username') usernameInputRef.value?.focus();
+  if (mode.value === 'verify') void nextTick(() => verifyOtpRef.value?.focus(0));
+  if (mode.value === 'reset' && resetStep.value === 'code')
+    void nextTick(() => resetOtpRef.value?.focus(0));
+  if (mode.value === 'username') void nextTick(() => usernameFieldRef.value?.focus());
 }
-
-// ── On mount ──────────────────────────────────────────────────────────────────
 
 onMounted(() => {
   if (authStore.isAuthenticated) {
     if (route.query.verify === '1') {
-      // Session restored but email not verified — go straight to verify screen
       verifyDigits.value = ['', '', '', '', '', ''];
       mode.value = 'verify';
     } else {
@@ -1427,7 +1176,7 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   margin-bottom: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .app-title {
@@ -1454,9 +1203,14 @@ onMounted(() => {
   height: 420px;
   padding-bottom: max(24px, env(safe-area-inset-bottom, 24px));
 
-  // Social: buttons anchored to the bottom of the block
   &--social {
     justify-content: flex-end;
+  }
+
+  &--welcome {
+    justify-content: center;
+    align-items: center;
+    gap: 28px;
   }
 }
 
@@ -1483,9 +1237,9 @@ onMounted(() => {
   gap: 10px;
   width: 100%;
   height: 50px;
-  border-radius: 14px;
+  border-radius: $radius-xl;
   border: none;
-  font-size: 16px;
+  font-size: $font-body;
   font-weight: 600;
   letter-spacing: -0.2px;
   cursor: pointer;
@@ -1523,249 +1277,45 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
-// ── OTP code cells ────────────────────────────────────────────────────────────
-@keyframes otp-shake {
-  0% {
-    transform: translateX(0);
-  }
-  15% {
-    transform: translateX(-6px);
-  }
-  30% {
-    transform: translateX(5px);
-  }
-  45% {
-    transform: translateX(-4px);
-  }
-  60% {
-    transform: translateX(3px);
-  }
-  75% {
-    transform: translateX(-2px);
-  }
-  90% {
-    transform: translateX(1px);
-  }
-  100% {
-    transform: translateX(0);
-  }
-}
-
-.otp-row {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-
-  &--error .otp-cell {
-    border-color: var(--auth-border);
-    background: var(--auth-surface-1);
-  }
-
-  &--shake {
-    animation: otp-shake 0.45s ease;
-  }
-}
-
-.otp-cell {
-  flex: 1;
-  min-width: 0;
-  max-width: 52px;
-  height: 56px;
-  border-radius: 12px;
-  background: var(--auth-surface-1);
-  color: var(--auth-text-primary);
-  font-size: 22px;
-  font-weight: 600;
-  text-align: center;
-  caret-color: transparent;
-  outline: none;
-  transition:
-    border-color 0.15s ease,
-    background 0.15s ease;
-  -webkit-tap-highlight-color: transparent;
-
-  &--filled {
-    border-color: var(--auth-border-strong);
-    background: var(--auth-surface-2);
-  }
-
-  &:focus {
-    border-color: var(--auth-border-focus);
-    background: var(--auth-surface-focus);
-    caret-color: var(--auth-text-primary);
-  }
-}
-
-.otp-verifying {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-}
-
-// ── Text fields ───────────────────────────────────────────────────────────────
-.field-group {
-  background: var(--auth-surface-1);
-  border: 0.5px solid var(--auth-border);
-  border-radius: 14px;
-  overflow: hidden;
-}
-
-.field-wrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-
-  &--error {
-    background: rgba(255, 69, 58, 0.06);
-  }
-}
-
-.field-input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  padding: 14px 16px;
-  font-size: 16px;
-  color: var(--auth-text-primary);
-  letter-spacing: -0.2px;
-  caret-color: var(--color-primary);
-  width: 100%;
-
-  &::placeholder {
-    color: var(--auth-text-subtle);
-  }
-
-  &--code {
-    letter-spacing: 6px;
-    font-size: 20px;
-    font-weight: 600;
-    text-align: center;
-  }
-
-  &:-webkit-autofill {
-    -webkit-text-fill-color: var(--auth-text-primary);
-    -webkit-box-shadow: 0 0 0 100px var(--auth-sheet-bg) inset;
-    caret-color: var(--color-primary);
-  }
-}
-
-.field-eye {
-  background: none;
-  border: none;
-  padding: 14px 16px 14px 0;
-  color: var(--auth-text-subtle);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  flex-shrink: 0;
-}
-
-.field-separator {
-  height: 0.5px;
-  background: var(--auth-surface-1);
-  margin-left: 16px;
-}
-
-// ── Password strength ─────────────────────────────────────────────────────────
-.password-strength {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.strength-bar {
-  flex: 1;
-  height: 3px;
-  background: var(--auth-surface-2);
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.strength-fill {
-  height: 100%;
-  border-radius: 2px;
-  transition:
-    width 0.3s ease,
-    background 0.3s ease;
-
-  &--weak {
-    background: var(--color-negative);
-  }
-  &--fair {
-    background: var(--color-accent);
-  }
-  &--good {
-    background: var(--color-positive);
-  }
-  &--strong {
-    background: var(--color-positive);
-  }
-}
-
-.strength-label {
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.1px;
-  white-space: nowrap;
-
-  &--weak {
-    color: var(--color-negative);
-  }
-  &--fair {
-    color: var(--color-accent);
-  }
-  &--good {
-    color: var(--color-positive);
-  }
-  &--strong {
-    color: var(--color-positive);
-  }
-}
-
-// ── Error states ──────────────────────────────────────────────────────────────
-// Reserve fixed height for field + auth errors so the block never shifts
-.feedback-area {
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-}
-
-.success-text {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  color: var(--color-positive);
-  letter-spacing: -0.1px;
-}
-
-.error-text {
-  font-size: 13px;
-  color: var(--color-negative);
-  padding-left: 4px;
-  letter-spacing: -0.1px;
-}
-
+// ── Global error ──────────────────────────────────────────────────────────────
 .global-error {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: $space-3;
   background: rgba(255, 69, 58, 0.12);
   border: 0.5px solid rgba(255, 69, 58, 0.25);
-  border-radius: 10px;
-  padding: 10px 14px;
-  font-size: 14px;
+  border-radius: $radius-md;
+  padding: $space-5 $space-7;
+  font-size: $font-body-sm;
   color: var(--color-negative);
   letter-spacing: -0.1px;
 }
 
-// ── Buttons ───────────────────────────────────────────────────────────────────
+// ── Navigation ────────────────────────────────────────────────────────────────
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: $font-body-lg;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  align-self: flex-start;
+  -webkit-tap-highlight-color: transparent;
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
 .forgot-btn {
   background: none;
   border: none;
   text-align: right;
-  font-size: 13px;
+  font-size: $font-body-sm;
   color: var(--auth-text-muted);
   cursor: pointer;
   padding: 0;
@@ -1779,7 +1329,7 @@ onMounted(() => {
 }
 
 .switch-text {
-  font-size: 14px;
+  font-size: $font-body-sm;
   color: var(--auth-text-muted);
   text-align: center;
   margin: 0;
@@ -1789,7 +1339,7 @@ onMounted(() => {
   background: none;
   border: none;
   color: var(--color-primary);
-  font-size: 14px;
+  font-size: inherit;
   cursor: pointer;
   padding: 0;
   -webkit-tap-highlight-color: transparent;
@@ -1799,44 +1349,28 @@ onMounted(() => {
   background: none;
   border: none;
   color: var(--auth-text-subtle);
-  font-size: 14px;
+  font-size: $font-body-sm;
   cursor: pointer;
-  padding: 8px;
+  padding: $space-4;
   text-align: center;
   width: 100%;
   -webkit-tap-highlight-color: transparent;
   letter-spacing: -0.1px;
 }
 
-.back-btn {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  background: none;
-  border: none;
-  color: var(--color-primary);
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  padding: 0;
-  align-self: flex-start;
-  -webkit-tap-highlight-color: transparent;
-  margin-bottom: 8px;
-}
-
 .terms-text {
-  font-size: 12px;
+  font-size: $font-caption;
   color: var(--auth-text-subtle);
   text-align: center;
   margin: 0;
   line-height: 1.5;
 
   .switch-link {
-    font-size: 12px;
+    font-size: $font-caption;
   }
 }
 
-// ── Reset two-step layout ─────────────────────────────────────────────────────
+// ── Reset two-step ────────────────────────────────────────────────────────────
 .reset-step {
   flex: 1;
   display: flex;
@@ -1854,7 +1388,7 @@ onMounted(() => {
 }
 
 .verify-countdown {
-  font-size: 13px;
+  font-size: $font-body-sm;
   color: var(--auth-text-subtle);
   margin: 0;
   text-align: center;
@@ -1868,10 +1402,75 @@ onMounted(() => {
 .verify-resent {
   display: flex;
   align-items: center;
-  gap: 5px;
-  font-size: 13px;
+  gap: $space-2;
+  font-size: $font-body-sm;
   color: var(--color-positive);
   margin: 0;
+}
+
+// ── Username picker ───────────────────────────────────────────────────────────
+.username-at {
+  font-size: $font-body-lg;
+  color: var(--auth-text-subtle);
+  font-weight: 500;
+  flex-shrink: 0;
+  padding-left: 16px;
+  padding-right: 2px;
+}
+
+.username-status-icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  width: 22px;
+  justify-content: center;
+  padding-right: 16px;
+}
+
+.username-rules-hint {
+  font-size: $font-caption;
+  color: var(--auth-text-subtle);
+  margin: 0;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.username-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.username-suggestions-label {
+  font-size: $font-caption;
+  color: var(--auth-text-subtle);
+  margin: 0;
+}
+
+.username-suggestions-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-4;
+}
+
+.username-suggestion-chip {
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: $radius-full;
+  padding: $space-2 $space-7;
+  font-size: $font-body-sm;
+  color: #a5b4fc;
+  cursor: pointer;
+  font-family: inherit;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+
+  &:hover,
+  &:active {
+    background: rgba(99, 102, 241, 0.28);
+    border-color: rgba(99, 102, 241, 0.55);
+  }
 }
 
 // ── Biometric sheet ───────────────────────────────────────────────────────────
@@ -1899,7 +1498,7 @@ onMounted(() => {
 }
 
 .biometric-title {
-  font-size: 20px;
+  font-size: $font-title-sm;
   font-weight: 700;
   color: var(--auth-text-primary);
   margin: 0;
@@ -1907,50 +1506,17 @@ onMounted(() => {
 }
 
 .biometric-desc {
-  font-size: 14px;
+  font-size: $font-body-sm;
   color: var(--auth-text-muted);
   margin: 0;
   line-height: 1.5;
 }
 
 .biometric-enable-btn {
-  margin-top: 8px;
+  margin-top: $space-4;
 }
 
-// ── Transitions ───────────────────────────────────────────────────────────────
-// .fade-* is defined globally in app.scss
-
-// Directional slide transitions
-.slide-left-enter-active,
-.slide-left-leave-active,
-.slide-right-enter-active,
-.slide-right-leave-active {
-  transition:
-    transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-    opacity 0.28s ease;
-}
-
-.slide-left-enter-from {
-  transform: translateX(32px);
-  opacity: 0;
-}
-
-.slide-left-leave-to {
-  transform: translateX(-32px);
-  opacity: 0;
-}
-
-.slide-right-enter-from {
-  transform: translateX(-32px);
-  opacity: 0;
-}
-
-.slide-right-leave-to {
-  transform: translateX(32px);
-  opacity: 0;
-}
-
-// ── Welcome success block ─────────────────────────────────────────────────────
+// ── Welcome / success ─────────────────────────────────────────────────────────
 @keyframes face-bounce-in {
   0% {
     transform: scale(0);
@@ -2004,12 +1570,6 @@ onMounted(() => {
   }
 }
 
-.form-block--welcome {
-  justify-content: center;
-  align-items: center;
-  gap: 28px;
-}
-
 .welcome-face-wrap {
   display: flex;
   align-items: center;
@@ -2039,7 +1599,7 @@ onMounted(() => {
   text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: $space-3;
 }
 
 .welcome-title {
@@ -2059,90 +1619,30 @@ onMounted(() => {
   animation: welcome-fade-up 0.4s ease 0.55s both;
 }
 
-// ── Username picker ───────────────────────────────────────────────────────────
-
-.username-field-wrap {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-
-  &.field-wrap--success {
-    background: rgba(34, 197, 94, 0.06);
-    border-color: rgba(34, 197, 94, 0.25);
-  }
-  &.field-wrap--error {
-    background: rgba(239, 68, 68, 0.08);
-    border-color: rgba(239, 68, 68, 0.3);
-  }
-}
-
-.username-at {
-  font-size: 17px;
-  color: rgba(255, 255, 255, 0.4);
-  font-weight: 500;
-  flex-shrink: 0;
-  padding-right: 2px;
-}
-
-.username-status-icon {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-  width: 22px;
-  justify-content: center;
-}
-
-.username-rules-hint {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.3);
-  margin: 0;
-  text-align: center;
-  line-height: 1.5;
-}
-
-.username-suggestions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.username-suggestions-label {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.4);
-  margin: 0;
-}
-
-.username-suggestions-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.username-suggestion-chip {
-  background: rgba(99, 102, 241, 0.15);
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  border-radius: 20px;
-  padding: 6px 14px;
-  font-size: 13px;
-  color: #a5b4fc;
-  cursor: pointer;
-  font-family: inherit;
+// ── Transitions ───────────────────────────────────────────────────────────────
+.slide-left-enter-active,
+.slide-left-leave-active,
+.slide-right-enter-active,
+.slide-right-leave-active {
   transition:
-    background 0.15s,
-    border-color 0.15s;
-
-  &:hover,
-  &:active {
-    background: rgba(99, 102, 241, 0.28);
-    border-color: rgba(99, 102, 241, 0.55);
-  }
+    transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.28s ease;
 }
 
-.success-text {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: #22c55e;
+.slide-left-enter-from {
+  transform: translateX(32px);
+  opacity: 0;
+}
+.slide-left-leave-to {
+  transform: translateX(-32px);
+  opacity: 0;
+}
+.slide-right-enter-from {
+  transform: translateX(-32px);
+  opacity: 0;
+}
+.slide-right-leave-to {
+  transform: translateX(32px);
+  opacity: 0;
 }
 </style>
