@@ -1,759 +1,565 @@
-# TGC App — Architecture
+# Synkos Template — Architecture
 
 ## Table of Contents
 
 - [Overview](#overview)
-- [The Template Contract](#the-template-contract)
-- [Directory Structure](#directory-structure)
-- [core/ — Template Infrastructure](#core--template-infrastructure)
-  - [Layouts](#layouts)
-  - [Auth pages](#auth-pages)
-  - [Profile page](#profile-page)
-  - [Settings pages](#settings-pages)
-  - [Components](#components)
-  - [Composables](#composables)
-- [features/ — App-Specific Code](#features--app-specific-code)
-- [Router Architecture](#router-architecture)
-  - [Route modules](#route-modules)
-  - [Route naming convention](#route-naming-convention)
-  - [RouteMeta — i18n-aware titles](#routemeta--i18n-aware-titles)
+- [Design principle](#design-principle)
+- [Directory structure](#directory-structure)
+- [Router architecture](#router-architecture)
+  - [Layout components](#layout-components)
+  - [Tab declaration via meta.tab](#tab-declaration-via-metatab)
+  - [Settings routes](#settings-routes)
+  - [Custom layouts](#custom-layouts)
+  - [Nav bar control from pages](#nav-bar-control-from-pages)
+  - [Route meta fields](#route-meta-fields)
   - [Navigation guard](#navigation-guard)
-- [iOS Navigation Bar Integration](#ios-navigation-bar-integration)
-- [Layout System](#layout-system)
-- [Page Transitions](#page-transitions)
-- [Keep-Alive Strategy](#keep-alive-strategy)
-- [Creating a New App from This Template](#creating-a-new-app-from-this-template)
-- [Adding a New App Feature](#adding-a-new-app-feature)
-- [Adding a New Settings Sub-Page](#adding-a-new-settings-sub-page)
+- [Theme system](#theme-system)
+  - [Layer 1 — SCSS variables](#layer-1--scss-variables)
+  - [Layer 2 — CSS custom properties](#layer-2--css-custom-properties)
+  - [Layer 3 — Platform tokens](#layer-3--platform-tokens)
+- [Auth pages](#auth-pages)
+- [Settings pages](#settings-pages)
+- [Page transitions](#page-transitions)
+- [Keep-alive strategy](#keep-alive-strategy)
+- [Large title pattern](#large-title-pattern)
+- [Boot initialization](#boot-initialization)
+- [Adding a new tab](#adding-a-new-tab)
+- [Adding a custom layout](#adding-a-custom-layout)
+- [Adding a settings sub-page](#adding-a-settings-sub-page)
 
 ---
 
 ## Overview
 
-This project is a **Quasar + Vue 3 + Capacitor template** designed to be reused across multiple native mobile apps. It ships with a fully working foundation — auth, settings, profile, navigation — so every new app starts with those problems already solved.
+This template is the frontend workspace for a Synkos app. It's where you develop features before publishing to `create-synkos`.
 
-The architecture has one core constraint:
+The template uses:
 
-> **To build a new app from this template, you should only need to touch `src/features/` and `src/router/routes/app.routes.ts`.**
-
-Everything else (`src/core/`, layouts, settings, auth) is generic infrastructure inherited by every app.
-
----
-
-## The Template Contract
-
-```
-src/core/      ← inherit — do not modify when building a new app
-src/features/  ← replace — delete everything and build your own features
-```
-
-| Directory   | What it means in practice                                                                                                                                                                                            |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `core/`     | Auth flow, all settings sections, profile shell, layouts. Identical across all apps built from this template. Customize only when changing the template itself (e.g. adding a new settings section to the template). |
-| `features/` | The actual app. Collection, Grade Center, Scan, Home content, Feed — anything specific to "this" app. When starting a new app, delete the existing features and create your own.                                     |
-
-The other root-level directories (`stores/`, `services/`, `types/`, `i18n/`) are shared and contain a mix of template and app code. Their naming makes the origin clear (`auth.store.ts` = template, `cards.store.ts` = app).
-
-Components and composables follow the same rule — they live inside `core/` or `features/` depending on who uses them, not in a separate top-level `components/` or `composables/` folder.
+- **Vue 3** + **Quasar** (build tooling, Capacitor integration)
+- **`@synkos/client`** — auth store, API client, boot factories, layout components
+- **`@synkos/ui`** — iOS-style UI component library
 
 ---
 
-## Directory Structure
+## Design principle
+
+**The framework provides logic and components. You own all pages.**
 
 ```
-tgc-app/src/
+@synkos/client                     apps/frontend/src/
+────────────────────────────────   ────────────────────────────────
+stores: useAuthStore                pages/auth/LoginPage.vue     ← yours
+        useSettingsStore            pages/auth/UsernamePage.vue  ← yours
+services: AuthService               pages/settings/**/*.vue      ← yours
+          UserService               layouts/OnboardingLayout.vue ← yours
+          AccountService            router/settings.routes.ts    ← yours
+composables: usePlatform            router/index.ts              ← yours
+             useNavAction
+             useNavTitle
+layouts: MainLayout      → imported and used as route components
+         AuthLayout      ↗
+```
+
+This means you can customize every screen without forking any package.
+
+---
+
+## Directory structure
+
+```
+src/
+├── app.config.ts                ← identity, feature flags, links, native settings
+├── boot/synkos.ts               ← createSynkosBoot({ config, messages })
 │
-├── core/                              ← TEMPLATE — generic, shared by all apps
-│   ├── layouts/
-│   │   ├── AuthLayout.vue             Full-screen layout (no tab bar, no nav bar)
-│   │   └── MainLayout.vue             App shell: iOS nav bar + tab bar + router-view
-│   │
-│   ├── components/
-│   │   ├── SplashOverlay.vue          Native-feel splash screen on cold start
-│   │   ├── LegalBottomSheet.vue       Bottom sheet for legal document display
-│   │   ├── ui/                        iOS-style list primitives (no business logic)
-│   │   │   ├── AppListSection.vue     Section wrapper with header label
-│   │   │   ├── AppListRow.vue         Tappable row with icon, label, hint, chevron
-│   │   │   ├── AppListDivider.vue     Inset separator between rows
-│   │   │   └── SegmentControl.vue     iOS segmented control (tab-style selector)
-│   │   └── navigation/                Components owned by MainLayout
-│   │       ├── AppMenuDrawer.vue      Right-side settings drawer with swipe-to-close
-│   │       └── DeletionBanner.vue     Persistent banner when account deletion is pending
-│   │
-│   ├── composables/
-│   │   ├── useSettings.ts             Settings state, language switching, notifications toggle
-│   │   ├── useSignOut.ts              Sign-out / exit-guest flow + farewell state machine
-│   │   ├── useSheetDrag.ts            Rubber-band drag behaviour for bottom sheets
-│   │   └── usePullToRefresh.ts        iOS-style pull-to-refresh gesture with haptics
-│   │
+├── features/                    ← YOUR app code
+│   └── home/pages/HomePage.vue
+│
+├── pages/
 │   ├── auth/
-│   │   └── pages/
-│   │       ├── LoginPage.vue          Login, register, forgot password, Face ID prompt
-│   │       └── UsernamePickerPage.vue First-time OAuth username selection
-│   │
-│   ├── profile/
-│   │   ├── components/
-│   │   │   └── ProfileHeader.vue      Avatar, display name and email header
-│   │   └── pages/
-│   │       └── ProfilePage.vue        Profile tab shell (stats, sign-out)
-│   │
+│   │   ├── LoginPage.vue        ← full auth UI: social, email, OTP, Face ID, username
+│   │   └── UsernamePage.vue     ← first-time username picker after OAuth
 │   └── settings/
+│       ├── ProfilePage.vue
+│       ├── components/ProfileHeader.vue
 │       ├── account/
-│       │   ├── components/
-│       │   │   └── SignOutDialog.vue   Bottom-sheet sign-out confirmation dialog
-│       │   └── pages/
-│       │       ├── AccountHubPage.vue
-│       │       ├── EditProfilePage.vue
-│       │       ├── ChangeUsernamePage.vue
-│       │       ├── ChangePasswordPage.vue
-│       │       └── DeleteAccountPage.vue
-│       ├── preferences/pages/
-│       │   ├── PreferencesHubPage.vue
-│       │   └── LanguagePage.vue
-│       ├── notifications/pages/
-│       │   └── NotificationsHubPage.vue
-│       ├── security/pages/
-│       │   └── SecurityHubPage.vue
-│       ├── billing/pages/
-│       │   └── BillingHubPage.vue
-│       ├── support/pages/
-│       │   ├── SupportHubPage.vue
-│       │   └── HelpPage.vue
-│       ├── legal/pages/
-│       │   └── LegalHubPage.vue
-│       └── about/pages/
-│           ├── AboutHubPage.vue
-│           └── AboutPage.vue
+│       │   ├── AccountHubPage.vue
+│       │   ├── EditProfilePage.vue
+│       │   ├── ChangePasswordPage.vue
+│       │   ├── ChangeUsernamePage.vue
+│       │   ├── DeleteAccountPage.vue
+│       │   └── components/SignOutDialog.vue
+│       ├── preferences/         ← PreferencesHub, Language
+│       ├── notifications/       ← NotificationsHub
+│       ├── security/            ← SecurityHub
+│       ├── billing/             ← BillingHub — integrate Stripe/RevenueCat here
+│       ├── support/             ← SupportHub, Help
+│       ├── legal/               ← LegalHub — put your actual terms/privacy here
+│       └── about/               ← AboutHub, About
 │
-├── features/                          ← APP-SPECIFIC — replace per app
-│   ├── home/pages/
-│   │   └── HomePage.vue
-│   ├── feed/pages/
-│   │   └── FeedPage.vue
-│   ├── collection/
-│   │   ├── components/
-│   │   │   └── CardItem.vue           Single card cell (grid and list variants)
-│   │   └── pages/
-│   │       ├── CollectionPage.vue
-│   │       ├── CardsPage.vue
-│   │       └── CatalogPage.vue
-│   ├── grade-center/pages/
-│   │   └── GradeCenterPage.vue
-│   └── scan/
-│       ├── components/
-│       │   ├── CameraView.vue         Camera feed + capture (native + web fallback)
-│       │   └── ScanResult.vue         Identified card result panel
-│       └── pages/
-│           └── ScanPage.vue
+├── layouts/
+│   └── OnboardingLayout.vue     ← example custom layout (no tab bar, custom header)
 │
 ├── router/
-│   ├── index.ts                       Global navigation guard + router factory
-│   └── routes/
-│       ├── index.ts                   Assembles all route modules into the final array
-│       ├── core.routes.ts             TEMPLATE routes: auth flow + profile tab
-│       ├── settings.routes.ts         TEMPLATE routes: all /settings/* sections
-│       └── app.routes.ts              APP routes: tab content + full-screen experiences
+│   ├── index.ts                 ← createRouter + setupSynkosRouter + your guards
+│   └── settings.routes.ts      ← explicit route definitions for all settings pages
 │
-├── stores/                            Pinia stores (core + app mixed)
-├── services/                          API services (core + app mixed)
-├── types/                             TypeScript interfaces (core + app mixed)
-├── i18n/                              Translations (en-US, es-ES)
-├── boot/                              Quasar boot files
-├── pages/
-│   └── ErrorNotFound.vue              Global 404 page
-└── App.vue                            Root component — layout transitions + splash
+├── css/
+│   ├── app.scss                 ← imports all theme files + global animations
+│   ├── quasar.variables.scss    ← SCSS design tokens (colors, spacing, typography)
+│   ├── dark.theme.scss          ← CSS vars for dark theme (default)
+│   ├── light.theme.scss         ← CSS vars for light theme
+│   └── platform.scss            ← platform tokens (iOS/Android sizing + transitions)
+│
+├── i18n/                        ← your app strings (framework strings auto-merged)
+├── stores/                      ← your Pinia stores
+└── pages/ErrorNotFound.vue
 ```
 
 ---
 
-## core/ — Template Infrastructure
+## Router architecture
 
-### Layouts
-
-Two layouts serve fundamentally different purposes:
-
-| Layout           | Path            | Used for                                                                                                                                          |
-| ---------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `AuthLayout.vue` | `core/layouts/` | Full-screen experiences: login, username picker, and any app-specific full-screen flows (e.g. camera scanner). No tab bar, no nav bar.            |
-| `MainLayout.vue` | `core/layouts/` | The main app shell. Renders the iOS navigation bar, the tab bar, `<router-view>`, and the `DeletionBanner`. Used for all tab and settings routes. |
-
-### Auth pages
-
-`LoginPage.vue` is a self-contained multi-step flow: login, register, forgot password, email verification, password reset, and Face ID offer. It lives in `core/auth/pages/` because every app needs authentication and this page does not reference any app-specific feature.
-
-`UsernamePickerPage.vue` is shown after a first-time OAuth sign-in when the user has no username yet.
-
-### Profile page
-
-`ProfilePage.vue` is the profile tab shell. It shows the user avatar, display name, and stats row. The stats values (graded cards, collections, wishlist) come from app-specific stores — customize the stats section per app without moving the file.
-
-### Settings pages
-
-All settings sections live under `core/settings/`. Each section follows the same pattern:
-
-```
-core/settings/<section>/pages/
-  <Section>HubPage.vue     ← hub/index for that section (list of sub-options)
-  <SubPage>.vue            ← individual sub-pages (one per option)
-```
-
-The hub pages use `AppListSection` + `AppListRow` components with i18n labels and navigate to sub-pages by route name. Sub-pages that are not yet implemented are listed as commented-out routes in `settings.routes.ts` — uncomment and create the page when needed.
-
-### Components
-
-Components inside `core/` are split by purpose:
-
-#### `core/components/ui/` — iOS list primitives
-
-Purely presentational components with no business logic or store dependencies. Used by every settings hub page and any future page that needs an iOS-style list.
-
-| Component        | Props                                                                                               | Purpose                                                         |
-| ---------------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| `AppListSection` | `title?: string`                                                                                    | Wraps a group of rows with an optional uppercase section header |
-| `AppListRow`     | `label`, `hint?`, `icon?`, `iconColor?`, `iconBg?`, `danger?`, `disabled?`, `comingSoon?`, `value?` | Tappable row supporting button and display-only variants        |
-| `AppListDivider` | `indent?: number`                                                                                   | Hairline separator between rows, with optional left inset       |
-| `SegmentControl` | `options`, `modelValue`                                                                             | iOS-style segmented selector, used in preference pages          |
-
-#### `core/components/navigation/` — Shell components
-
-Tightly coupled to `MainLayout`. Not intended for use in pages directly.
-
-| Component        | Purpose                                                                                                                                                                  |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `AppMenuDrawer`  | Right-side settings drawer opened from the profile menu button. Includes swipe-to-close gesture with backdrop opacity sync and haptic feedback at the dismiss threshold. |
-| `DeletionBanner` | Sticky banner shown at the top of every page when an account deletion is pending. Navigates to `settings-account-delete` on tap.                                         |
-
-#### `core/components/` — Generic core components
-
-| Component          | Purpose                                                                                                                    |
-| ------------------ | -------------------------------------------------------------------------------------------------------------------------- |
-| `SplashOverlay`    | Native-feel launch screen shown on Capacitor cold start. Emits `done` when its exit animation completes.                   |
-| `LegalBottomSheet` | Bottom sheet for displaying legal documents (terms, privacy policy). Used in `LoginPage`, `LegalHubPage`, and `AboutPage`. |
-
-#### Feature-scoped components
-
-Components used by a single section live next to that section, not in `core/components/`:
-
-| Component       | Location                            | Used by               |
-| --------------- | ----------------------------------- | --------------------- |
-| `ProfileHeader` | `core/profile/components/`          | `ProfilePage` only    |
-| `SignOutDialog` | `core/settings/account/components/` | `AccountHubPage` only |
-
-This keeps the scope visible from the file path — if a component is not in `core/components/`, it belongs to one specific page or section.
-
----
-
-### Composables
-
-All composables that can be used across both `core/` and `features/` live in `core/composables/`. There is no separate top-level `composables/` directory.
-
-#### `useSettings`
-
-**File:** `core/composables/useSettings.ts`
-
-Encapsulates the full settings interaction layer: reading and writing language, card language, haptics, grid size, and notification preferences. Also exposes navigation to `settings-account-delete`.
-
-Used by: `PreferencesHubPage`, `LanguagePage`, and indirectly by stores that read settings on init.
-
-#### `useSignOut`
-
-**File:** `core/composables/useSignOut.ts`
-
-Manages the sign-out and exit-guest flow: dialog visibility, a two-state machine (`confirm` → `farewell`), haptic feedback, and the final `authStore.logout()` + redirect to `auth-login`.
-
-Used by: `AccountHubPage`.
-
-#### `useSheetDrag`
-
-**File:** `core/composables/useSheetDrag.ts`
-
-Provides iOS rubber-band drag behaviour for bottom sheets. Returns `sheetDragStyle` (a computed CSS transform) and touch event handlers. The drag applies exponential resistance so the sheet feels anchored rather than free-floating.
-
-Used by: `SignOutDialog`. Can be added to any other bottom sheet component.
-
-#### `usePullToRefresh`
-
-**File:** `core/composables/usePullToRefresh.ts`
-
-iOS-style pull-to-refresh gesture. Accepts an async `onRefresh` callback, handles drag resistance, the visual indicator, the snap-back animation, and haptic feedback at the trigger threshold. Designed to work with any scrollable page.
-
-**Usage:**
+The template uses **Quasar-style layout routing** — the same pattern as any standard Vue Router + Quasar app. Layouts are Vue components used directly in route definitions.
 
 ```typescript
-const { pullState, pullY, isSnapping, onTouchStart, onTouchMove, onTouchEnd } = usePullToRefresh(
-  () => store.fetchData(),
-);
-```
+// src/router/index.ts
+import { createRouter, createWebHashHistory } from 'vue-router';
+import { MainLayout, AuthLayout, setupSynkosRouter } from '@synkos/client';
+import { settingsRoutes } from './settings.routes';
 
-Currently used by `CollectionPage` and `CatalogPage`. Available to all pages in `core/` and `features/`.
-
----
-
-## features/ — App-Specific Code
-
-Everything in `features/` belongs to the current app (TGC Grading). When reusing this template for a new app:
-
-1. Delete the entire `features/` directory.
-2. Create new feature directories for the new app's functionality.
-3. Update `app.routes.ts` to register the new routes.
-
-A feature directory groups everything it needs, co-located by feature rather than by file type:
-
-```
-features/<feature-name>/
-  pages/          ← route-level components
-  components/     ← components used only within this feature
-  composables/    ← composables used only within this feature
-```
-
-Only create `components/` or `composables/` subdirectories when they are actually needed. A feature with a single page and no shared sub-components only needs `pages/`.
-
-**Rule for promoting to `core/composables/`:** if a composable currently in a feature starts being used by a second unrelated feature or by any `core/` page, move it to `core/composables/` at that point. Don't move it preemptively.
-
----
-
-## Router Architecture
-
-### Route modules
-
-The router is split into four files under `src/router/routes/`:
-
-| File                 | Contents                                               | Who maintains it |
-| -------------------- | ------------------------------------------------------ | ---------------- |
-| `core.routes.ts`     | Auth route group (`/auth/*`) and the profile tab route | Template         |
-| `settings.routes.ts` | All `/settings/*` routes with their sub-page tree      | Template         |
-| `app.routes.ts`      | App tab routes and full-screen app experiences         | App developer    |
-| `index.ts`           | Assembles all modules into the final `routes` array    | Both             |
-
-**`index.ts` assembly:**
-
-```typescript
-const routes = [
-  coreAuthRoute, // /auth/login, /auth/username — AuthLayout
-  appFullscreen, // /app/scan (and future app full-screen routes) — AuthLayout
-  {
-    path: '/',
-    component: MainLayout,
-    children: [
-      ...appTabRoutes, // home, collection, grade-center, feed
-      coreProfileRoute, // profile
-      ...coreSettingsRoutes, // /settings/*
+export default defineRouter(() => {
+  const router = createRouter({
+    history: createWebHashHistory(process.env.VUE_ROUTER_BASE),
+    scrollBehavior: () => ({ left: 0, top: 0 }),
+    routes: [
+      {
+        path: '/auth',
+        component: AuthLayout,
+        children: [
+          { path: 'login', name: 'auth-login', meta: { requiresAuth: false },
+            component: () => import('src/pages/auth/LoginPage.vue') },
+          { path: 'username', name: 'auth-username', meta: { requiresAuth: false },
+            component: () => import('src/pages/auth/UsernamePage.vue') },
+        ],
+      },
+      {
+        path: '/',
+        component: MainLayout,
+        children: [
+          {
+            path: '',
+            name: 'home',
+            meta: { tab: { icon: 'home', labelKey: 'tabs.home', cache: true, componentName: 'HomePage' } },
+            component: () => import('src/features/home/pages/HomePage.vue'),
+          },
+          // Add more tabs here...
+          ...settingsRoutes,
+        ],
+      },
+      { path: '/:catchAll(.*)*', component: () => import('src/pages/ErrorNotFound.vue') },
     ],
+  });
+
+  setupSynkosRouter(router);           // registers auth guard + tab discovery
+  router.beforeEach((to) => { ... });  // your guards run AFTER Synkos's auth guard
+  return router;
+});
+```
+
+### Layout components
+
+| Component    | Source              | Used for                                      |
+| ------------ | ------------------- | --------------------------------------------- |
+| `MainLayout` | `@synkos/client`    | iOS nav bar + tab bar + router-view           |
+| `AuthLayout` | `@synkos/client`    | Full-screen, no chrome (auth, modals, camera) |
+| Custom       | `src/layouts/*.vue` | Your own layouts (onboarding, wizards, etc.)  |
+
+### Tab declaration via `meta.tab`
+
+Tabs are declared inline on routes. `setupSynkosRouter` discovers them automatically:
+
+```typescript
+{
+  path: '',
+  name: 'home',
+  meta: {
+    tab: {
+      icon: 'home',            // Material icon name
+      labelKey: 'tabs.home',   // i18n key
+      cache: true,             // keep-alive (preserves scroll + data)
+      componentName: 'HomePage', // Vue component name for keep-alive matching
+      badge: unreadCountRef,   // Ref<number> — reactive badge pill
+    },
   },
-  { path: '/:catchAll(.*)*', component: ErrorNotFound },
+  component: () => import('src/features/home/pages/HomePage.vue'),
+}
+```
+
+Tabs appear in the order they're declared in the route array.
+
+### Settings routes
+
+All settings routes are defined in `src/router/settings.routes.ts`. This file is yours — add, remove, or reorder sections freely.
+
+```typescript
+// src/router/settings.routes.ts
+export const settingsRoutes: RouteRecordRaw[] = [
+  {
+    path: 'profile',
+    name: 'profile',
+    meta: { tab: { icon: 'person', labelKey: 'tabs.profile' } },
+    component: () => import('src/pages/settings/ProfilePage.vue'),
+  },
+  {
+    path: 'settings/account',
+    name: 'settings-account',
+    meta: { titleKey: 'nav.myAccount' },
+    component: () => import('src/pages/settings/account/AccountHubPage.vue'),
+  },
+  // ... all other settings routes
 ];
 ```
 
-The key design decision: **`profile` is declared in `core.routes.ts`**, not in `app.routes.ts`. This ensures every app always has the profile tab — it cannot be accidentally removed. App developers add their own tabs to `appTabRoutes` without touching the profile.
+### Custom layouts
 
-### Route naming convention
-
-All route names follow a kebab-case hierarchy mirroring the URL structure:
-
-```
-auth-login                   → /auth/login
-auth-username                → /auth/username
-profile                      → /profile
-home                         → /
-collection                   → /collection
-collection-cards             → /collection/:slug/cards
-scan                         → /app/scan
-
-settings-account             → /settings/account
-settings-account-edit        → /settings/account/edit
-settings-account-username    → /settings/account/username
-settings-account-password    → /settings/account/password
-settings-account-delete      → /settings/account/delete
-
-settings-preferences         → /settings/preferences
-settings-preferences-language → /settings/preferences/language
-settings-preferences-appearance → /settings/preferences/appearance (planned)
-
-settings-notifications       → /settings/notifications
-settings-security            → /settings/security
-settings-billing             → /settings/billing
-settings-support             → /settings/support
-settings-support-help        → /settings/support/help
-settings-legal               → /settings/legal
-settings-about               → /settings/about
-```
-
-**Rule:** always navigate by name, never by path. This decouples all components from URL structure.
+Add any layout as a new route group. Use `meta.requiresAuth: false` for public routes:
 
 ```typescript
-// ✅ correct
-router.push({ name: 'settings-account-edit' });
-
-// ❌ avoid
-router.push('/settings/account/edit');
+// router/index.ts
+{
+  path: '/onboarding',
+  component: () => import('src/layouts/OnboardingLayout.vue'),
+  children: [
+    {
+      path: '',
+      name: 'onboarding',
+      meta: { requiresAuth: false, canSkip: true, skipTo: 'home' },
+      component: () => import('src/pages/OnboardingPage.vue'),
+    },
+  ],
+}
 ```
 
-### RouteMeta — i18n-aware titles
+The example `OnboardingLayout.vue` demonstrates:
 
-Route `meta` is extended with two fields used by `MainLayout.vue` to drive the iOS navigation bar:
+- No tab bar, no nav bar — custom chrome
+- Header buttons controlled by `route.meta.canGoBack` and `route.meta.canSkip`
+- Safe area insets
+
+### Nav bar control from pages
+
+Two composables let pages control the nav bar:
+
+```typescript
+// Inject a trailing action button (e.g. "+" to create)
+import { useNavAction } from '@synkos/client';
+useNavAction({ icon: 'add', onClick: () => openModal() });
+// Clears automatically when the page unmounts.
+
+// Override the nav bar title with dynamic data
+import { useNavTitle } from '@synkos/client';
+useNavTitle(user.value?.displayName ?? 'Profile');
+// Clears automatically when the page unmounts.
+```
+
+### Route meta fields
 
 ```typescript
 declare module 'vue-router' {
   interface RouteMeta {
-    titleKey?: string; // i18n key → resolved to page title
-    parentTitleKey?: string; // i18n key → resolved to back button label
-    requiresAuth?: boolean; // guards requiring a non-guest user
+    titleKey?: string; // i18n key → nav bar title
+    parentTitleKey?: string; // i18n key → back button label
+    requiresAuth?: boolean; // false = public route (used by setupSynkosRouter guard)
+    hideTabBar?: boolean; // hide the tab bar on this route
+    tab?: TabMeta; // declare this route as a tab
+    canGoBack?: boolean; // custom layout: show back button
+    canSkip?: boolean; // custom layout: show skip button
+    skipTo?: string; // custom layout: route name to skip to
   }
 }
 ```
-
-**Never hardcode strings in route meta.** Always use i18n keys:
-
-```typescript
-// ✅ correct — reactive to locale changes
-{
-  path: 'settings/account/edit',
-  name: 'settings-account-edit',
-  meta: {
-    titleKey: 'nav.editProfile',
-    parentTitleKey: 'nav.myAccount',
-  },
-  component: () => import('src/core/settings/account/pages/EditProfilePage.vue'),
-}
-
-// ❌ wrong — hardcoded, breaks on locale change
-{
-  meta: { title: 'Edit Profile', parentTitle: 'My Account' }
-}
-```
-
-`MainLayout.vue` resolves the keys with `t()`:
-
-```typescript
-const pageTitle = computed(() => {
-  if (collectionSlug.value) return currentCollection.value?.name ?? collectionSlug.value;
-  if (route.meta?.titleKey) return t(route.meta.titleKey);
-  // tab paths fall back to tab labels
-  if (route.path === '/collection')   return t('tabs.collection');
-  if (route.path === '/grade-center') return t('tabs.grades');
-  ...
-  return t('nav.appTitle');
-});
-
-const parentTitle = computed(() => {
-  if (route.meta?.parentTitleKey) return t(route.meta.parentTitleKey);
-  return t('nav.back');
-});
-```
-
-Because the title is a computed based on a reactive i18n translation, changing the app language instantly updates the nav bar — no route reload required.
 
 ### Navigation guard
 
-A single global `beforeEach` guard in `src/router/index.ts` handles all auth-related redirects:
+`setupSynkosRouter` installs a guard that:
 
-```typescript
-Router.beforeEach(async (to) => {
-  const authStore = useAuthStore();
-  const isPublicRoute = to.name === 'auth-login';
-  const canAccess = authStore.isAuthenticated || authStore.isGuest;
+- Redirects unauthenticated users to `auth-login` (unless `meta.requiresAuth === false`)
+- Redirects authenticated + verified users away from the login page
+- Redirects to login with `?verify=1` for accounts pending email verification
 
-  // Already has session → skip the login screen
-  if (isPublicRoute && authStore.isAuthenticated && authStore.user?.isEmailVerified) {
-    return { name: 'home' };
-  }
-
-  // No session → force login
-  if (!isPublicRoute && !canAccess) {
-    return { name: 'auth-login' };
-  }
-
-  // Has account but email not verified → back to login for verification
-  if (
-    !isPublicRoute &&
-    authStore.isAuthenticated &&
-    !authStore.isGuest &&
-    !authStore.user?.isEmailVerified
-  ) {
-    return { name: 'auth-login', query: { verify: '1' } };
-  }
-
-  return true;
-});
-```
-
-The guard uses dynamic import for `useAuthStore` to avoid a circular dependency between the router and the store (both used in boot files).
+Your `router.beforeEach()` calls run **after** this guard.
 
 ---
 
-## iOS Navigation Bar Integration
+## Theme system
 
-`MainLayout.vue` renders an iOS-style navigation bar that:
+Three independent layers, each with a different purpose:
 
-- Shows **no back button** on root tab routes (`/`, `/collection`, `/grade-center`, `/feed`, `/profile`).
-- Shows a **back button** on all other routes, with the label resolved from `route.meta.parentTitleKey`.
-- Shows the **menu button** (hamburger) only on the `/profile` route.
-- Highlights the **correct tab** in the tab bar for all routes, including settings sub-pages.
+### Layer 1 — SCSS variables (`quasar.variables.scss`)
 
-**Tab active logic** — all `/settings/*` routes highlight the Profile tab:
+Compile-time design tokens available in every `<style lang="scss">` block. No import needed — Quasar injects them automatically.
 
-```typescript
-function isTabActive(tab: { path: string }) {
-  if (tab.path === '/profile') {
-    return route.path === '/profile' || route.path.startsWith('/settings');
-  }
-  return route.path.startsWith(tab.path);
+```scss
+.my-card {
+  background: $surface-2; // rgba(255, 255, 255, 0.06)
+  border-radius: $radius-xl; // 14px
+  padding: $space-8; // 16px
+  font-size: $font-body; // 15px
+  color: $text-primary; // rgba(255, 255, 255, 0.95)
 }
 ```
 
-**Sub-route detection:**
+### Layer 2 — CSS custom properties (`dark.theme.scss` / `light.theme.scss`)
 
-```typescript
-const isSubRoute = computed(() => tabs.value.every((tab) => tab.path !== route.path));
+Runtime-switchable brand colors applied by `SynkosApp.vue` via `data-theme="dark|light"` on `<html>`. The user switches themes in Settings → Preferences.
+
+```scss
+// Customize your brand in dark.theme.scss
+:root,
+:root[data-theme='dark'] {
+  --color-primary: #007aff; // ← change this to rebrand buttons, links, actives
+  --auth-bg: #000000; // auth screen background
+  --auth-icon-bg: linear-gradient(145deg, #1a1a2e, #16213e); // app icon background
+}
 ```
 
-Any route that is not a direct tab path is treated as a sub-route and gets a back button.
+Auth pages use `--auth-*` tokens. All other UI uses `--color-primary`, `--surface-bg`, `--text-primary`, etc.
+
+### Layer 3 — Platform tokens (`platform.scss`)
+
+Applied via `data-platform="ios|android|web"` on `<html>` (set at boot). MainLayout reads these variables:
+
+```scss
+:root[data-platform='ios'] {
+  --nav-bar-height: 44px;
+  --tab-bar-height: 49px;
+  --platform-transition-push: 0.32s cubic-bezier(0.36, 0.66, 0.04, 1);
+}
+
+:root[data-platform='android'] {
+  --nav-bar-height: 64px;
+  --tab-bar-height: 80px;
+  --platform-transition-push: 0.3s cubic-bezier(0.2, 0, 0, 1);
+}
+```
 
 ---
 
-## Layout System
+## Auth pages
 
-There are exactly two layouts and the choice is made at the route level:
+`src/pages/auth/LoginPage.vue` handles the full authentication flow in a single page (multi-step via internal `mode` state):
 
-```
-AuthLayout      → /auth/*  and  /app/*  (full-screen, no chrome)
-MainLayout      → /*  (app shell with tab bar and nav bar)
-```
+| Mode       | What it shows                         |
+| ---------- | ------------------------------------- |
+| `social`   | Apple, Google, email, guest buttons   |
+| `login`    | Email + password form                 |
+| `register` | Email + password + strength indicator |
+| `forgot`   | Email input for password reset        |
+| `reset`    | 6-digit OTP + new password            |
+| `verify`   | 6-digit OTP for email verification    |
+| `username` | Username picker (post-OAuth)          |
+| `success`  | Welcome animation                     |
 
-To add a new full-screen experience (e.g. an onboarding flow):
+The page imports all its logic from `@synkos/client`:
 
 ```typescript
-// app.routes.ts
-export const appFullscreen: RouteRecordRaw = {
-  path: '/app',
-  component: () => import('src/core/layouts/AuthLayout.vue'),
-  children: [
-    { path: 'scan', name: 'scan', component: () => import('...') },
-    { path: 'onboarding', name: 'onboarding', component: () => import('...') }, // add here
-  ],
-};
+import { useAuthStore, AuthService, UsernameService, getClientConfig } from '@synkos/client';
+```
+
+**To customize:** edit `src/pages/auth/LoginPage.vue` freely. The logic stays the same; change the CSS, layout, or branding as needed.
+
+**To add a social provider:** add the OAuth logic in `handleMyProvider()` and call `authStore.loginEmail/Google/Apple(dto)`.
+
+---
+
+## Settings pages
+
+All pages in `src/pages/settings/` import from the public `@synkos/client` API:
+
+```typescript
+import { useAuthStore, useSettingsStore, useSignOut, getClientConfig } from '@synkos/client';
+import { LegalBottomSheet } from '@synkos/client';
+import { AppListRow, AppListSection } from '@synkos/ui';
+```
+
+**Key pages to customize:**
+
+| Page                                 | Why you need to edit it                                |
+| ------------------------------------ | ------------------------------------------------------ |
+| `billing/BillingHubPage.vue`         | Integrate Stripe, RevenueCat, or your payment provider |
+| `legal/LegalHubPage.vue`             | Show your actual privacy policy and terms of service   |
+| `about/AboutHubPage.vue`             | App Store links, version info, your branding           |
+| `preferences/PreferencesHubPage.vue` | Remove/add preference rows                             |
+
+---
+
+## Page transitions
+
+`SynkosApp.vue` handles auth-level transitions by watching `route.path`:
+
+| Navigation            | Transition    | Effect                                               |
+| --------------------- | ------------- | ---------------------------------------------------- |
+| Any route → `/auth/*` | `login-enter` | Auth screen slides in from top; app scales+fades out |
+| `/auth/*` → any route | `login-exit`  | Auth slides out; app scales+fades in                 |
+
+Tab transitions (`tab-slide-left` / `tab-slide-right`) are handled in `MainLayout` and use `var(--platform-transition-push)` for the timing curve.
+
+---
+
+## Keep-alive strategy
+
+Routes with `meta.tab.cache: true` and `meta.tab.componentName` are kept alive between tab switches. The component name must match the `name` option of the Vue component:
+
+```typescript
+// router
+meta: { tab: { cache: true, componentName: 'HomePage' } }
+
+// component
+defineOptions({ name: 'HomePage' })
+```
+
+Settings pages and detail views should **not** be cached — they'd show stale state after edits.
+
+---
+
+## Large title pattern
+
+Use `AppPageLargeTitle` at the top of any scrollable page. It auto-collapses into the nav bar on scroll:
+
+```vue
+<template>
+  <AppPage>
+    <AppPageLargeTitle title="My Page" subtitle="Subtitle text" />
+    <!-- ... scrollable content -->
+  </AppPage>
+</template>
+
+<script setup>
+import { AppPage, AppPageLargeTitle } from '@synkos/ui';
+</script>
+```
+
+The component uses `IntersectionObserver` and communicates with `MainLayout` via `inject('synkos:set-nav-title')`. Nav bar shows a crossfade transition between the large title and the compact title.
+
+---
+
+## Boot initialization
+
+`src/boot/synkos.ts` runs the full initialization in order: i18n → API client → background tracking → auth store init → push notifications → splash screen.
+
+```typescript
+export default defineBoot(
+  createSynkosBoot({
+    config: appConfig,
+    messages: { 'en-US': enUS, 'es-ES': esES },
+    // apiBaseUrl: defaults to VITE_API_URL
+    // notifications: { onNotification, onActionPerformed }
+    // onLogin: (user) => analytics.identify(user.id),
+    // onLogout: () => analytics.reset(),
+  }),
+);
+```
+
+Add your own boots in `src/boot/` and register them in `quasar.config.ts`:
+
+```typescript
+boot: ['synkos', 'analytics', 'my-sdk'],
 ```
 
 ---
 
-## Page Transitions
+## Adding a new tab
 
-`App.vue` handles two top-level transitions triggered by route name changes:
+**1. Create the page:**
 
-| Trigger                               | Transition    | Effect                                                           |
-| ------------------------------------- | ------------- | ---------------------------------------------------------------- |
-| Navigating **to** `auth-login`        | `login-enter` | Login slides in from the top; main app scales down and fades out |
-| Navigating **away from** `auth-login` | `login-exit`  | Login slides out to the top; main app scales up and fades in     |
+```
+src/features/feed/pages/FeedPage.vue
+```
 
-These transitions run at the `App.vue` level (not `MainLayout`) so they cover the entire viewport without interference from the nav bar or tab bar.
-
-Tab-to-tab transitions (`tab-slide-left` / `tab-slide-right`) are handled inside `MainLayout.vue` and are directional — swiping right animates leftward, swiping left animates rightward — mirroring native iOS tab bar behaviour.
-
----
-
-## Keep-Alive Strategy
-
-`MainLayout.vue` uses `<keep-alive>` to preserve component state for tabs where it matters:
+**2. Add to `router/index.ts` children:**
 
 ```typescript
-const cachedViews = ['CollectionPage', 'HomePage'];
+{
+  path: 'feed',
+  name: 'feed',
+  meta: { tab: { icon: 'rss_feed', labelKey: 'tabs.feed' } },
+  component: () => import('src/features/feed/pages/FeedPage.vue'),
+},
 ```
 
-**Why only these two?**
-
-- `CollectionPage` — fetches a list of collections on mount. Caching avoids a network request every time the user switches tabs.
-- `HomePage` — placeholder; cached as a best practice for the root tab.
-
-Pages that should **not** be cached (settings pages, detail views) are excluded. Caching a settings page would show stale form state if the user edits their profile, navigates away, and returns.
-
-The `routeKey` computed forces a fresh component instance for collection sub-pages:
-
-```typescript
-const routeKey = computed(() => {
-  if (collectionSlug.value) return `cards-${collectionSlug.value}`;
-  return route.path;
-});
-```
-
-This ensures switching from the Pokémon collection to the One Piece collection creates a fresh `CardsPage` rather than re-using the cached one with wrong data.
-
----
-
-## Creating a New App from This Template
-
-### 1. Clone and install
-
-```bash
-git clone <template-repo> my-new-app
-cd my-new-app/tgc-app
-pnpm install
-```
-
-### 2. Remove app-specific features
-
-```bash
-rm -rf src/features/collection
-rm -rf src/features/grade-center
-rm -rf src/features/scan
-rm -rf src/features/home
-rm -rf src/features/feed
-```
-
-Remove app-specific stores, services, and types:
-
-```bash
-rm src/stores/cards.store.ts
-rm src/stores/catalog.store.ts
-rm src/stores/collections.store.ts
-rm src/stores/graded-cards.store.ts
-rm src/stores/scan.store.ts
-rm src/services/cards.service.ts
-# ... etc
-```
-
-### 3. Replace app routes
-
-Edit `src/router/routes/app.routes.ts`:
-
-```typescript
-export const appTabRoutes: RouteRecordRaw[] = [
-  { path: '', name: 'home', component: () => import('src/features/home/pages/HomePage.vue') },
-  {
-    path: 'my-feature',
-    name: 'my-feature',
-    component: () => import('src/features/my-feature/pages/MyFeaturePage.vue'),
-  },
-  // add your tabs here
-];
-
-export const appFullscreen: RouteRecordRaw = {
-  path: '/app',
-  component: () => import('src/core/layouts/AuthLayout.vue'),
-  children: [
-    // add app-specific full-screen routes here
-  ],
-};
-```
-
-### 4. Create your features
-
-```
-src/features/
-  home/pages/HomePage.vue
-  my-feature/pages/MyFeaturePage.vue
-```
-
-### 5. Update the tab bar labels
-
-In `src/core/layouts/MainLayout.vue` (or the i18n files), update the `tabs` computed to match your new feature names:
-
-```typescript
-const tabs = computed(() => [
-  { path: '/', label: t('tabs.home'), icon: 'home' },
-  { path: '/my-feature', label: t('tabs.myFeature'), icon: 'star' },
-  { path: '/profile', label: t('tabs.profile'), icon: 'person' },
-]);
-```
-
-### 6. Customize branding
-
-- App name, bundle ID, icons: `capacitor.config.ts` + Xcode
-- Colors, fonts: `src/css/`
-- i18n strings: `src/i18n/en-US/index.ts`, `src/i18n/es-ES/index.ts`
-
-**Everything in `src/core/` can be left untouched.** Auth, settings, profile, and navigation are ready to use.
-
----
-
-## Adding a New App Feature
-
-A feature is a self-contained directory with its own pages, and optionally its own components, composables, and types.
-
-### 1. Create the feature directory
-
-```
-src/features/wishlist/
-  pages/
-    WishlistPage.vue
-  components/
-    WishlistItem.vue
-```
-
-### 2. Register the route in `app.routes.ts`
-
-```typescript
-export const appTabRoutes: RouteRecordRaw[] = [
-  // ... existing routes
-  {
-    path: 'wishlist',
-    name: 'wishlist',
-    component: () => import('src/features/wishlist/pages/WishlistPage.vue'),
-  },
-];
-```
-
-### 3. Add the tab to MainLayout
-
-```typescript
-const tabs = computed(() => [
-  // ... existing tabs
-  { path: '/wishlist', label: t('tabs.wishlist'), icon: 'bookmark' },
-]);
-```
-
-### 4. Add i18n keys
+**3. Add i18n key:**
 
 ```typescript
 // src/i18n/en-US/index.ts
 tabs: {
-  wishlist: 'Wishlist',
-},
-pages: {
-  wishlist: {
-    title: 'My Wishlist',
-    empty: 'No items yet',
-  },
+  feed: 'Feed';
 }
 ```
 
-For full-screen experiences (no tab bar), add to `appFullscreen.children` in `app.routes.ts` instead.
+That's it — the tab bar updates automatically.
 
 ---
 
-## Adding a New Settings Sub-Page
+## Adding a custom layout
 
-Settings sub-pages live in `src/core/settings/<section>/pages/`. They are part of the template because every app built from this template inherits the same settings structure.
-
-### 1. Create the page file
+**1. Create the layout in `src/layouts/`:**
 
 ```
-src/core/settings/security/pages/TwoFactorPage.vue
+src/layouts/FullscreenLayout.vue
 ```
 
-### 2. Uncomment or add the route in `settings.routes.ts`
+A layout is any Vue component with `<router-view />` in the template. See `OnboardingLayout.vue` for a complete example.
+
+**2. Add to `router/index.ts`:**
 
 ```typescript
-// settings.routes.ts
+{
+  path: '/fullscreen',
+  component: () => import('src/layouts/FullscreenLayout.vue'),
+  children: [
+    {
+      path: 'camera',
+      name: 'camera',
+      meta: { requiresAuth: false },  // if public
+      component: () => import('src/features/camera/pages/CameraPage.vue'),
+    },
+  ],
+}
+```
+
+---
+
+## Adding a settings sub-page
+
+**1. Create the page in `src/pages/settings/<section>/`:**
+
+```
+src/pages/settings/security/TwoFactorPage.vue
+```
+
+**2. Add the route in `router/settings.routes.ts`:**
+
+```typescript
 {
   path: 'settings/security/two-factor',
   name: 'settings-security-two-factor',
-  meta: {
-    titleKey: 'pages.settings.seguridadSection.dosFactor',
-    parentTitleKey: 'nav.security',
-  },
-  component: () => import('src/core/settings/security/pages/TwoFactorPage.vue'),
+  meta: { titleKey: 'nav.twoFactor', parentTitleKey: 'nav.security' },
+  component: () => import('src/pages/settings/security/TwoFactorPage.vue'),
 },
 ```
 
-### 3. Link to it from the hub page
+**3. Link from the hub page:**
 
 ```typescript
-// SecurityHubPage.vue
 router.push({ name: 'settings-security-two-factor' });
 ```
 
-### 4. Add i18n keys if needed
+**4. Add i18n key:**
 
-The `pages.settings.seguridadSection.*` namespace in `src/i18n/` already has keys for all planned security sub-pages. Check there before adding new ones.
+```typescript
+nav: {
+  twoFactor: 'Two-Factor Authentication';
+}
+```
 
-The back button label is automatic — `parentTitleKey: 'nav.security'` resolves to "Security" / "Seguridad" and is displayed in the iOS nav bar without any additional wiring.
+The back button label ("Security") is wired automatically via `parentTitleKey`.
