@@ -87,6 +87,7 @@ export { default as OtpInput } from './vue/components/auth/OtpInput.vue';
 export { default as AuthFieldGroup } from './vue/components/auth/AuthFieldGroup.vue';
 export { default as AuthFieldRow } from './vue/components/auth/AuthFieldRow.vue';
 export { default as AuthFeedback } from './vue/components/auth/AuthFeedback.vue';
+export { default as PasswordStrengthBar } from './vue/components/auth/PasswordStrengthBar.vue';
 
 // ── Auth composables ──────────────────────────────────────────────────────────
 export { usePasswordStrength } from './composables/usePasswordStrength.js';

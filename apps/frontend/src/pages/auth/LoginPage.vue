@@ -489,16 +489,10 @@ import {
   AuthFieldGroup,
   AuthFieldRow,
   AuthFeedback,
+  PasswordStrengthBar,
   usePasswordStrength,
 } from '@synkos/client';
-import {
-  AppBottomSheet,
-  AppIcon,
-  AppSpinner,
-  AppButton,
-  AppCircularProgress,
-  PasswordStrengthBar,
-} from '@synkos/ui';
+import { AppBottomSheet, AppIcon, AppSpinner, AppButton, AppCircularProgress } from '@synkos/ui';
 
 const appConfig = getClientConfig();
 const { t } = useI18n();

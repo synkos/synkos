@@ -489,14 +489,8 @@ import AuthFieldRow from '../../components/auth/AuthFieldRow.vue';
 import AuthFeedback from '../../components/auth/AuthFeedback.vue';
 import { getClientConfig } from '../../../internal/app-config.js';
 import { usePasswordStrength } from '../../../composables/usePasswordStrength.js';
-import {
-  AppBottomSheet,
-  AppIcon,
-  AppSpinner,
-  AppButton,
-  AppCircularProgress,
-  PasswordStrengthBar,
-} from '@synkos/ui';
+import PasswordStrengthBar from '../../components/auth/PasswordStrengthBar.vue';
+import { AppBottomSheet, AppIcon, AppSpinner, AppButton, AppCircularProgress } from '@synkos/ui';
 
 const appConfig = getClientConfig();
 const { t } = useI18n();
