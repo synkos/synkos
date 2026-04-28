@@ -1,5 +1,5 @@
 <template>
-  <q-page class="help-page">
+  <AppPage class="help-page">
     <div class="help-scroll">
       <!-- ── GET HELP ──────────────────────────────────────────────── -->
       <AppListSection :title="t('pages.help.sections.getHelp')">
@@ -92,12 +92,12 @@
 
       <div style="height: 32px" />
     </div>
-  </q-page>
+  </AppPage>
 </template>
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-import { AppListRow } from '@synkos/ui';
+import { AppPage, AppListRow } from '@synkos/ui';
 import { AppListSection } from '@synkos/ui';
 import { AppListDivider } from '@synkos/ui';
 import { getClientConfig } from '../../../../internal/app-config.js';

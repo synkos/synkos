@@ -1,11 +1,5 @@
 <template>
-  <q-dialog
-    class="legal-sheet-dialog"
-    :model-value="show"
-    position="bottom"
-    full-width
-    @update:model-value="$emit('update:show', $event)"
-  >
+  <AppBottomSheet :model-value="show" @update:model-value="$emit('update:show', $event)">
     <div ref="sheetRef" class="legal-sheet" :style="sheetStyle">
       <!-- Drag zone: handle + header — touch listeners live here -->
       <div
@@ -47,13 +41,14 @@
         <div class="legal-footer-spacer" />
       </div>
     </div>
-  </q-dialog>
+  </AppBottomSheet>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getLegalContent } from '../../legal/legalContent.js';
+import { AppBottomSheet } from '@synkos/ui';
 
 const props = defineProps<{
   show: boolean;

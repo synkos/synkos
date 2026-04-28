@@ -1,14 +1,23 @@
 <template>
-  <q-page class="preferences-page">
+  <AppPage class="preferences-page">
     <div class="preferences-scroll">
       <!-- ── APARIENCIA ─────────────────────────────────────────────── -->
       <AppListSection :title="t('pages.settings.preferenciasSection.apariencia')">
-        <AppListRow
-          :label="t('pages.settings.aparienciaSection.tema')"
-          :hint="t('pages.settings.aparienciaSection.temaHint')"
-          disabled
-          coming-soon
-        />
+        <div class="theme-control">
+          <div class="theme-control__header">
+            <span class="theme-control__label">{{
+              t('pages.settings.aparienciaSection.tema')
+            }}</span>
+            <span class="theme-control__hint">{{
+              t('pages.settings.aparienciaSection.temaHint')
+            }}</span>
+          </div>
+          <SegmentControl
+            :options="themeOptions"
+            :model-value="settingsStore.theme"
+            @update:model-value="(v) => settingsStore.setTheme(v as AppTheme)"
+          />
+        </div>
         <AppListDivider />
         <AppListRow
           :label="t('pages.settings.aparienciaSection.tamanoTexto')"
@@ -70,7 +79,7 @@
 
       <div style="height: 32px" />
     </div>
-  </q-page>
+  </AppPage>
 </template>
 
 <script setup lang="ts">
@@ -78,21 +87,51 @@ import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { useSettingsStore } from '../../../../stores/settings.store.js';
-import { AppListRow } from '@synkos/ui';
-import { AppListSection } from '@synkos/ui';
-import { AppListDivider } from '@synkos/ui';
+import type { AppTheme } from '../../../../composables/useTheme.js';
+import { AppPage, AppListRow, AppListSection, AppListDivider, SegmentControl } from '@synkos/ui';
 
 const { t } = useI18n();
 const router = useRouter();
 const settingsStore = useSettingsStore();
 
-// Show the active language as a hint on the Idioma row
 const currentLangLabel = computed(() => t(`pages.settings.languages.${settingsStore.appLang}`));
+
+const themeOptions = computed(() => [
+  { value: 'light', label: t('pages.settings.aparienciaSection.temaLight') },
+  { value: 'dark', label: t('pages.settings.aparienciaSection.temaDark') },
+  { value: 'system', label: t('pages.settings.aparienciaSection.temaSystem') },
+]);
 </script>
 
 <style lang="scss" scoped>
-// q-page background and min-height are handled globally in app.scss
 .preferences-scroll {
   padding-top: $space-4;
+}
+
+.theme-control {
+  display: flex;
+  flex-direction: column;
+  gap: $space-5;
+  padding: $space-6 $space-8 $space-8;
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+  }
+
+  &__label {
+    font-size: $font-body;
+    font-weight: 400;
+    color: var(--text-secondary, #{$text-secondary});
+    letter-spacing: $ls-normal;
+  }
+
+  &__hint {
+    font-size: $font-caption;
+    color: var(--text-tertiary, #{$text-tertiary});
+    letter-spacing: $ls-normal;
+    line-height: 1.3;
+  }
 }
 </style>

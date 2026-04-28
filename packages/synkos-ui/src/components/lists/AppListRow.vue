@@ -6,7 +6,7 @@
     @click="!value && !disabled ? $emit('click') : undefined"
   >
     <div v-if="icon" class="row-icon-wrap" :style="{ background: iconBg }">
-      <q-icon :name="icon" size="18px" :style="{ color: iconColor }" />
+      <AppIcon :name="icon" size="18px" :style="{ color: iconColor }" />
     </div>
 
     <div class="row-body">
@@ -24,13 +24,15 @@
       </template>
       <template v-else>
         <span v-if="comingSoon" class="badge-soon">{{ comingSoonLabel }}</span>
-        <q-icon name="chevron_right" class="row-chevron" />
+        <AppIcon name="chevron_right" class="row-chevron" />
       </template>
     </slot>
   </component>
 </template>
 
 <script setup lang="ts">
+import AppIcon from '../media/AppIcon.vue';
+
 withDefaults(
   defineProps<{
     icon?: string;
@@ -71,7 +73,7 @@ button.app-list-row {
   cursor: pointer;
 
   &:active:not(:disabled) {
-    background: $surface-press;
+    background: var(--surface-press, #{$surface-press});
   }
   &:disabled {
     opacity: 0.45;
@@ -100,43 +102,44 @@ button.app-list-row {
 .row-label {
   font-size: $font-body;
   font-weight: 400;
-  color: $text-secondary;
+  color: var(--text-secondary, #{$text-secondary});
   letter-spacing: $ls-normal;
 
   &--muted {
-    color: $text-disabled;
+    color: var(--text-disabled, #{$text-disabled});
   }
   &--danger {
-    color: $negative;
+    color: var(--color-negative, #{$negative});
   }
 }
 
 .row-hint {
   font-size: $font-caption;
-  color: $text-tertiary;
+  color: var(--text-tertiary, #{$text-tertiary});
   letter-spacing: $ls-normal;
   line-height: 1.3;
 }
 
 .row-value {
   font-size: $font-body;
-  color: rgba(235, 235, 245, 0.42);
+  color: var(--text-quaternary, #{$text-quaternary});
   letter-spacing: $ls-normal;
   flex-shrink: 0;
 }
 
 .row-chevron {
-  color: rgba(255, 255, 255, 0.22) !important;
-  font-size: 20px !important;
+  color: var(--text-quaternary, rgba(255, 255, 255, 0.22));
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
 }
 
 .badge-soon {
   font-size: $font-xs;
   font-weight: 600;
-  color: $text-label;
-  background: $separator;
-  border: 0.5px solid $border-medium;
+  color: var(--text-label, #{$text-label});
+  background: var(--separator, #{$separator});
+  border: 0.5px solid var(--border-medium, #{$border-medium});
   border-radius: $radius-full;
   padding: $space-1 $space-4;
   letter-spacing: $ls-caps;

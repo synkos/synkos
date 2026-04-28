@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue';
-import { useAuthStore } from '../../stores/auth.store.js';
+import { useAuthStore } from '../../auth/store.js';
 
 defineProps<{ logoSrc?: string }>();
 defineEmits<{ done: [] }>();

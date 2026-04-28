@@ -11,7 +11,7 @@ defineProps<{
 <style lang="scss" scoped>
 .app-list-divider {
   height: 0.5px;
-  background: $separator;
+  background: var(--separator, #{$separator});
   margin-left: $space-8;
 }
 </style>

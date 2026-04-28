@@ -1,5 +1,5 @@
 <template>
-  <q-page class="legal-page">
+  <AppPage class="legal-page">
     <div class="legal-scroll">
       <!-- ── Políticas ──────────────────────────────────────────────── -->
       <AppListSection :title="t('pages.settings.legalSection.sectionPoliticas')">
@@ -44,13 +44,13 @@
     </div>
 
     <LegalBottomSheet v-model:show="showSheet" :type="sheetType" />
-  </q-page>
+  </AppPage>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { AppListRow } from '@synkos/ui';
+import { AppPage, AppListRow } from '@synkos/ui';
 import { AppListSection } from '@synkos/ui';
 import { AppListDivider } from '@synkos/ui';
 import LegalBottomSheet from '../../../components/LegalBottomSheet.vue';

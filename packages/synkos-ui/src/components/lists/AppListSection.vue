@@ -21,7 +21,7 @@ defineProps<{
 .section-header {
   font-size: $font-caption;
   font-weight: 600;
-  color: $text-label;
+  color: var(--text-label, #{$text-label});
   letter-spacing: $ls-label;
   text-transform: uppercase;
   padding: $space-8 $space-2 $space-3;
@@ -29,8 +29,8 @@ defineProps<{
 }
 
 .list-group {
-  background: $surface-2;
-  border: 0.5px solid $surface-2-border;
+  background: var(--surface-2, #{$surface-2});
+  border: 0.5px solid var(--surface-2-border, #{$surface-2-border});
   border-radius: $radius-xl;
   overflow: hidden;
 }

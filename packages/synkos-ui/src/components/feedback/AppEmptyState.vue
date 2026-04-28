@@ -1,18 +1,19 @@
 <template>
   <div class="app-empty-state">
     <div class="empty-icon">
-      <q-icon :name="icon" size="48px" color="white" style="opacity: 0.9" />
+      <AppIcon :name="icon" size="48px" style="color: white; opacity: 0.9" />
     </div>
     <h2 class="empty-title">{{ title }}</h2>
     <p v-if="subtitle" class="empty-subtitle">{{ subtitle }}</p>
     <button v-if="action" class="empty-cta" @click="action.onClick">
-      <q-icon v-if="action.icon" :name="action.icon" size="18px" />
+      <AppIcon v-if="action.icon" :name="action.icon" size="18px" />
       {{ action.label }}
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
+import AppIcon from '../media/AppIcon.vue';
 interface EmptyAction {
   label: string;
   icon?: string;
@@ -41,8 +42,8 @@ defineProps<{
   width: 88px;
   height: 88px;
   border-radius: 22px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 0.5px solid rgba(255, 255, 255, 0.12);
+  background: var(--surface-1, rgba(255, 255, 255, 0.07));
+  border: 0.5px solid var(--surface-1-border, rgba(255, 255, 255, 0.12));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -52,7 +53,7 @@ defineProps<{
 .empty-title {
   font-size: $font-title;
   font-weight: 700;
-  color: $text-primary;
+  color: var(--text-primary, #{$text-primary});
   letter-spacing: $ls-tight;
   margin: 0 0 10px;
   line-height: $lh-tight;
@@ -60,7 +61,7 @@ defineProps<{
 
 .empty-subtitle {
   font-size: $font-body;
-  color: $text-label;
+  color: var(--text-label, #{$text-label});
   line-height: $lh-relaxed;
   margin: 0 0 32px;
   white-space: pre-line;

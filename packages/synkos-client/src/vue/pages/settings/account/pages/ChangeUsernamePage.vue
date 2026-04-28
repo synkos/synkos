@@ -1,12 +1,12 @@
 <template>
-  <q-page class="change-username-page">
+  <AppPage class="change-username-page">
     <div class="page-scroll">
       <div class="form-card">
         <p class="card-subtitle">{{ t('pages.changeUsername.subtitle') }}</p>
 
         <!-- Cooldown banner -->
         <div v-if="cooldownDaysLeft !== null" class="cooldown-banner">
-          <q-icon name="schedule" size="18px" class="cooldown-icon" />
+          <AppIcon name="schedule" size="18px" class="cooldown-icon" />
           <span>{{ t('pages.changeUsername.cooldown', { days: cooldownDaysLeft }) }}</span>
         </div>
 
@@ -32,14 +32,19 @@
             @input="onInput"
           />
           <div class="status-icon">
-            <q-spinner v-if="isChecking" size="16px" color="white" />
-            <q-icon
+            <AppSpinner v-if="isChecking" size="16px" color="white" />
+            <AppIcon
               v-else-if="statusType === 'success'"
               name="check_circle"
               size="18px"
-              color="positive"
+              style="color: var(--color-positive)"
             />
-            <q-icon v-else-if="statusType === 'error'" name="cancel" size="18px" color="negative" />
+            <AppIcon
+              v-else-if="statusType === 'error'"
+              name="cancel"
+              size="18px"
+              style="color: var(--color-negative)"
+            />
           </div>
         </div>
 
@@ -68,22 +73,23 @@
 
         <!-- Save button -->
         <button class="save-btn" :disabled="!canSave" @click="saveUsername">
-          <q-spinner v-if="isSaving" size="18px" color="white" />
+          <AppSpinner v-if="isSaving" size="18px" color="white" />
           <span v-else>{{ t('pages.changeUsername.save') }}</span>
         </button>
 
         <p class="policy-note">{{ t('pages.changeUsername.policy') }}</p>
       </div>
     </div>
-  </q-page>
+  </AppPage>
 </template>
 
 <script setup lang="ts">
+import { AppPage, AppIcon, AppSpinner } from '@synkos/ui';
 import { ref, computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '../../../../../stores/auth.store.js';
-import { UsernameService } from '../../../../../services/username.service.js';
+import { useAuthStore } from '../../../../../auth/store.js';
+import { UsernameService } from '../../../../../auth/services/username.service.js';
 
 const { t } = useI18n();
 const router = useRouter();

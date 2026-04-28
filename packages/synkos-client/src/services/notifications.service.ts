@@ -66,7 +66,7 @@ class NotificationsService {
       if (!token) return;
       if (token === registered) return;
 
-      const { UserService } = await import('./user.service.js');
+      const { UserService } = await import('../auth/services/user.service.js');
       await UserService.registerPushToken(token);
 
       await Preferences.set({ key: storageKeys.pushTokenRegistered, value: token });
@@ -81,7 +81,7 @@ class NotificationsService {
       const { value: token } = await Preferences.get({ key: storageKeys.pushToken });
 
       if (token) {
-        const { UserService } = await import('./user.service.js');
+        const { UserService } = await import('../auth/services/user.service.js');
         await UserService.unregisterPushToken(token);
       }
     } catch (err) {

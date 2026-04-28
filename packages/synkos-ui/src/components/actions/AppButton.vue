@@ -42,7 +42,7 @@ withDefaults(
 
 .app-btn--primary {
   height: 50px;
-  background: $primary;
+  background: var(--color-primary, #{$primary});
   color: #fff;
   border-radius: $radius-xl;
   font-size: $font-body-lg;
@@ -58,7 +58,7 @@ withDefaults(
 .app-btn--ghost {
   height: 44px;
   background: transparent;
-  color: $text-label;
+  color: var(--text-label, #{$text-label});
   border-radius: $radius-xl;
   font-size: $font-body;
   font-weight: 500;
@@ -92,13 +92,13 @@ withDefaults(
 
 .app-btn--ghost .app-btn__spinner,
 .app-btn--link .app-btn__spinner {
-  border-color: rgba($primary, 0.25);
-  border-top-color: $primary;
+  border-color: rgba(10, 132, 255, 0.25);
+  border-top-color: var(--color-primary, #{$primary});
 }
 
 .app-btn--link {
   background: none;
-  color: $primary;
+  color: var(--color-primary, #{$primary});
   font-size: $font-body;
   font-weight: 500;
   padding: $space-4;

@@ -1,5 +1,5 @@
 <template>
-  <q-page class="account-page">
+  <AppPage class="account-page">
     <div class="account-scroll">
       <!-- ── Perfil ─────────────────────────────────────────────────── -->
       <AppListSection :title="t('pages.settings.cuentaSection.sections.perfil')">
@@ -38,7 +38,7 @@
 
       <div style="height: 32px" />
     </div>
-  </q-page>
+  </AppPage>
 
   <SignOutDialog
     v-model="showSignOutDialog"
@@ -52,9 +52,9 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '../../../../../stores/auth.store.js';
+import { useAuthStore } from '../../../../../auth/store.js';
 import { useSignOut } from '../../../../../composables/useSignOut.js';
-import { AppListRow } from '@synkos/ui';
+import { AppPage, AppListRow } from '@synkos/ui';
 import { AppListSection } from '@synkos/ui';
 import { AppListDivider } from '@synkos/ui';
 import SignOutDialog from '../components/SignOutDialog.vue';

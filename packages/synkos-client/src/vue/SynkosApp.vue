@@ -9,23 +9,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
 import { Capacitor } from '@capacitor/core';
 import SplashOverlay from './components/SplashOverlay.vue';
+import { useSettingsStore } from '../stores/settings.store.js';
+import { useTheme } from '../composables/useTheme.js';
 
 defineProps<{ logoSrc?: string }>();
 
 const route = useRoute();
 const showSplash = ref(Capacitor.isNativePlatform());
+
+const settingsStore = useSettingsStore();
+const { applyTheme } = useTheme();
+watchEffect(() => applyTheme(settingsStore.theme));
 const transitionName = ref('');
 
+const isAuthPath = (path: string) => path.startsWith('/auth');
+
 watch(
-  () => route.name,
-  (newName, oldName) => {
-    if (oldName === 'auth-login') {
+  () => route.path,
+  (newPath, oldPath) => {
+    if (isAuthPath(oldPath) && !isAuthPath(newPath)) {
       transitionName.value = 'login-exit';
-    } else if (newName === 'auth-login') {
+    } else if (!isAuthPath(oldPath) && isAuthPath(newPath)) {
       transitionName.value = 'login-enter';
     } else {
       transitionName.value = '';

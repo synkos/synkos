@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { notificationsService } from '../services/notifications.service.js';
 import { getClientConfig } from '../internal/app-config.js';
 import { setLocale } from '../internal/i18n-bridge.js';
+import type { AppTheme } from '../composables/useTheme.js';
 
 type MessageLanguages = string;
 
@@ -10,6 +11,7 @@ interface PersistedSettings {
   appLang: MessageLanguages;
   haptics: boolean;
   pushNotificationsEnabled: boolean;
+  theme: AppTheme;
 }
 
 function getStorageKey() {
@@ -17,14 +19,20 @@ function getStorageKey() {
 }
 
 function load(): PersistedSettings {
+  const defaultLang: MessageLanguages = navigator.language.startsWith('en') ? 'en-US' : 'es-ES';
+  const defaults: PersistedSettings = {
+    appLang: defaultLang,
+    haptics: true,
+    pushNotificationsEnabled: true,
+    theme: 'system',
+  };
   try {
     const raw = localStorage.getItem(getStorageKey());
-    if (raw) return JSON.parse(raw) as PersistedSettings;
+    if (raw) return { ...defaults, ...(JSON.parse(raw) as Partial<PersistedSettings>) };
   } catch {
     // ignore
   }
-  const defaultLang: MessageLanguages = navigator.language.startsWith('en') ? 'en-US' : 'es-ES';
-  return { appLang: defaultLang, haptics: true, pushNotificationsEnabled: true };
+  return defaults;
 }
 
 function persist(settings: PersistedSettings) {
@@ -37,12 +45,14 @@ export const useSettingsStore = defineStore('settings', () => {
   const appLang = ref<MessageLanguages>(saved.appLang);
   const haptics = ref<boolean>(saved.haptics);
   const pushNotificationsEnabled = ref<boolean>(saved.pushNotificationsEnabled);
+  const theme = ref<AppTheme>(saved.theme);
 
   function save() {
     persist({
       appLang: appLang.value,
       haptics: haptics.value,
       pushNotificationsEnabled: pushNotificationsEnabled.value,
+      theme: theme.value,
     });
   }
 
@@ -68,12 +78,19 @@ export const useSettingsStore = defineStore('settings', () => {
     save();
   }
 
+  function setTheme(value: AppTheme) {
+    theme.value = value;
+    save();
+  }
+
   return {
     appLang,
     haptics,
     pushNotificationsEnabled,
+    theme,
     setAppLang,
     setHaptics,
     setPushNotificationsEnabled,
+    setTheme,
   };
 });

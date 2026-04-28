@@ -6,7 +6,7 @@ import { Capacitor } from '@capacitor/core';
 import { setClientConfig, getClientConfig } from '../internal/app-config.js';
 import { registerSetLocale } from '../internal/i18n-bridge.js';
 import { createApiClient } from '../api/index.js';
-import { useAuthStore } from '../stores/auth.store.js';
+import { useAuthStore } from '../auth/store.js';
 import { notificationsService } from '../services/notifications.service.js';
 import coreEnUS from '../i18n/en-US.js';
 import coreEsES from '../i18n/es-ES.js';
@@ -64,6 +64,9 @@ function deepMerge<T extends AnyMessages>(base: T, override: AnyMessages): T {
 
 export function createSynkosBoot(options: SynkosBootOptions): ClientBootFn {
   return async ({ app, router }) => {
+    // ── 0. Platform ───────────────────────────────────────────────────────────
+    document.documentElement.dataset.platform = Capacitor.getPlatform();
+
     // ── 1. Config ────────────────────────────────────────────────────────────
     setClientConfig(options.config);
 
@@ -148,28 +151,30 @@ export function createSynkosBoot(options: SynkosBootOptions): ClientBootFn {
     }
 
     // ── 6. Push notifications ─────────────────────────────────────────────────
-    await notificationsService.init({
-      onNotification:
-        options.notifications?.onNotification ??
-        ((n) => {
-          console.warn('[notifications] Foreground:', n.title, n.body);
-        }),
-      onActionPerformed:
-        options.notifications?.onActionPerformed ??
-        ((action) => {
-          const data = (action.notification.data ?? {}) as {
-            screen?: string;
-            params?: Record<string, string>;
-            query?: Record<string, string>;
-          };
-          if (!data.screen) return;
-          void router.push({
-            name: data.screen,
-            ...(data.params && { params: data.params }),
-            ...(data.query && { query: data.query }),
-          });
-        }),
-    });
+    if (options.config.features.pushNotifications !== false) {
+      await notificationsService.init({
+        onNotification:
+          options.notifications?.onNotification ??
+          ((n) => {
+            console.warn('[notifications] Foreground:', n.title, n.body);
+          }),
+        onActionPerformed:
+          options.notifications?.onActionPerformed ??
+          ((action) => {
+            const data = (action.notification.data ?? {}) as {
+              screen?: string;
+              params?: Record<string, string>;
+              query?: Record<string, string>;
+            };
+            if (!data.screen) return;
+            void router.push({
+              name: data.screen,
+              ...(data.params && { params: data.params }),
+              ...(data.query && { query: data.query }),
+            });
+          }),
+      });
+    }
 
     // ── 7. Splash screen ──────────────────────────────────────────────────────
     if (Capacitor.isNativePlatform()) {

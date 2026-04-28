@@ -1,10 +1,10 @@
 <template>
-  <q-page class="about-page">
+  <AppPage class="about-page">
     <div class="about-scroll">
       <!-- ── App hero ──────────────────────────────────────────────── -->
       <div class="app-hero">
         <div class="app-icon-wrap">
-          <q-icon name="verified" size="40px" color="white" />
+          <AppIcon name="verified" size="40px" style="color: #fff" />
         </div>
         <p class="app-name">{{ appConfig.name }}</p>
         <p class="app-version">{{ t('pages.about.version') }} {{ appVersion }}</p>
@@ -51,12 +51,12 @@
         {{ t('pages.about.copyright', { year: currentYear, appName: appConfig.name }) }}
       </p>
     </div>
-  </q-page>
+  </AppPage>
 </template>
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-import { AppListRow } from '@synkos/ui';
+import { AppIcon, AppPage, AppListRow } from '@synkos/ui';
 import { AppListSection } from '@synkos/ui';
 import { AppListDivider } from '@synkos/ui';
 import { getClientConfig } from '../../../../internal/app-config.js';

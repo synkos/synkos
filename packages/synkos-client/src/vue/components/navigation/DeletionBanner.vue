@@ -1,7 +1,7 @@
 <template>
   <div v-if="authStore.isPendingDeletion" class="deletion-banner">
     <div class="banner-content">
-      <q-icon name="warning_amber" class="banner-icon" />
+      <AppIcon name="warning_amber" size="18px" class="banner-icon" />
       <div class="banner-text">
         <span class="banner-title">{{ t('components.deletionBanner.title') }}</span>
         <span class="banner-date">
@@ -19,7 +19,8 @@
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { useAuthStore } from '../../../stores/auth.store.js';
+import { useAuthStore } from '../../../auth/store.js';
+import { AppIcon } from '@synkos/ui';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -56,8 +57,7 @@ function goToDelete() {
 }
 
 .banner-icon {
-  font-size: 18px !important;
-  color: $negative;
+  color: var(--color-negative, #{$negative});
   flex-shrink: 0;
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <q-page class="profile-page">
+  <AppPage class="profile-page">
     <div class="profile-scroll">
       <!-- ── Avatar + name ─────────────────────────────────────────── -->
       <ProfileHeader
@@ -29,14 +29,15 @@
         </div>
       </div>
     </div>
-  </q-page>
+  </AppPage>
 </template>
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
+import { AppPage } from '@synkos/ui';
 import { useRouter } from 'vue-router';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
-import { useAuthStore } from '../../../stores/auth.store.js';
+import { useAuthStore } from '../../../auth/store.js';
 import ProfileHeader from './components/ProfileHeader.vue';
 
 const { t } = useI18n();

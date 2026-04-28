@@ -1,29 +1,29 @@
 <template>
-  <q-page class="delete-page">
+  <AppPage class="delete-page">
     <!-- ── Step 1: Information ───────────────────────────────────────────── -->
     <transition name="fade" mode="out-in">
       <div v-if="step === 1" key="step1" class="step-container">
         <div class="icon-wrap">
-          <q-icon name="warning_amber" class="danger-icon" />
+          <AppIcon name="warning_amber" class="danger-icon" />
         </div>
         <h1 class="step-title">{{ t('pages.deleteAccount.step1.title') }}</h1>
         <p class="step-subtitle">{{ t('pages.deleteAccount.step1.subtitle') }}</p>
 
         <ul class="info-list">
           <li class="info-item">
-            <q-icon name="schedule" class="info-icon" />
+            <AppIcon name="schedule" class="info-icon" />
             <span>{{ t('pages.deleteAccount.step1.grace') }}</span>
           </li>
           <li class="info-item">
-            <q-icon name="block" class="info-icon" />
+            <AppIcon name="block" class="info-icon" />
             <span>{{ t('pages.deleteAccount.step1.accessBlocked') }}</span>
           </li>
           <li class="info-item">
-            <q-icon name="delete_forever" class="info-icon" />
+            <AppIcon name="delete_forever" class="info-icon" />
             <span>{{ t('pages.deleteAccount.step1.dataDeleted') }}</span>
           </li>
           <li class="info-item">
-            <q-icon name="undo" class="info-icon info-icon--green" />
+            <AppIcon name="undo" class="info-icon info-icon--green" />
             <span>{{ t('pages.deleteAccount.step1.reversible') }}</span>
           </li>
         </ul>
@@ -46,7 +46,7 @@
       <!-- ── Step 2: Confirmation ──────────────────────────────────────── -->
       <div v-else-if="step === 2" key="step2" class="step-container">
         <div class="icon-wrap">
-          <q-icon name="lock" class="danger-icon" />
+          <AppIcon name="lock" class="danger-icon" />
         </div>
         <h1 class="step-title">{{ t('pages.deleteAccount.step2.title') }}</h1>
         <p class="step-subtitle">{{ t('pages.deleteAccount.step2.subtitle') }}</p>
@@ -90,7 +90,7 @@
             :disabled="!canSubmit || isLoading"
             @click="submitDeletion"
           >
-            <q-spinner v-if="isLoading" size="18px" color="white" />
+            <AppSpinner v-if="isLoading" size="18px" color="white" />
             <span v-else>{{ t('pages.deleteAccount.step2.confirm') }}</span>
           </button>
           <button class="btn btn--ghost" :disabled="isLoading" @click="step = 1">
@@ -102,7 +102,7 @@
       <!-- ── Step 3: Scheduled ─────────────────────────────────────────── -->
       <div v-else key="step3" class="step-container step-container--center">
         <div class="icon-wrap">
-          <q-icon name="check_circle" class="success-icon" />
+          <AppIcon name="check_circle" class="success-icon" />
         </div>
         <h1 class="step-title">{{ t('pages.deleteAccount.step3.title') }}</h1>
         <p class="step-subtitle">
@@ -118,7 +118,7 @@
 
         <div class="actions">
           <button class="btn btn--ghost-danger" :disabled="isCancelling" @click="cancelDeletion">
-            <q-spinner v-if="isCancelling" size="18px" color="white" />
+            <AppSpinner v-if="isCancelling" size="18px" color="white" />
             <span v-else>{{ t('pages.deleteAccount.step3.cancelDeletion') }}</span>
           </button>
           <button class="btn btn--ghost" @click="goHome">
@@ -127,14 +127,15 @@
         </div>
       </div>
     </transition>
-  </q-page>
+  </AppPage>
 </template>
 
 <script setup lang="ts">
+import { AppPage, AppIcon, AppSpinner } from '@synkos/ui';
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { useAuthStore } from '../../../../../stores/auth.store.js';
+import { useAuthStore } from '../../../../../auth/store.js';
 
 const { t } = useI18n();
 const router = useRouter();

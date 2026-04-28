@@ -65,7 +65,7 @@ export interface OAuthDto {
 
 // ── Vue / Router ───────────────────────────────────────────────────────────────
 
-import type { Component } from 'vue';
+import type { Component, Ref, ComputedRef } from 'vue';
 import type coreEnUS from './i18n/en-US.js';
 
 export interface AppTabRoute {
@@ -77,8 +77,35 @@ export interface AppTabRoute {
   icon: string;
   /** i18n key resolved reactively in the tab bar (e.g. 'tabs.home') */
   labelKey: string;
-  /** Lazy-loaded component factory */
-  component: () => Promise<{ default: Component }>;
+  /** Lazy-loaded component factory (optional when using meta.tab pattern) */
+  component?: () => Promise<{ default: Component }>;
+  /** Reactive or static badge count. Shown as a pill on the tab icon. */
+  badge?: Ref<number> | ComputedRef<number> | number;
+  /** If true, the tab's component is included in keep-alive cache. Default: false */
+  cache?: boolean;
+  /**
+   * Vue component name for keep-alive matching.
+   * When set, used instead of the auto-derived "${name}Page" convention.
+   * Required for keep-alive to work correctly with the meta.tab pattern.
+   */
+  componentName?: string;
+}
+
+/** Declared inline on a route via meta.tab — alternative to AppTabRoute array */
+export interface TabMeta {
+  /** Material icon name for the tab bar */
+  icon: string;
+  /** i18n key resolved reactively in the tab bar (e.g. 'tabs.home') */
+  labelKey: string;
+  /** If true, the tab's component is included in keep-alive cache. Default: false */
+  cache?: boolean;
+  /**
+   * Vue component name for keep-alive matching.
+   * Set this to the component's `name` option when cache is true.
+   */
+  componentName?: string;
+  /** Reactive or static badge count. Shown as a pill on the tab icon. */
+  badge?: Ref<number> | ComputedRef<number> | number;
 }
 
 /** Merge utility: produces a type that combines core i18n keys with app-specific keys */

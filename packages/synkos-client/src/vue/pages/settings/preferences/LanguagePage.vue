@@ -1,5 +1,5 @@
 <template>
-  <q-page class="settings-subpage">
+  <AppPage class="settings-subpage">
     <div class="subpage-scroll">
       <div class="section">
         <p class="section-header">{{ t('pages.settings.sections.language') }}</p>
@@ -17,13 +17,13 @@
 
       <div style="height: 32px" />
     </div>
-  </q-page>
+  </AppPage>
 </template>
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
 import { useSettings } from '../../../composables/useSettings.js';
-import { SegmentControl } from '@synkos/ui';
+import { AppPage, SegmentControl } from '@synkos/ui';
 
 const { t } = useI18n();
 const { settingsStore, appLangs } = useSettings();

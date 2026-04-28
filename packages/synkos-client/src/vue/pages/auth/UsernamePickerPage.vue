@@ -3,8 +3,8 @@
     <div class="auth-screen">
       <!-- Logo block -->
       <div class="auth-header">
-        <div class="app-icon">
-          <q-icon name="style" size="38px" color="white" />
+        <div class="auth-app-icon">
+          <AppIcon name="style" size="38px" style="color: #fff" />
         </div>
         <h1 class="app-title">{{ appName }}</h1>
         <p class="app-tagline">{{ t('pages.usernamePicker.tagline') }}</p>
@@ -37,18 +37,18 @@
               @input="onInput"
             />
             <div class="username-status-icon">
-              <q-spinner v-if="isChecking" size="16px" color="white" />
-              <q-icon
+              <AppSpinner v-if="isChecking" size="16px" color="white" />
+              <AppIcon
                 v-else-if="statusType === 'success'"
                 name="check_circle"
                 size="18px"
-                color="positive"
+                style="color: var(--color-positive)"
               />
-              <q-icon
+              <AppIcon
                 v-else-if="statusType === 'error'"
                 name="cancel"
                 size="18px"
-                color="negative"
+                style="color: var(--color-negative)"
               />
             </div>
           </div>
@@ -66,7 +66,7 @@
               {{ errorMessage }}
             </div>
             <div v-else-if="statusType === 'success'" key="ok" class="success-text">
-              <q-icon name="check_circle_outline" size="16px" />
+              <AppIcon name="check_circle_outline" size="16px" />
               {{ t('pages.usernamePicker.available') }}
             </div>
           </Transition>
@@ -95,7 +95,7 @@
           :disabled="isSubmitting || statusType !== 'success'"
           @click="handleSubmit"
         >
-          <q-spinner v-if="isSubmitting" size="18px" color="white" />
+          <AppSpinner v-if="isSubmitting" size="18px" color="white" />
           <span v-else>{{ t('pages.usernamePicker.confirm') }}</span>
         </button>
       </div>
@@ -104,12 +104,13 @@
 </template>
 
 <script setup lang="ts">
+import { AppIcon, AppSpinner } from '@synkos/ui';
 import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
-import { useAuthStore } from '../../../stores/auth.store.js';
-import { UsernameService } from '../../../services/username.service.js';
+import { useAuthStore } from '../../../auth/store.js';
+import { UsernameService } from '../../../auth/services/username.service.js';
 import { getClientConfig } from '../../../internal/app-config.js';
 const appConfig = getClientConfig();
 
@@ -270,7 +271,7 @@ onMounted(() => {
   margin-bottom: 40px;
 }
 
-.app-icon {
+.auth-app-icon {
   width: 72px;
   height: 72px;
   border-radius: 18px;

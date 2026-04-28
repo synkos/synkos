@@ -1,5 +1,5 @@
 <template>
-  <q-page class="change-password-page">
+  <AppPage class="change-password-page">
     <div class="page-scroll">
       <div class="form-card">
         <p class="card-subtitle">{{ t('pages.changePassword.subtitle') }}</p>
@@ -17,7 +17,7 @@
               @input="currentError = ''"
             />
             <button class="toggle-btn" @click="showCurrent = !showCurrent" type="button">
-              <q-icon :name="showCurrent ? 'visibility_off' : 'visibility'" size="18px" />
+              <AppIcon :name="showCurrent ? 'visibility_off' : 'visibility'" size="18px" />
             </button>
           </div>
           <p v-if="currentError" class="field-error">{{ currentError }}</p>
@@ -36,7 +36,7 @@
               @input="validateNew"
             />
             <button class="toggle-btn" @click="showNew = !showNew" type="button">
-              <q-icon :name="showNew ? 'visibility_off' : 'visibility'" size="18px" />
+              <AppIcon :name="showNew ? 'visibility_off' : 'visibility'" size="18px" />
             </button>
           </div>
           <p v-if="newError" class="field-error">{{ newError }}</p>
@@ -44,21 +44,21 @@
           <!-- Rules checklist -->
           <ul class="rules-list">
             <li class="rule-item" :class="{ 'rule-item--met': rules.minLength }">
-              <q-icon
+              <AppIcon
                 :name="rules.minLength ? 'check_circle' : 'radio_button_unchecked'"
                 size="14px"
               />
               {{ t('pages.changePassword.rules.minLength') }}
             </li>
             <li class="rule-item" :class="{ 'rule-item--met': rules.hasUppercase }">
-              <q-icon
+              <AppIcon
                 :name="rules.hasUppercase ? 'check_circle' : 'radio_button_unchecked'"
                 size="14px"
               />
               {{ t('pages.changePassword.rules.uppercase') }}
             </li>
             <li class="rule-item" :class="{ 'rule-item--met': rules.hasNumber }">
-              <q-icon
+              <AppIcon
                 :name="rules.hasNumber ? 'check_circle' : 'radio_button_unchecked'"
                 size="14px"
               />
@@ -69,19 +69,20 @@
 
         <!-- Save button -->
         <button class="save-btn" :disabled="!canSave" @click="savePassword">
-          <q-spinner v-if="isSaving" size="18px" color="white" />
+          <AppSpinner v-if="isSaving" size="18px" color="white" />
           <span v-else>{{ t('pages.changePassword.save') }}</span>
         </button>
       </div>
     </div>
-  </q-page>
+  </AppPage>
 </template>
 
 <script setup lang="ts">
+import { AppPage, AppIcon, AppSpinner } from '@synkos/ui';
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '../../../../../stores/auth.store.js';
+import { useAuthStore } from '../../../../../auth/store.js';
 
 const { t } = useI18n();
 const router = useRouter();

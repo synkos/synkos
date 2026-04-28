@@ -1,5 +1,5 @@
 <template>
-  <q-page class="edit-profile-page">
+  <AppPage class="edit-profile-page">
     <div class="edit-scroll">
       <!-- ── Avatar ─────────────────────────────────────────────────── -->
       <div class="section-wrap">
@@ -8,9 +8,9 @@
           <div class="photo-row">
             <div class="avatar-preview" @click="pickPhoto">
               <img v-if="avatarPreviewUrl" :src="avatarPreviewUrl" class="avatar-img" />
-              <q-icon v-else name="person" size="40px" color="white" />
+              <AppIcon v-else name="person" size="40px" style="color: #fff" />
               <div class="avatar-overlay">
-                <q-icon name="photo_camera" size="18px" color="white" />
+                <AppIcon name="photo_camera" size="18px" style="color: #fff" />
               </div>
             </div>
 
@@ -28,7 +28,7 @@
               </button>
             </div>
 
-            <q-spinner v-if="photoLoading" size="18px" color="primary" class="q-ml-auto" />
+            <AppSpinner v-if="photoLoading" size="18px" color="primary" class="q-ml-auto" />
           </div>
 
           <p v-if="photoError" class="field-error">{{ photoError }}</p>
@@ -63,8 +63,13 @@
                 @blur="saveName"
                 @keyup.enter="saveName"
               />
-              <q-spinner v-if="nameLoading" size="16px" color="primary" />
-              <q-icon v-else-if="nameSaved" name="check_circle" size="18px" color="positive" />
+              <AppSpinner v-if="nameLoading" size="16px" color="primary" />
+              <AppIcon
+                v-else-if="nameSaved"
+                name="check_circle"
+                size="18px"
+                style="color: var(--color-positive)"
+              />
             </div>
           </div>
           <p v-if="nameError" class="field-error field-error--padded">{{ nameError }}</p>
@@ -78,7 +83,7 @@
               <span class="username-current">
                 {{ authStore.user?.username ?? t('pages.editProfile.username.notSet') }}
               </span>
-              <q-icon name="chevron_right" class="row-chevron" />
+              <AppIcon name="chevron_right" class="row-chevron" />
             </button>
           </div>
 
@@ -94,25 +99,26 @@
         <div class="list-group">
           <button class="list-row list-row--first list-row--last" @click="goToChangePassword">
             <div class="row-icon-wrap" style="background: rgba(255, 159, 10, 0.15)">
-              <q-icon name="lock" size="18px" style="color: #ff9f0a" />
+              <AppIcon name="lock" size="18px" style="color: #ff9f0a" />
             </div>
             <div class="row-content">
               <span class="row-title">{{ t('pages.editProfile.password.label') }}</span>
               <span class="row-hint">{{ t('pages.editProfile.password.hint') }}</span>
             </div>
-            <q-icon name="chevron_right" class="row-chevron" />
+            <AppIcon name="chevron_right" class="row-chevron" />
           </button>
         </div>
       </div>
     </div>
-  </q-page>
+  </AppPage>
 </template>
 
 <script setup lang="ts">
+import { AppPage, AppIcon, AppSpinner } from '@synkos/ui';
 import { ref, computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from '../../../../../stores/auth.store.js';
+import { useAuthStore } from '../../../../../auth/store.js';
 
 const { t } = useI18n();
 const router = useRouter();

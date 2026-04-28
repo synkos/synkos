@@ -1,7 +1,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
-import { useAuthStore } from '../stores/auth.store.js';
+import { useAuthStore } from '../auth/store.js';
 
 export function useSignOut() {
   const router = useRouter();

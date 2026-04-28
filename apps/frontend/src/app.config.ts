@@ -149,7 +149,7 @@ export const appConfig: AppConfig = {
     googleAuth: true,
     appleAuth: true,
     faceId: true,
-    guestMode: false,
+    guestMode: true,
     pushNotifications: true,
     exampleFeature: false,
   },

@@ -1,0 +1,60 @@
+// ─── Dark Theme ────────────────────────────────────────────────────────────────
+// Applied when data-theme="dark" is set on <html>.
+// Also used as the default fallback (maintains backwards compatibility).
+
+:root,
+:root[data-theme='dark'] {
+  // ── Brand ────────────────────────────────────────────────────────────────────
+  --color-primary: #0a84ff;
+  --color-secondary: #30d158;
+  --color-accent: #ff9f0a;
+  --color-positive: #30d158;
+  --color-negative: #ff453a;
+  --color-info: #64d2ff;
+  --color-warning: #ffd60a;
+
+  // ── Surface ──────────────────────────────────────────────────────────────────
+  --surface-bg: #000000;
+  --surface-1: rgba(255, 255, 255, 0.05);
+  --surface-1-border: rgba(255, 255, 255, 0.08);
+  --surface-2: rgba(255, 255, 255, 0.06);
+  --surface-2-border: rgba(255, 255, 255, 0.08);
+  --surface-press: rgba(255, 255, 255, 0.04);
+  --surface-search: rgba(118, 118, 128, 0.24);
+
+  // ── Glass morphism ───────────────────────────────────────────────────────────
+  --glass-bg: rgba(28, 28, 30, 0.82);
+  --glass-border: rgba(255, 255, 255, 0.12);
+
+  // ── Text hierarchy ───────────────────────────────────────────────────────────
+  --text-primary: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.9);
+  --text-muted: rgba(255, 255, 255, 0.75);
+  --text-disabled: rgba(255, 255, 255, 0.55);
+  --text-label: rgba(235, 235, 245, 0.45);
+  --text-secondary-ios: rgba(235, 235, 245, 0.55);
+  --text-tertiary: rgba(235, 235, 245, 0.38);
+  --text-quaternary: rgba(235, 235, 245, 0.28);
+
+  // ── Separators & borders ─────────────────────────────────────────────────────
+  --separator: rgba(255, 255, 255, 0.07);
+  --separator-strong: rgba(255, 255, 255, 0.12);
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.15);
+
+  // ── Auth page tokens ─────────────────────────────────────────────────────────
+  --auth-bg: #000000;
+  --auth-icon-bg: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  --auth-sheet-bg: #1c1c1e;
+  --auth-surface-1: rgba(255, 255, 255, 0.07);
+  --auth-surface-2: rgba(255, 255, 255, 0.11);
+  --auth-surface-focus: rgba(255, 255, 255, 0.13);
+  --auth-text-primary: rgba(255, 255, 255, 0.92);
+  --auth-text-muted: rgba(235, 235, 245, 0.45);
+  --auth-text-subtle: rgba(235, 235, 245, 0.3);
+  --auth-border: rgba(255, 255, 255, 0.1);
+  --auth-border-strong: rgba(255, 255, 255, 0.25);
+  --auth-border-focus: rgba(255, 255, 255, 0.4);
+  --auth-separator: rgba(255, 255, 255, 0.08);
+}

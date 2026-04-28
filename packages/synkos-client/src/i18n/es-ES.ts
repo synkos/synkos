@@ -244,6 +244,9 @@ const esES = {
       aparienciaSection: {
         tema: 'Tema',
         temaHint: 'Claro, oscuro o automático',
+        temaLight: 'Claro',
+        temaDark: 'Oscuro',
+        temaSystem: 'Auto',
         tamanoTexto: 'Tamaño de texto',
         tamanoTextoHint: 'Ajusta el tamaño del texto de la app',
       },

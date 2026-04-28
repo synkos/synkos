@@ -1,14 +1,11 @@
 <template>
-  <q-dialog
+  <AppDrawer
+    ref="appDrawer"
     :model-value="modelValue"
-    position="right"
-    full-height
-    transition-show="slide-left"
-    :transition-hide="transitionHide"
     @update:model-value="$emit('update:modelValue', $event)"
   >
     <div
-      ref="drawerRef"
+      ref="drawerEl"
       class="app-menu"
       :style="dragStyle"
       @touchstart="onDragStart"
@@ -17,7 +14,7 @@
       <!-- ── Header ─────────────────────────────────────────────────── -->
       <div class="menu-header">
         <div class="logo-icon">
-          <q-icon name="verified" size="18px" color="white" />
+          <AppIcon name="verified" size="18px" style="color: white" />
         </div>
         <span class="logo-label">{{ appConfig.name }}</span>
       </div>
@@ -39,70 +36,35 @@
         </div>
 
         <!-- ── MAIN CATEGORIES ─────────────────────────────────────── -->
-        <div class="menu-section">
+        <div v-if="visibleMainItems.length > 0" class="menu-section">
           <div class="section-group">
-            <AppListRow
-              icon="tune"
-              icon-color="#5E5CE6"
-              icon-bg="rgba(94, 92, 230, 0.15)"
-              :label="t('nav.preferences')"
-              :hint="t('pages.settings.preferenciasSection.preferencesHint')"
-              @click="navigate('settings-preferences')"
-            />
-            <div class="row-sep" />
-            <AppListRow
-              icon="credit_card"
-              icon-color="#30D158"
-              icon-bg="rgba(48, 209, 88, 0.15)"
-              :label="t('nav.billing')"
-              :hint="t('pages.settings.menu.facturacionHint')"
-              @click="navigate('settings-billing')"
-            />
-            <div class="row-sep" />
-            <AppListRow
-              icon="shield"
-              icon-color="#FF9F0A"
-              icon-bg="rgba(255, 159, 10, 0.15)"
-              :label="t('nav.security')"
-              :hint="t('pages.settings.menu.seguridadHint')"
-              @click="navigate('settings-security')"
-            />
-            <div class="row-sep" />
-            <AppListRow
-              icon="notifications"
-              icon-color="#FF9F0A"
-              icon-bg="rgba(255, 159, 10, 0.15)"
-              :label="t('nav.notifications')"
-              :hint="t('pages.settings.menu.notificacionesHint')"
-              @click="navigate('settings-notifications')"
-            />
-            <div class="row-sep" />
-            <AppListRow
-              icon="help_outline"
-              icon-color="#30D158"
-              icon-bg="rgba(48, 209, 88, 0.15)"
-              :label="t('nav.support')"
-              :hint="t('pages.profile.actions.helpHint')"
-              @click="navigate('settings-support')"
-            />
-            <div class="row-sep" />
-            <AppListRow
-              icon="gavel"
-              icon-color="#8E8E93"
-              icon-bg="rgba(142, 142, 147, 0.15)"
-              :label="t('nav.legal')"
-              :hint="t('pages.settings.menu.legalHint')"
-              @click="navigate('settings-legal')"
-            />
-            <div class="row-sep" />
-            <AppListRow
-              icon="info_outline"
-              icon-color="#FF9F0A"
-              icon-bg="rgba(255, 159, 10, 0.15)"
-              :label="t('nav.acercaDe')"
-              :hint="t('pages.profile.actions.aboutHint')"
-              @click="navigate('settings-about')"
-            />
+            <template v-for="(item, idx) in visibleMainItems" :key="item.name">
+              <div v-if="idx > 0" class="row-sep" />
+              <AppListRow
+                :icon="item.icon"
+                :icon-color="item.iconColor"
+                :icon-bg="item.iconBg"
+                :label="t(item.labelKey)"
+                :hint="t(item.hintKey)"
+                @click="navigate(item.name)"
+              />
+            </template>
+          </div>
+        </div>
+
+        <!-- ── CUSTOM SECTIONS ─────────────────────────────────────── -->
+        <div v-if="customSections.length > 0" class="menu-section">
+          <div class="section-group">
+            <template v-for="(item, idx) in customSections" :key="item.name">
+              <div v-if="idx > 0" class="row-sep" />
+              <AppListRow
+                icon="settings"
+                icon-color="#8E8E93"
+                icon-bg="rgba(142, 142, 147, 0.15)"
+                :label="t(item.titleKey)"
+                @click="navigate(item.name)"
+              />
+            </template>
           </div>
         </div>
 
@@ -114,7 +76,7 @@
         <div class="menu-footer-spacer" />
       </div>
     </div>
-  </q-dialog>
+  </AppDrawer>
 </template>
 
 <script setup lang="ts">
@@ -122,10 +84,86 @@ import { ref, computed, nextTick, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
-import { useAuthStore } from '../../../stores/auth.store.js';
-import { AppListRow } from '@synkos/ui';
+import { useAuthStore } from '../../../auth/store.js';
+import { AppDrawer, AppIcon, AppListRow } from '@synkos/ui';
 import { getClientConfig } from '../../../internal/app-config.js';
+import { getSettingsConfig } from '../../../navigation/internal/settings-config.js';
+
 const appConfig = getClientConfig();
+const settingsConfig = getSettingsConfig();
+
+// All built-in menu items in order
+const ALL_MENU_ITEMS = [
+  {
+    section: 'preferences' as const,
+    name: 'settings-preferences',
+    icon: 'tune',
+    iconColor: '#5E5CE6',
+    iconBg: 'rgba(94, 92, 230, 0.15)',
+    labelKey: 'nav.preferences',
+    hintKey: 'pages.settings.preferenciasSection.preferencesHint',
+  },
+  {
+    section: 'billing' as const,
+    name: 'settings-billing',
+    icon: 'credit_card',
+    iconColor: '#30D158',
+    iconBg: 'rgba(48, 209, 88, 0.15)',
+    labelKey: 'nav.billing',
+    hintKey: 'pages.settings.menu.facturacionHint',
+  },
+  {
+    section: 'security' as const,
+    name: 'settings-security',
+    icon: 'shield',
+    iconColor: '#FF9F0A',
+    iconBg: 'rgba(255, 159, 10, 0.15)',
+    labelKey: 'nav.security',
+    hintKey: 'pages.settings.menu.seguridadHint',
+  },
+  {
+    section: 'notifications' as const,
+    name: 'settings-notifications',
+    icon: 'notifications',
+    iconColor: '#FF9F0A',
+    iconBg: 'rgba(255, 159, 10, 0.15)',
+    labelKey: 'nav.notifications',
+    hintKey: 'pages.settings.menu.notificacionesHint',
+  },
+  {
+    section: 'support' as const,
+    name: 'settings-support',
+    icon: 'help_outline',
+    iconColor: '#30D158',
+    iconBg: 'rgba(48, 209, 88, 0.15)',
+    labelKey: 'nav.support',
+    hintKey: 'pages.profile.actions.helpHint',
+  },
+  {
+    section: 'legal' as const,
+    name: 'settings-legal',
+    icon: 'gavel',
+    iconColor: '#8E8E93',
+    iconBg: 'rgba(142, 142, 147, 0.15)',
+    labelKey: 'nav.legal',
+    hintKey: 'pages.settings.menu.legalHint',
+  },
+  {
+    section: 'about' as const,
+    name: 'settings-about',
+    icon: 'info_outline',
+    iconColor: '#FF9F0A',
+    iconBg: 'rgba(255, 159, 10, 0.15)',
+    labelKey: 'nav.acercaDe',
+    hintKey: 'pages.profile.actions.aboutHint',
+  },
+];
+
+const visibleMainItems = computed(() =>
+  ALL_MENU_ITEMS.filter((item) => settingsConfig.sections.includes(item.section))
+);
+
+const customSections = settingsConfig.customSections;
 
 defineProps<{ modelValue: boolean }>();
 const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>();
@@ -133,28 +171,27 @@ const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>();
 const { t } = useI18n();
 const router = useRouter();
 const authStore = useAuthStore();
-
 const appVersion = appConfig.version;
 
-// ── Swipe-to-close gesture ────────────────────────────────────────────
-const drawerRef = ref<HTMLElement | null>(null);
+// ── Template refs ─────────────────────────────────────────────────
+const appDrawer = ref<InstanceType<typeof AppDrawer> | null>(null);
+const drawerEl = ref<HTMLElement | null>(null);
+
+// ── Swipe-to-close gesture ────────────────────────────────────────
 const dragDeltaX = ref(0);
 const isDragging = ref(false);
-const transitionHide = ref('slide-right');
 
 let startX = 0;
 let startY = 0;
 let isHorizontal: boolean | null = null;
 let thresholdCrossed = false;
-
-// Velocity tracking
 let lastTouchX = 0;
 let lastTouchTime = 0;
-let swipeVelocity = 0; // px/ms, positive = rightward
+let swipeVelocity = 0;
 
-const DISMISS_THRESHOLD = 80; // px before threshold haptic fires
-const VELOCITY_THRESHOLD = 0.45; // px/ms — fast flick always dismisses
-const MIN_DRAG_TO_FLICK = 12; // px minimum drag to count a flick
+const DISMISS_THRESHOLD = 80;
+const VELOCITY_THRESHOLD = 0.45;
+const MIN_DRAG_TO_FLICK = 12;
 
 const dragStyle = computed(() => {
   if (dragDeltaX.value <= 0) return {};
@@ -165,36 +202,31 @@ const dragStyle = computed(() => {
   };
 });
 
-// ── Backdrop opacity sync ─────────────────────────────────────────────
-function getBackdropEl(): HTMLElement | null {
-  const inner = drawerRef.value?.closest('.q-dialog__inner');
-  return (inner?.previousElementSibling as HTMLElement) ?? null;
-}
-
+// ── Backdrop opacity sync ─────────────────────────────────────────
 function syncBackdrop(deltaX: number): void {
-  const backdrop = getBackdropEl();
+  const backdrop = appDrawer.value?.backdropEl;
   if (!backdrop) return;
-  const drawerWidth = drawerRef.value?.offsetWidth ?? 340;
+  const drawerWidth = drawerEl.value?.offsetWidth ?? 340;
   const opacity = 1 - Math.min(deltaX / drawerWidth, 1) * 0.85;
   backdrop.style.opacity = String(opacity);
   backdrop.style.transition = 'none';
 }
 
 function restoreBackdrop(): void {
-  const backdrop = getBackdropEl();
+  const backdrop = appDrawer.value?.backdropEl;
   if (!backdrop) return;
   backdrop.style.opacity = '1';
   backdrop.style.transition = 'opacity 0.32s ease';
 }
 
 function clearBackdrop(): void {
-  const backdrop = getBackdropEl();
+  const backdrop = appDrawer.value?.backdropEl;
   if (!backdrop) return;
   backdrop.style.opacity = '0';
   backdrop.style.transition = 'opacity 0.3s ease';
 }
 
-// ── Touch handlers ────────────────────────────────────────────────────
+// ── Touch handlers ────────────────────────────────────────────────
 function onDragStart(e: TouchEvent): void {
   isDragging.value = true;
   isHorizontal = null;
@@ -212,7 +244,6 @@ function onTouchMove(e: TouchEvent): void {
   const dx = e.touches[0]!.clientX - startX;
   const dy = e.touches[0]!.clientY - startY;
 
-  // Lock direction on first significant movement
   if (isHorizontal === null && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
     isHorizontal = Math.abs(dx) > Math.abs(dy);
   }
@@ -221,19 +252,15 @@ function onTouchMove(e: TouchEvent): void {
 
   e.preventDefault();
 
-  // Track instantaneous velocity
   const now = Date.now();
   const dt = now - lastTouchTime;
-  if (dt > 0) {
-    swipeVelocity = (e.touches[0]!.clientX - lastTouchX) / dt;
-  }
+  if (dt > 0) swipeVelocity = (e.touches[0]!.clientX - lastTouchX) / dt;
   lastTouchX = e.touches[0]!.clientX;
   lastTouchTime = now;
 
   dragDeltaX.value = dx > 0 ? dx : 0;
   syncBackdrop(dragDeltaX.value);
 
-  // Haptic feedback when crossing dismiss threshold
   if (!thresholdCrossed && dragDeltaX.value >= DISMISS_THRESHOLD) {
     thresholdCrossed = true;
     void Haptics.impact({ style: ImpactStyle.Light });
@@ -258,40 +285,36 @@ function onDragEnd(): void {
   }
 }
 
-// Animate drawer off-screen, then close bypassing q-dialog exit animation
 async function dragDismiss(): Promise<void> {
   void Haptics.impact({ style: ImpactStyle.Medium });
 
-  // Slide drawer fully off screen
-  const offscreen = (drawerRef.value?.offsetWidth ?? 380) + 20;
+  const offscreen = (drawerEl.value?.offsetWidth ?? 380) + 20;
   isDragging.value = false;
   dragDeltaX.value = offscreen;
   clearBackdrop();
 
-  // Wait for our CSS transition (0.38s)
   await new Promise<void>((r) => setTimeout(r, 360));
 
-  // Disable Quasar's exit animation so it doesn't re-animate
-  transitionHide.value = '';
+  // Disable AppDrawer's exit animation — drawer is already off-screen
+  appDrawer.value?.disableAnimation();
   emit('update:modelValue', false);
 
-  // Reset state after dialog closes
   await nextTick();
   setTimeout(() => {
     dragDeltaX.value = 0;
-    transitionHide.value = 'slide-right';
+    appDrawer.value?.enableAnimation();
     restoreBackdrop();
   }, 80);
 }
 
-// Watch drawerRef because q-dialog mounts content via teleport only when open —
-// onMounted runs before the portal content exists, so drawerRef is null there.
-watch(drawerRef, (el, prevEl) => {
+// Watch drawerEl because AppDrawer mounts via Teleport — need to attach
+// touchmove listener with { passive: false } so we can call preventDefault.
+watch(drawerEl, (el, prevEl) => {
   prevEl?.removeEventListener('touchmove', onTouchMove);
   el?.addEventListener('touchmove', onTouchMove, { passive: false });
 });
 
-// ── Actions ───────────────────────────────────────────────────────────
+// ── Actions ───────────────────────────────────────────────────────
 function close(): void {
   emit('update:modelValue', false);
 }
@@ -304,8 +327,7 @@ function navigate(routeName: string): void {
 </script>
 
 <style lang="scss" scoped>
-// ── Container ─────────────────────────────────────────────────────────
-// Global iOS dialog padding override lives in app.scss.
+// ── Container ─────────────────────────────────────────────────────
 .app-menu {
   width: min(380px, 92vw);
   height: 100dvh;
@@ -315,8 +337,7 @@ function navigate(routeName: string): void {
   overflow: hidden;
 }
 
-// ── Header ────────────────────────────────────────────────────────────
-// Compensate the top safe area so content sits below the notch/island.
+// ── Header ────────────────────────────────────────────────────────
 .menu-header {
   display: flex;
   align-items: center;
@@ -325,7 +346,7 @@ function navigate(routeName: string): void {
   padding-bottom: $space-8;
   padding-left: 18px;
   padding-right: 18px;
-  border-bottom: 0.5px solid $border-subtle;
+  border-bottom: 0.5px solid var(--border-subtle, #{$border-subtle});
   flex-shrink: 0;
 }
 
@@ -333,7 +354,7 @@ function navigate(routeName: string): void {
   width: 32px;
   height: 32px;
   border-radius: 9px;
-  background: linear-gradient(145deg, #5e5ce6, $primary);
+  background: linear-gradient(145deg, #5e5ce6, var(--color-primary, #{$primary}));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -347,7 +368,7 @@ function navigate(routeName: string): void {
   letter-spacing: $ls-base;
 }
 
-// ── Body ──────────────────────────────────────────────────────────────
+// ── Body ──────────────────────────────────────────────────────────
 .menu-body {
   flex: 1;
   overflow-y: auto;
@@ -356,14 +377,14 @@ function navigate(routeName: string): void {
   padding-top: $space-4;
 }
 
-// ── Section ───────────────────────────────────────────────────────────
+// ── Section ───────────────────────────────────────────────────────
 .menu-section {
   padding: 0 14px $space-2;
 }
 
 .section-group {
-  background: $surface-2;
-  border: 0.5px solid $surface-2-border;
+  background: var(--surface-2, #{$surface-2});
+  border: 0.5px solid var(--surface-2-border, #{$surface-2-border});
   border-radius: $radius-xl;
   overflow: hidden;
   margin-top: $space-6;
@@ -371,45 +392,16 @@ function navigate(routeName: string): void {
 
 .row-sep {
   height: 0.5px;
-  background: $separator;
+  background: var(--separator, #{$separator});
   margin-left: 56px;
 }
 
-// ── Danger rows ───────────────────────────────────────────────────────
-.danger-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: $space-7 $space-8;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  min-height: 50px;
-
-  &--centered {
-    justify-content: center;
-  }
-
-  &:active {
-    background: rgba(255, 69, 58, 0.06);
-  }
-}
-
-.danger-label {
-  font-size: $font-body;
-  font-weight: 500;
-  color: $negative;
-  letter-spacing: $ls-normal;
-}
-
-// ── Footer spacer — compensates bottom safe area (home indicator) ─────
+// ── Footer spacer ─────────────────────────────────────────────────
 .menu-footer-spacer {
   height: calc(32px + env(safe-area-inset-bottom, 0px));
 }
 
-// ── Version ───────────────────────────────────────────────────────────
+// ── Version ───────────────────────────────────────────────────────
 .menu-version {
   font-size: $font-sm;
   color: rgba(235, 235, 245, 0.18);
@@ -417,14 +409,5 @@ function navigate(routeName: string): void {
   padding: $space-12 $space-8 $space-2;
   margin: 0;
   letter-spacing: 0.1px;
-}
-
-// ── Toggle overrides ──────────────────────────────────────────────────
-:deep(.q-toggle) {
-  padding: 0;
-
-  .q-toggle__inner {
-    font-size: 32px;
-  }
 }
 </style>

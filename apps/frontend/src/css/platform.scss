@@ -1,0 +1,44 @@
+// ─── Platform Tokens ──────────────────────────────────────────────────────────
+// CSS custom properties driven by data-platform="ios|android|web" on <html>.
+// Applied by the synkos boot before first render.
+//
+// Usage in components:
+//   height: var(--nav-bar-height);
+//   transition: transform var(--platform-transition-push);
+//
+// iOS is the default (covers web preview in browser too).
+
+:root,
+:root[data-platform='ios'] {
+  // ── Chrome sizing ───────────────────────────────────────────────────────────
+  --nav-bar-height: 44px; // iOS navigation bar (HIG)
+  --tab-bar-height: 49px; // iOS tab bar (HIG)
+  --nav-content-size: 44px; // Inner content height (same as bar for iOS)
+
+  // ── Motion ─────────────────────────────────────────────────────────────────
+  --platform-transition-push: 0.32s cubic-bezier(0.36, 0.66, 0.04, 1);
+  --platform-transition-modal: 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --platform-transition-quick: 0.15s ease;
+
+  // ── Touch feedback ──────────────────────────────────────────────────────────
+  // iOS: opacity press, no ripple
+  --platform-tap-highlight: transparent;
+  --platform-active-opacity: 0.6;
+}
+
+:root[data-platform='android'] {
+  // ── Chrome sizing (Material 3) ──────────────────────────────────────────────
+  --nav-bar-height: 64px; // M3 top app bar
+  --tab-bar-height: 80px; // M3 navigation bar
+  --nav-content-size: 56px; // M3 inner content height
+
+  // ── Motion (Material 3 standard easing) ────────────────────────────────────
+  --platform-transition-push: 0.3s cubic-bezier(0.2, 0, 0, 1);
+  --platform-transition-modal: 0.4s cubic-bezier(0.05, 0.7, 0.1, 1);
+  --platform-transition-quick: 0.1s cubic-bezier(0.2, 0, 0, 1);
+
+  // ── Touch feedback ──────────────────────────────────────────────────────────
+  // Android: ripple (handled by component), less opacity change
+  --platform-tap-highlight: transparent;
+  --platform-active-opacity: 0.88;
+}

@@ -241,6 +241,9 @@ const enUS = {
       aparienciaSection: {
         tema: 'Theme',
         temaHint: 'Light, dark or automatic',
+        temaLight: 'Light',
+        temaDark: 'Dark',
+        temaSystem: 'Auto',
         tamanoTexto: 'Text size',
         tamanoTextoHint: 'Adjust the app text size',
       },

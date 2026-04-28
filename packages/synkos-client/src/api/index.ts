@@ -47,7 +47,7 @@ export function createApiClient(baseURL: string): AxiosInstance {
 
         try {
           // Dynamic import avoids circular dependency at module init time
-          const { useAuthStore } = await import('../stores/auth.store.js');
+          const { useAuthStore } = await import('../auth/store.js');
           const authStore = useAuthStore();
           const refreshed = await authStore.refreshTokens();
 
@@ -59,7 +59,7 @@ export function createApiClient(baseURL: string): AxiosInstance {
             return api(originalRequest);
           }
         } catch {
-          const { useAuthStore } = await import('../stores/auth.store.js');
+          const { useAuthStore } = await import('../auth/store.js');
           await useAuthStore().logout();
         } finally {
           isRefreshing = false;

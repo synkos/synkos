@@ -26,7 +26,7 @@ defineEmits<{
 <style lang="scss" scoped>
 .segment-control {
   display: flex;
-  background: $separator;
+  background: var(--separator, #{$separator});
   border-radius: 9px;
   padding: $space-1;
   gap: $space-1;
@@ -41,7 +41,7 @@ defineEmits<{
   background: transparent;
   font-size: $font-body-sm;
   font-weight: 500;
-  color: $text-disabled;
+  color: var(--text-disabled, #{$text-disabled});
   cursor: pointer;
   transition:
     background $transition-quick,
@@ -50,13 +50,13 @@ defineEmits<{
   letter-spacing: $ls-normal;
 
   &--active {
-    background: rgba(255, 255, 255, 0.13);
-    color: $text-primary;
+    background: var(--surface-1, rgba(255, 255, 255, 0.13));
+    color: var(--text-primary, #{$text-primary});
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   }
 
   &:active:not(.segment-btn--active) {
-    background: $surface-1;
+    background: var(--surface-press, #{$surface-press});
   }
 }
 </style>

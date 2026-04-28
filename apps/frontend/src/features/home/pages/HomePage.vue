@@ -1,17 +1,18 @@
 <template>
-  <q-page class="home-page">
+  <AppPage class="home-page">
     <div class="home-content">
       <div class="home-icon">
-        <q-icon name="style" size="52px" color="white" />
+        <AppIcon name="style" size="52px" style="color: #fff" />
       </div>
 
       <h1 class="home-title">{{ t('pages.home.title') }}</h1>
       <p class="home-subtitle">{{ t('pages.home.subtitle') }}</p>
     </div>
-  </q-page>
+  </AppPage>
 </template>
 
 <script setup lang="ts">
+import { AppPage, AppIcon } from '@synkos/ui';
 import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 </script>

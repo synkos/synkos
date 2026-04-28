@@ -5,10 +5,10 @@
       <div v-if="!authStore.isInitialized" class="splash-overlay">
         <div class="splash-logo">
           <div class="splash-icon">
-            <q-icon name="style" size="40px" color="white" />
+            <AppIcon name="style" size="40px" style="color: #fff" />
           </div>
         </div>
-        <q-circular-progress
+        <AppCircularProgress
           indeterminate
           size="24px"
           color="white"
@@ -22,8 +22,8 @@
     <div class="auth-screen">
       <!-- Logo block — always visible, outside the form transition -->
       <div class="auth-header">
-        <div class="app-icon">
-          <q-icon name="style" size="38px" color="white" />
+        <div class="auth-app-icon">
+          <AppIcon name="style" size="38px" style="color: #fff" />
         </div>
         <h1 class="app-title">{{ appName }}</h1>
         <p class="app-tagline">{{ t('pages.auth.tagline') }}</p>
@@ -75,7 +75,7 @@
           <!-- Global error -->
           <Transition name="fade">
             <div v-if="globalError" class="global-error">
-              <q-icon name="error_outline" size="16px" />
+              <AppIcon name="error_outline" size="16px" />
               {{ globalError }}
             </div>
           </Transition>
@@ -90,7 +90,7 @@
         </div>
         <div v-else-if="mode === 'login'" key="login" class="form-block">
           <button class="back-btn" @click="goTo('social')">
-            <q-icon name="chevron_left" size="22px" />
+            <AppIcon name="chevron_left" size="22px" />
             {{ t('nav.back') }}
           </button>
 
@@ -119,7 +119,7 @@
                 @input="errors.password = ''"
               />
               <button class="field-eye" @click="showPassword = !showPassword" tabindex="-1">
-                <q-icon :name="showPassword ? 'visibility_off' : 'visibility'" size="18px" />
+                <AppIcon :name="showPassword ? 'visibility_off' : 'visibility'" size="18px" />
               </button>
             </div>
           </div>
@@ -133,7 +133,7 @@
               {{ errors.email || errors.password }}
             </div>
             <div v-else-if="globalError" class="global-error">
-              <q-icon name="error_outline" size="16px" />
+              <AppIcon name="error_outline" size="16px" />
               {{ globalError }}
             </div>
           </div>
@@ -155,7 +155,7 @@
         </div>
         <div v-else-if="mode === 'register'" key="register" class="form-block">
           <button class="back-btn" @click="goTo('login')">
-            <q-icon name="chevron_left" size="22px" />
+            <AppIcon name="chevron_left" size="22px" />
             {{ t('pages.auth.backToLogin') }}
           </button>
 
@@ -187,7 +187,7 @@
                 "
               />
               <button class="field-eye" @click="showPassword = !showPassword" tabindex="-1">
-                <q-icon :name="showPassword ? 'visibility_off' : 'visibility'" size="18px" />
+                <AppIcon :name="showPassword ? 'visibility_off' : 'visibility'" size="18px" />
               </button>
             </div>
           </div>
@@ -210,7 +210,7 @@
               {{ errors.email || errors.password }}
             </div>
             <div v-else-if="globalError" class="global-error">
-              <q-icon name="error_outline" size="16px" />
+              <AppIcon name="error_outline" size="16px" />
               {{ globalError }}
             </div>
           </div>
@@ -236,7 +236,7 @@
         </div>
         <div v-else-if="mode === 'forgot'" key="forgot" class="form-block">
           <button class="back-btn" @click="goTo('login')">
-            <q-icon name="chevron_left" size="22px" />
+            <AppIcon name="chevron_left" size="22px" />
             {{ t('nav.back') }}
           </button>
 
@@ -259,7 +259,7 @@
           <div class="feedback-area">
             <div v-if="errors.email" class="error-text">{{ errors.email }}</div>
             <div v-else-if="globalError" class="global-error">
-              <q-icon name="error_outline" size="16px" />
+              <AppIcon name="error_outline" size="16px" />
               {{ globalError }}
             </div>
           </div>
@@ -274,7 +274,7 @@
         </div>
         <div v-else-if="mode === 'reset'" key="reset" class="form-block">
           <button class="back-btn" @click="handleResetBack">
-            <q-icon name="chevron_left" size="22px" />
+            <AppIcon name="chevron_left" size="22px" />
             {{ t('nav.back') }}
           </button>
 
@@ -313,11 +313,11 @@
 
               <div class="feedback-area">
                 <div v-if="authStore.isLoading" class="otp-verifying">
-                  <q-spinner size="18px" color="white" />
+                  <AppSpinner size="18px" color="white" />
                 </div>
                 <div v-else-if="errors.email" class="error-text">{{ errors.email }}</div>
                 <div v-else-if="globalError" class="global-error">
-                  <q-icon name="error_outline" size="16px" />
+                  <AppIcon name="error_outline" size="16px" />
                   {{ globalError }}
                 </div>
               </div>
@@ -367,7 +367,7 @@
                     "
                   />
                   <button class="field-eye" @click="showPassword = !showPassword" tabindex="-1">
-                    <q-icon :name="showPassword ? 'visibility_off' : 'visibility'" size="18px" />
+                    <AppIcon :name="showPassword ? 'visibility_off' : 'visibility'" size="18px" />
                   </button>
                 </div>
               </div>
@@ -387,12 +387,12 @@
 
               <div class="feedback-area">
                 <div v-if="resetSuccess" class="success-text">
-                  <q-icon name="check_circle_outline" size="16px" />
+                  <AppIcon name="check_circle_outline" size="16px" />
                   {{ t('pages.auth.resetSuccessHint') }}
                 </div>
                 <div v-else-if="errors.password" class="error-text">{{ errors.password }}</div>
                 <div v-else-if="globalError" class="global-error">
-                  <q-icon name="error_outline" size="16px" />
+                  <AppIcon name="error_outline" size="16px" />
                   {{ globalError }}
                 </div>
               </div>
@@ -409,7 +409,7 @@
         </div>
         <div v-else-if="mode === 'verify'" key="verify" class="form-block">
           <button class="back-btn" @click="handleVerifyBack">
-            <q-icon name="chevron_left" size="22px" />
+            <AppIcon name="chevron_left" size="22px" />
             {{ t('nav.back') }}
           </button>
 
@@ -445,11 +445,11 @@
 
           <div class="feedback-area">
             <div v-if="authStore.isLoading" class="otp-verifying">
-              <q-spinner size="18px" color="white" />
+              <AppSpinner size="18px" color="white" />
             </div>
             <div v-else-if="errors.email" class="error-text">{{ errors.email }}</div>
             <div v-else-if="globalError" class="global-error">
-              <q-icon name="error_outline" size="16px" />
+              <AppIcon name="error_outline" size="16px" />
               {{ globalError }}
             </div>
           </div>
@@ -457,7 +457,7 @@
           <div class="verify-footer">
             <Transition name="fade" mode="out-in">
               <p v-if="verifyResent" key="resent" class="verify-resent">
-                <q-icon name="check_circle_outline" size="14px" />
+                <AppIcon name="check_circle_outline" size="14px" />
                 {{ t('pages.auth.verifyResent') }}
               </p>
               <p v-else key="valid" class="verify-countdown">
@@ -503,18 +503,18 @@
                 @input="onUsernameInput"
               />
               <div class="username-status-icon">
-                <q-spinner v-if="usernameIsChecking" size="16px" color="white" />
-                <q-icon
+                <AppSpinner v-if="usernameIsChecking" size="16px" color="white" />
+                <AppIcon
                   v-else-if="usernameStatusType === 'success'"
                   name="check_circle"
                   size="18px"
-                  color="positive"
+                  style="color: var(--color-positive)"
                 />
-                <q-icon
+                <AppIcon
                   v-else-if="usernameStatusType === 'error'"
                   name="cancel"
                   size="18px"
-                  color="negative"
+                  style="color: var(--color-negative)"
                 />
               </div>
             </div>
@@ -528,7 +528,7 @@
             <Transition name="fade" mode="out-in">
               <div v-if="usernameErrorMsg" key="err" class="error-text">{{ usernameErrorMsg }}</div>
               <div v-else-if="usernameStatusType === 'success'" key="ok" class="success-text">
-                <q-icon name="check_circle_outline" size="16px" />
+                <AppIcon name="check_circle_outline" size="16px" />
                 {{ t('pages.usernamePicker.available') }}
               </div>
             </Transition>
@@ -597,10 +597,10 @@
     <LegalBottomSheet v-model:show="showLegalSheet" :type="legalSheetType" />
 
     <!-- ── Face ID prompt (post-login) ───────────────────────────────────── -->
-    <q-dialog v-model="showBiometricPrompt" position="bottom" seamless>
+    <AppBottomSheet v-model="showBiometricPrompt" seamless>
       <div class="biometric-sheet">
         <div class="biometric-icon">
-          <q-icon name="face" size="44px" color="white" />
+          <AppIcon name="face" size="44px" style="color: #fff" />
         </div>
         <h3 class="biometric-title">{{ t('pages.auth.faceIdTitle') }}</h3>
         <p class="biometric-desc">{{ t('pages.auth.faceIdDesc') }}</p>
@@ -611,7 +611,7 @@
           {{ t('pages.auth.notNow') }}
         </AppButton>
       </div>
-    </q-dialog>
+    </AppBottomSheet>
   </div>
 </template>
 
@@ -620,13 +620,13 @@ import { ref, computed, onMounted, nextTick } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
-import { useAuthStore } from '../../../stores/auth.store.js';
-import { AuthService } from '../../../services/auth.service.js';
-import { UsernameService } from '../../../services/username.service.js';
+import { useAuthStore } from '../../../auth/store.js';
+import { AuthService } from '../../../auth/services/auth.service.js';
+import { UsernameService } from '../../../auth/services/username.service.js';
 import LegalBottomSheet from '../../components/LegalBottomSheet.vue';
 import { getClientConfig } from '../../../internal/app-config.js';
 const appConfig = getClientConfig();
-import { AppButton } from '@synkos/ui';
+import { AppBottomSheet, AppIcon, AppSpinner, AppButton } from '@synkos/ui';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -1417,7 +1417,7 @@ onMounted(() => {
   text-align: center;
 }
 
-.app-icon {
+.auth-app-icon {
   width: 72px;
   height: 72px;
   border-radius: 18px;
