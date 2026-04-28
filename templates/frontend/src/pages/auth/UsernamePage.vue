@@ -348,7 +348,7 @@ onMounted(() => {
 
 .error-text {
   font-size: 13px;
-  color: #ef4444;
+  color: var(--color-negative);
   line-height: 1.4;
 }
 
@@ -357,7 +357,7 @@ onMounted(() => {
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  color: #22c55e;
+  color: var(--color-positive);
 }
 
 .suggestions-block {

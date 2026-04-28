@@ -82,11 +82,13 @@ export default defineConfig(() => {
         // which causes the "isFunction is not a function" error at startup.
         if (!viteConf.optimizeDeps) viteConf.optimizeDeps = {};
 
-        // Force pre-bundling of workspace packages. Vite skips linked packages
-        // (symlinks) by default, which leaves cssInjectedByJs side-effects
-        // unprocessed and breaks component style injection + resolution at runtime.
-        // vue-i18n must also be pre-bundled as a whole unit to prevent the circular
-        // @vue/shared → @vue/runtime-core dependency from resolving out-of-order.
+        // Force pre-bundling so Vite doesn't discover deps lazily at navigation
+        // time and trigger full-page reloads (white flash on first route change).
+        //
+        // - @synkos/* workspace symlinks: skipped by default, cssInjectedByJs
+        //   side-effects lost otherwise.
+        // - @capacitor/*: discovered on first page navigation → reload flash.
+        // - vue-i18n: must be bundled as a unit to prevent @vue/shared circular dep.
         viteConf.optimizeDeps.include = [
           ...(viteConf.optimizeDeps.include ?? []),
           '@synkos/ui',
@@ -96,7 +98,24 @@ export default defineConfig(() => {
           '@intlify/shared',
           '@intlify/message-compiler',
           '@vue/devtools-api',
+          '@capacitor/core',
+          '@capacitor/haptics',
+          '@capacitor/app',
+          '@capacitor/preferences',
+          '@capacitor/splash-screen',
+          '@capacitor/push-notifications',
         ];
+
+        // Pre-transform the most-visited pages so their module graphs are fully
+        // resolved before any navigation, eliminating first-visit reload flashes.
+        if (!viteConf.server) viteConf.server = {};
+        viteConf.server.warmup = {
+          clientFiles: [
+            './src/pages/auth/LoginPage.vue',
+            './src/features/home/pages/HomePage.vue',
+            './src/pages/settings/ProfilePage.vue',
+          ],
+        };
       },
       // viteVuePluginOptions: {},
       vitePlugins: [
