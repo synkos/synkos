@@ -244,7 +244,7 @@ onMounted(() => {
 
 .auth-root {
   min-height: 100dvh;
-  background: #0a0a0a;
+  background: var(--auth-bg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -285,14 +285,14 @@ onMounted(() => {
 .app-title {
   font-size: 22px;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--auth-text-primary);
   margin: 0;
   letter-spacing: -0.3px;
 }
 
 .app-tagline {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--auth-text-muted);
   margin: 0;
   text-align: center;
 }
@@ -306,7 +306,7 @@ onMounted(() => {
 
 .form-subtitle {
   font-size: 15px;
-  color: rgba(255, 255, 255, 0.65);
+  color: var(--auth-text-muted);
   margin: 0;
   line-height: 1.5;
   text-align: center;
@@ -316,10 +316,10 @@ onMounted(() => {
 .field-group {
   display: flex;
   flex-direction: column;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--auth-surface-1);
   border-radius: 14px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--auth-border);
 }
 
 .field-wrap {
@@ -346,7 +346,7 @@ onMounted(() => {
 
 .username-prefix {
   font-size: 17px;
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--auth-text-subtle);
   font-weight: 500;
   flex-shrink: 0;
 }
@@ -357,13 +357,13 @@ onMounted(() => {
   border: none;
   outline: none;
   font-size: 17px;
-  color: #ffffff;
+  color: var(--auth-text-primary);
   font-family: inherit;
   letter-spacing: 0.3px;
 }
 
 .field-input::placeholder {
-  color: rgba(255, 255, 255, 0.25);
+  color: var(--auth-text-subtle);
 }
 
 .username-input {
@@ -381,7 +381,7 @@ onMounted(() => {
 /* ── Hints ── */
 .rules-hint {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--auth-text-subtle);
   margin: 0;
   text-align: center;
   line-height: 1.5;
@@ -396,7 +396,7 @@ onMounted(() => {
 
 .error-text {
   font-size: 13px;
-  color: #ef4444;
+  color: var(--color-negative);
   line-height: 1.4;
 }
 
@@ -405,7 +405,7 @@ onMounted(() => {
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  color: #22c55e;
+  color: var(--color-positive);
 }
 
 /* ── Suggestions ── */
@@ -417,7 +417,7 @@ onMounted(() => {
 
 .suggestions-label {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--auth-text-subtle);
   margin: 0;
 }
 
@@ -453,7 +453,7 @@ onMounted(() => {
   border-radius: 14px;
   background: linear-gradient(135deg, #6366f1, #8b5cf6);
   border: none;
-  color: #ffffff;
+  color: var(--auth-text-primary);
   font-size: 16px;
   font-weight: 600;
   font-family: inherit;

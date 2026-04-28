@@ -2,7 +2,7 @@
   <AppPage class="home-page">
     <div class="home-content">
       <div class="home-icon">
-        <AppIcon name="style" size="52px" style="color: #fff" />
+        <AppIcon name="style" size="52px" style="color: var(--color-primary)" />
       </div>
 
       <h1 class="home-title">{{ t('pages.home.title') }}</h1>
@@ -37,19 +37,19 @@ const { t } = useI18n();
   width: 88px;
   height: 88px;
   border-radius: 22px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--surface-1);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 28px;
   backdrop-filter: blur(10px);
-  border: 0.5px solid rgba(255, 255, 255, 0.12);
+  border: 0.5px solid var(--border-subtle);
 }
 
 .home-title {
   font-size: 34px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--text-primary);
   letter-spacing: -0.5px;
   margin: 0 0 12px 0;
   line-height: 1.1;
@@ -58,7 +58,7 @@ const { t } = useI18n();
 .home-subtitle {
   font-size: 17px;
   font-weight: 400;
-  color: rgba(235, 235, 245, 0.55);
+  color: var(--text-secondary-ios);
   line-height: 1.5;
   margin: 0;
   white-space: pre-line;

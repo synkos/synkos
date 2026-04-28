@@ -160,14 +160,14 @@ function onDragEnd() {
 .legal-title {
   font-size: $font-body-lg;
   font-weight: 600;
-  color: $text-primary;
+  color: var(--text-primary);
   letter-spacing: $ls-tight;
   margin: 0;
 }
 
 .legal-updated {
   font-size: $font-caption;
-  color: $text-tertiary;
+  color: var(--text-tertiary);
   margin: 0;
   letter-spacing: $ls-normal;
 }
@@ -175,7 +175,7 @@ function onDragEnd() {
 .legal-close-btn {
   font-size: $font-body;
   font-weight: 600;
-  color: $primary;
+  color: var(--color-primary);
   background: none;
   border: none;
   padding: $space-1 0;

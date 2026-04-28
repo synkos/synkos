@@ -97,14 +97,14 @@ const { t } = useI18n();
 .profile-name {
   font-size: $font-title;
   font-weight: 700;
-  color: $text-primary;
+  color: var(--text-primary);
   letter-spacing: -0.4px;
   margin: 0 0 $space-3 0;
 }
 
 .profile-sub {
   font-size: 14px;
-  color: $text-label;
+  color: var(--text-label);
   margin: 0 0 $space-8 0;
   line-height: $lh-base;
 }
@@ -112,7 +112,7 @@ const { t } = useI18n();
 .sign-in-btn {
   font-size: $font-body;
   font-weight: 600;
-  color: $primary;
+  color: var(--color-primary);
   background: rgba(10, 132, 255, 0.12);
   border: 0.5px solid rgba(10, 132, 255, 0.25);
   border-radius: $radius-full;
@@ -138,12 +138,12 @@ const { t } = useI18n();
   display: flex;
   align-items: center;
   gap: $space-2;
-  background: $separator;
-  border: 0.5px solid $border-medium;
+  background: var(--separator);
+  border: 0.5px solid var(--border-medium);
   border-radius: $radius-full;
   padding: $space-2 $space-5;
   font-size: $font-caption;
-  color: rgba(235, 235, 245, 0.5);
+  color: var(--text-secondary-ios);
   text-transform: capitalize;
 }
 </style>

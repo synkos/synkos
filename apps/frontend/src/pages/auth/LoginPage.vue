@@ -1460,6 +1460,7 @@ onMounted(() => {
 .social-btn--apple {
   background: #fff;
   color: #000;
+  border: 0.5px solid var(--auth-border);
 }
 
 .social-btn--google {
@@ -1584,7 +1585,7 @@ onMounted(() => {
 
   &:-webkit-autofill {
     -webkit-text-fill-color: var(--auth-text-primary, rgba(255, 255, 255, 0.92));
-    -webkit-box-shadow: 0 0 0 100px #111 inset;
+    -webkit-box-shadow: 0 0 0 100px var(--auth-sheet-bg) inset;
     caret-color: var(--color-primary, #0a84ff);
   }
 }
@@ -1705,16 +1706,16 @@ onMounted(() => {
     width 0.3s ease,
     background 0.3s ease;
   &--weak {
-    background: #ff453a;
+    background: var(--color-negative);
   }
   &--fair {
-    background: #ff9f0a;
+    background: var(--color-accent);
   }
   &--good {
-    background: #30d158;
+    background: var(--color-positive);
   }
   &--strong {
-    background: #30d158;
+    background: var(--color-positive);
   }
 }
 
@@ -1724,16 +1725,16 @@ onMounted(() => {
   letter-spacing: 0.1px;
   white-space: nowrap;
   &--weak {
-    color: #ff453a;
+    color: var(--color-negative);
   }
   &--fair {
-    color: #ff9f0a;
+    color: var(--color-accent);
   }
   &--good {
-    color: #30d158;
+    color: var(--color-positive);
   }
   &--strong {
-    color: #30d158;
+    color: var(--color-positive);
   }
 }
 
@@ -1749,13 +1750,13 @@ onMounted(() => {
   align-items: center;
   gap: 6px;
   font-size: 14px;
-  color: #30d158;
+  color: var(--color-positive);
   letter-spacing: -0.1px;
 }
 
 .error-text {
   font-size: 13px;
-  color: #ff453a;
+  color: var(--color-negative);
   padding-left: 4px;
   letter-spacing: -0.1px;
 }
@@ -1769,7 +1770,7 @@ onMounted(() => {
   border-radius: 10px;
   padding: 10px 14px;
   font-size: 14px;
-  color: #ff453a;
+  color: var(--color-negative);
   letter-spacing: -0.1px;
 }
 
@@ -1871,7 +1872,7 @@ onMounted(() => {
   text-align: center;
   letter-spacing: -0.1px;
   &--expired {
-    color: #ff9f0a;
+    color: var(--color-accent);
   }
 }
 
@@ -1880,7 +1881,7 @@ onMounted(() => {
   align-items: center;
   gap: 5px;
   font-size: 13px;
-  color: #30d158;
+  color: var(--color-positive);
   margin: 0;
 }
 

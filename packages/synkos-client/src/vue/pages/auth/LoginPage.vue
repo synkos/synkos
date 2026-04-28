@@ -1354,7 +1354,7 @@ onMounted(() => {
 .auth-root {
   position: fixed;
   inset: 0;
-  background: #000;
+  background: var(--auth-bg);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -1364,7 +1364,7 @@ onMounted(() => {
 .splash-overlay {
   position: absolute;
   inset: 0;
-  background: #000;
+  background: var(--auth-bg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1384,8 +1384,8 @@ onMounted(() => {
   width: 80px;
   height: 80px;
   border-radius: 22px;
-  background: linear-gradient(135deg, #1a1a2e, #16213e);
-  border: 0.5px solid rgba(255, 255, 255, 0.12);
+  background: var(--auth-icon-bg);
+  border: 0.5px solid var(--auth-border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1421,8 +1421,8 @@ onMounted(() => {
   width: 72px;
   height: 72px;
   border-radius: 18px;
-  background: linear-gradient(145deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  border: 0.5px solid rgba(255, 255, 255, 0.14);
+  background: var(--auth-icon-bg);
+  border: 0.5px solid var(--auth-border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1433,14 +1433,14 @@ onMounted(() => {
 .app-title {
   font-size: 28px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--auth-text-primary);
   letter-spacing: -0.6px;
   margin: 0 0 6px 0;
 }
 
 .app-tagline {
   font-size: 15px;
-  color: rgba(235, 235, 245, 0.45);
+  color: var(--auth-text-muted);
   margin: 0;
   letter-spacing: -0.1px;
 }
@@ -1463,14 +1463,14 @@ onMounted(() => {
 .form-title {
   font-size: 24px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--auth-text-primary);
   letter-spacing: -0.5px;
   margin: 0 0 2px 0;
 }
 
 .form-subtitle {
   font-size: 14px;
-  color: rgba(235, 235, 245, 0.45);
+  color: var(--auth-text-muted);
   margin: 0 0 6px 0;
   line-height: 1.4;
 }
@@ -1508,12 +1508,13 @@ onMounted(() => {
 .social-btn--apple {
   background: #fff;
   color: #000;
+  border: 0.5px solid var(--auth-border);
 }
 
 .social-btn--google {
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.92);
-  border: 0.5px solid rgba(255, 255, 255, 0.12);
+  background: var(--auth-surface-1);
+  color: var(--auth-text-primary);
+  border: 0.5px solid var(--auth-border);
 }
 
 .social-icon {
@@ -1556,8 +1557,8 @@ onMounted(() => {
   justify-content: center;
 
   &--error .otp-cell {
-    border-color: rgba(255, 255, 255, 0.1);
-    background: rgba(255, 255, 255, 0.07);
+    border-color: var(--auth-border);
+    background: var(--auth-surface-1);
   }
 
   &--shake {
@@ -1571,8 +1572,8 @@ onMounted(() => {
   max-width: 52px;
   height: 56px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.07);
-  color: rgba(255, 255, 255, 0.92);
+  background: var(--auth-surface-1);
+  color: var(--auth-text-primary);
   font-size: 22px;
   font-weight: 600;
   text-align: center;
@@ -1584,14 +1585,14 @@ onMounted(() => {
   -webkit-tap-highlight-color: transparent;
 
   &--filled {
-    border-color: rgba(255, 255, 255, 0.25);
-    background: rgba(255, 255, 255, 0.11);
+    border-color: var(--auth-border-strong);
+    background: var(--auth-surface-2);
   }
 
   &:focus {
-    border-color: rgba(255, 255, 255, 0.4);
-    background: rgba(255, 255, 255, 0.13);
-    caret-color: rgba(255, 255, 255, 0.92);
+    border-color: var(--auth-border-focus);
+    background: var(--auth-surface-focus);
+    caret-color: var(--auth-text-primary);
   }
 }
 
@@ -1604,8 +1605,8 @@ onMounted(() => {
 
 // ── Text fields ───────────────────────────────────────────────────────────────
 .field-group {
-  background: rgba(255, 255, 255, 0.07);
-  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  background: var(--auth-surface-1);
+  border: 0.5px solid var(--auth-border);
   border-radius: 14px;
   overflow: hidden;
 }
@@ -1627,13 +1628,13 @@ onMounted(() => {
   outline: none;
   padding: 14px 16px;
   font-size: 16px;
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--auth-text-primary);
   letter-spacing: -0.2px;
-  caret-color: #0a84ff;
+  caret-color: var(--color-primary);
   width: 100%;
 
   &::placeholder {
-    color: rgba(235, 235, 245, 0.3);
+    color: var(--auth-text-subtle);
   }
 
   &--code {
@@ -1644,9 +1645,9 @@ onMounted(() => {
   }
 
   &:-webkit-autofill {
-    -webkit-text-fill-color: rgba(255, 255, 255, 0.92);
-    -webkit-box-shadow: 0 0 0 100px #111 inset;
-    caret-color: #0a84ff;
+    -webkit-text-fill-color: var(--auth-text-primary);
+    -webkit-box-shadow: 0 0 0 100px var(--auth-sheet-bg) inset;
+    caret-color: var(--color-primary);
   }
 }
 
@@ -1654,7 +1655,7 @@ onMounted(() => {
   background: none;
   border: none;
   padding: 14px 16px 14px 0;
-  color: rgba(235, 235, 245, 0.35);
+  color: var(--auth-text-subtle);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   flex-shrink: 0;
@@ -1662,7 +1663,7 @@ onMounted(() => {
 
 .field-separator {
   height: 0.5px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--auth-surface-1);
   margin-left: 16px;
 }
 
@@ -1676,7 +1677,7 @@ onMounted(() => {
 .strength-bar {
   flex: 1;
   height: 3px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--auth-surface-2);
   border-radius: 2px;
   overflow: hidden;
 }
@@ -1689,16 +1690,16 @@ onMounted(() => {
     background 0.3s ease;
 
   &--weak {
-    background: #ff453a;
+    background: var(--color-negative);
   }
   &--fair {
-    background: #ff9f0a;
+    background: var(--color-accent);
   }
   &--good {
-    background: #30d158;
+    background: var(--color-positive);
   }
   &--strong {
-    background: #30d158;
+    background: var(--color-positive);
   }
 }
 
@@ -1709,16 +1710,16 @@ onMounted(() => {
   white-space: nowrap;
 
   &--weak {
-    color: #ff453a;
+    color: var(--color-negative);
   }
   &--fair {
-    color: #ff9f0a;
+    color: var(--color-accent);
   }
   &--good {
-    color: #30d158;
+    color: var(--color-positive);
   }
   &--strong {
-    color: #30d158;
+    color: var(--color-positive);
   }
 }
 
@@ -1735,13 +1736,13 @@ onMounted(() => {
   align-items: center;
   gap: 6px;
   font-size: 14px;
-  color: #30d158;
+  color: var(--color-positive);
   letter-spacing: -0.1px;
 }
 
 .error-text {
   font-size: 13px;
-  color: #ff453a;
+  color: var(--color-negative);
   padding-left: 4px;
   letter-spacing: -0.1px;
 }
@@ -1755,7 +1756,7 @@ onMounted(() => {
   border-radius: 10px;
   padding: 10px 14px;
   font-size: 14px;
-  color: #ff453a;
+  color: var(--color-negative);
   letter-spacing: -0.1px;
 }
 
@@ -1765,7 +1766,7 @@ onMounted(() => {
   border: none;
   text-align: right;
   font-size: 13px;
-  color: rgba(235, 235, 245, 0.45);
+  color: var(--auth-text-muted);
   cursor: pointer;
   padding: 0;
   align-self: flex-end;
@@ -1779,7 +1780,7 @@ onMounted(() => {
 
 .switch-text {
   font-size: 14px;
-  color: rgba(235, 235, 245, 0.45);
+  color: var(--auth-text-muted);
   text-align: center;
   margin: 0;
 }
@@ -1787,7 +1788,7 @@ onMounted(() => {
 .switch-link {
   background: none;
   border: none;
-  color: #0a84ff;
+  color: var(--color-primary);
   font-size: 14px;
   cursor: pointer;
   padding: 0;
@@ -1797,7 +1798,7 @@ onMounted(() => {
 .guest-btn {
   background: none;
   border: none;
-  color: rgba(235, 235, 245, 0.35);
+  color: var(--auth-text-subtle);
   font-size: 14px;
   cursor: pointer;
   padding: 8px;
@@ -1813,7 +1814,7 @@ onMounted(() => {
   gap: 2px;
   background: none;
   border: none;
-  color: #0a84ff;
+  color: var(--color-primary);
   font-size: 16px;
   font-weight: 500;
   cursor: pointer;
@@ -1825,7 +1826,7 @@ onMounted(() => {
 
 .terms-text {
   font-size: 12px;
-  color: rgba(235, 235, 245, 0.3);
+  color: var(--auth-text-subtle);
   text-align: center;
   margin: 0;
   line-height: 1.5;
@@ -1854,13 +1855,13 @@ onMounted(() => {
 
 .verify-countdown {
   font-size: 13px;
-  color: rgba(235, 235, 245, 0.4);
+  color: var(--auth-text-subtle);
   margin: 0;
   text-align: center;
   letter-spacing: -0.1px;
 
   &--expired {
-    color: #ff9f0a;
+    color: var(--color-accent);
   }
 }
 
@@ -1869,15 +1870,15 @@ onMounted(() => {
   align-items: center;
   gap: 5px;
   font-size: 13px;
-  color: #30d158;
+  color: var(--color-positive);
   margin: 0;
 }
 
 // ── Biometric sheet ───────────────────────────────────────────────────────────
 .biometric-sheet {
-  background: #1c1c1e;
+  background: var(--auth-sheet-bg);
   border-radius: 24px 24px 0 0;
-  border-top: 0.5px solid rgba(255, 255, 255, 0.1);
+  border-top: 0.5px solid var(--auth-border);
   padding: 32px 24px max(32px, env(safe-area-inset-bottom, 32px));
   display: flex;
   flex-direction: column;
@@ -1900,14 +1901,14 @@ onMounted(() => {
 .biometric-title {
   font-size: 20px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--auth-text-primary);
   margin: 0;
   letter-spacing: -0.4px;
 }
 
 .biometric-desc {
   font-size: 14px;
-  color: rgba(235, 235, 245, 0.45);
+  color: var(--auth-text-muted);
   margin: 0;
   line-height: 1.5;
 }
@@ -2044,7 +2045,7 @@ onMounted(() => {
 .welcome-title {
   font-size: 26px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--auth-text-primary);
   letter-spacing: -0.5px;
   margin: 0;
   animation: welcome-fade-up 0.4s ease 0.4s both;
@@ -2052,7 +2053,7 @@ onMounted(() => {
 
 .welcome-subtitle {
   font-size: 15px;
-  color: rgba(235, 235, 245, 0.45);
+  color: var(--auth-text-muted);
   margin: 0;
   letter-spacing: -0.1px;
   animation: welcome-fade-up 0.4s ease 0.55s both;

@@ -331,7 +331,7 @@ function navigate(routeName: string): void {
 .app-menu {
   width: min(380px, 92vw);
   height: 100dvh;
-  background: #111111;
+  background: var(--surface-bg);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -364,7 +364,7 @@ function navigate(routeName: string): void {
 .logo-label {
   font-size: $font-body;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.88);
+  color: var(--text-primary);
   letter-spacing: $ls-base;
 }
 
@@ -404,7 +404,7 @@ function navigate(routeName: string): void {
 // ── Version ───────────────────────────────────────────────────────
 .menu-version {
   font-size: $font-sm;
-  color: rgba(235, 235, 245, 0.18);
+  color: var(--text-quaternary);
   text-align: center;
   padding: $space-12 $space-8 $space-2;
   margin: 0;

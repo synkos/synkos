@@ -61,8 +61,8 @@ function goToLogin() {
   display: flex;
   align-items: center;
   margin: 0 $space-8 $space-4;
-  background: $surface-1;
-  border: 0.5px solid $surface-1-border;
+  background: var(--surface-1);
+  border: 0.5px solid var(--surface-1-border);
   border-radius: $radius-2xl;
   padding: $space-8 0;
 }
@@ -78,7 +78,7 @@ function goToLogin() {
 .stat-value {
   font-size: $font-title;
   font-weight: 700;
-  color: $text-primary;
+  color: var(--text-primary);
   letter-spacing: $ls-tighter;
   line-height: $lh-tight;
 }
@@ -86,7 +86,7 @@ function goToLogin() {
 .stat-label {
   font-size: $font-sm;
   font-weight: 500;
-  color: $text-label;
+  color: var(--text-label);
   letter-spacing: 0.1px;
   text-transform: uppercase;
 }
@@ -94,6 +94,6 @@ function goToLogin() {
 .stat-divider {
   width: 0.5px;
   height: 32px;
-  background: $border-medium;
+  background: var(--border-medium);
 }
 </style>
