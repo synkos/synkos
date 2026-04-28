@@ -30,9 +30,9 @@
   </div>
 </template>
 
-import { AppIcon } from '@synkos/ui';
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
+import { AppIcon } from '@synkos/ui';
 
 interface Props {
   avatar?: string | undefined;
