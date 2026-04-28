@@ -7,9 +7,7 @@ export interface PasswordStrength {
   pct: number;
 }
 
-export function usePasswordStrength(
-  password: Ref<string> | ComputedRef<string>
-): ComputedRef<PasswordStrength> {
+export function usePasswordStrength(password: Ref<string>): ComputedRef<PasswordStrength> {
   return computed(() => {
     const p = password.value;
     let score = 0;
