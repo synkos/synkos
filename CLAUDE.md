@@ -15,8 +15,12 @@
 ### Checklist post-implementación (siempre, sin que te lo pidan)
 
 1. ¿Se modificó `apps/frontend/src/` o `apps/backend/src/`? → proponer `pnpm sync:templates` (sincroniza ambos)
-2. ¿Se modificó `packages/`? → evaluar changeset (ver tabla más abajo)
-3. ¿Hay commits pendientes? → seguir workflow `push-git`
+2. ¿Se modificó `packages/synkos-ui/src/components/` o `packages/synkos-client/src/vue/components/`? → proponer `pnpm sync:docs` (regenera `apps/web/content/en/docs/{components,api}/`)
+3. ¿Se añadió un componente nuevo a `@synkos/ui` o `@synkos/client`? → proponer:
+   - JSDoc al inicio de su `<script setup>` (descripción + `@example` + `/** */` por prop/emit/slot)
+   - `apps/web/components/<Name>Demo.vue` si tiene sentido como demo standalone
+4. ¿Se modificó `packages/`? → evaluar changeset (ver tabla más abajo)
+5. ¿Hay commits pendientes? → seguir workflow `push-git`
 
 ### Reglas de orquestación
 
@@ -39,7 +43,8 @@ Synkos is a **framework and scaffolding CLI** for building fullstack mobile/web 
 synkos/
 ├── apps/
 │   ├── frontend/       ← dev workspace for the frontend template (live, workspace deps)
-│   └── backend/        ← dev workspace for the backend template (live, workspace deps)
+│   ├── backend/        ← dev workspace for the backend template (live, workspace deps)
+│   └── web/            ← public website (synkos.dev): landing + docs + blog (Nuxt 3)
 ├── packages/
 │   ├── create-synkos/  ← the CLI published to npm (pnpm create synkos)
 │   ├── synkos/         ← core runtime package (AppConfig type, Vue plugin, guards)
@@ -79,6 +84,97 @@ apps/frontend  ──(pnpm sync:templates)──▶  templates/frontend  ──(
 | `{{PROJECT_NAME}}` | `frontend` / `backend` |
 | `{{APP_NAME}}`     | `Synkos Dev`           |
 | `{{BUNDLE_ID}}`    | `com.synkos.dev`       |
+
+---
+
+## Documentation pipeline (apps/web)
+
+`apps/web/` is the public website at synkos.dev: landing, docs and blog. It's a Nuxt 3 app that consumes `@synkos/ui` and `@synkos/client` directly via `workspace:*` so live demos render the real components.
+
+### Auto-generated content
+
+Two parts of the site are **auto-generated from package source** and committed to git (same pattern as `templates/`):
+
+```
+packages/synkos-ui/src/components/*.vue       ──(vue-docgen-api)──▶  apps/web/content/en/docs/components/*.md
+packages/synkos-client/src/vue/components/*.vue                  ──▶  apps/web/content/en/docs/components/*.md
+packages/synkos-client/src/index.ts (TS API) ──(TypeDoc)─────────▶  apps/web/content/en/docs/api/*.md
+                                                                     apps/web/assets/generated/{components,api}.manifest.json
+```
+
+The orchestrator: `apps/web/scripts/sync-docs.mjs` (run via `pnpm sync:docs`).
+
+**Files under `apps/web/content/en/docs/components/` and `apps/web/content/en/docs/api/` are NEVER hand-edited.** They carry an `<!-- AUTO-GENERATED -->` marker and are overwritten on every sync. Edit JSDoc in the package source instead and run `pnpm sync:docs`.
+
+### JSDoc convention for components
+
+Every exported `.vue` component must have JSDoc at the top of `<script setup>`:
+
+```vue
+<script setup lang="ts">
+/**
+ * One-line summary that fits in a card. Then a sentence or two on what it
+ * does and when to reach for it.
+ *
+ * @example
+ * <AppButton variant="primary" :loading="saving" @click="save">Save</AppButton>
+ */
+
+withDefaults(
+  defineProps<{
+    /** Visual variant. `primary` is the dominant action, `ghost` low-emphasis. */
+    variant?: 'primary' | 'ghost' | 'link';
+    /** When true, replaces the slot with a spinner and disables interaction. */
+    loading?: boolean;
+  }>(),
+  { variant: 'primary', loading: false }
+);
+
+defineEmits<{
+  /** Fired when the user taps the button. Not emitted when disabled. */
+  click: [event: MouseEvent];
+}>();
+
+defineSlots<{
+  /** Button content. */
+  default: () => unknown;
+}>();
+</script>
+```
+
+**Rules:**
+
+- Component description goes inside `<script setup>` (not as an HTML comment, not in a separate `<script>` block — `vue-docgen-api`'s defaults don't pick those up; the sync script has a fallback parser specifically for the `<script setup>` form)
+- Each prop, emit and slot gets a single-line `/** */`
+- `@example` blocks are rendered into the "Usage" section verbatim — keep them realistic and copy-pasteable
+
+### Live previews — `apps/web/components/<Name>Demo.vue`
+
+When a component benefits from being shown interactively (button variants, segment switch, OTP input, sheet/drawer open/close, …), create a sibling demo in `apps/web/components/`:
+
+```vue
+<!-- apps/web/components/AppButtonDemo.vue -->
+<script setup lang="ts">
+import { AppButton } from '@synkos/ui';
+const code = `<AppButton variant="primary">Continue</AppButton>`;
+</script>
+
+<template>
+  <DocsComponentDemo :code="code">
+    <AppButton variant="primary">Continue</AppButton>
+  </DocsComponentDemo>
+</template>
+```
+
+The sync script auto-detects `<Name>Demo.vue` and injects a `## Preview` section in the generated markdown that renders the demo via MDC inside `<ClientOnly>`. **No demo file → no preview section** (correct for layouts/wrappers that don't make sense standalone).
+
+### Visual catalog at `/docs/components`
+
+`apps/web/components/ComponentsCatalog.vue` reads `assets/generated/components.manifest.json` at runtime and renders a card grid grouped by category. Each card shows a CSS-only silhouette from `apps/web/components/ComponentSilhouette.vue` (one `v-if` branch per shape — extend that file when adding distinctive new components).
+
+### Deploy
+
+`apps/web` deploys to Railway via `apps/web/Dockerfile` (multi-stage, build context = monorepo root). The `prebuild` hook runs `pnpm sync:docs` so the deployed site always carries fresh docs even if the author forgot to commit them. CI also fails the build if regenerated docs differ from what's committed (see `.github/workflows/ci.yml`).
 
 ---
 
@@ -284,7 +380,10 @@ Auth pages use `--auth-bg`, `--auth-text-primary`, `--auth-surface-*`, `--color-
 ```bash
 pnpm dev:frontend          # run apps/frontend in dev mode
 pnpm dev:backend           # run apps/backend in dev mode
+pnpm dev:web               # run apps/web (synkos.dev) in dev mode
 pnpm sync:templates        # sync apps/ → templates/ (run after feature work)
+pnpm sync:docs             # regenerate apps/web/content/en/docs/{components,api} from package source
+pnpm build:web             # build apps/web for Railway deploy
 pnpm build                 # build all packages/
 pnpm changeset             # create a new changeset
 pnpm release               # build + publish packages with changesets
@@ -313,6 +412,7 @@ Only for changes in `packages/` that users will notice:
 | New feature / export in a package | Yes                   | minor |
 | Breaking API change               | Yes                   | major |
 | Change only in `apps/`            | No                    | —     |
+| Change only in `apps/web/`        | No                    | —     |
 | Change only in `templates/`       | No                    | —     |
 | templates/ change visible to user | Yes (`create-synkos`) | patch |
 | Docs / style / format             | No                    | —     |
@@ -323,11 +423,12 @@ Use `.claude/workflows/push-git.yaml` for the full git flow.
 
 ## Workflows available
 
-| Workflow                                | When to use                                            |
-| --------------------------------------- | ------------------------------------------------------ |
-| `.claude/workflows/push-git.yaml`       | Stage, commit, and push following monorepo conventions |
-| `.claude/workflows/sync-templates.yaml` | Sync apps/ → templates/ and push the update            |
-| `.claude/workflows/plan-task.yaml`      | Analyze a request and decide execution strategy        |
+| Workflow                                | When to use                                                  |
+| --------------------------------------- | ------------------------------------------------------------ |
+| `.claude/workflows/push-git.yaml`       | Stage, commit, and push following monorepo conventions       |
+| `.claude/workflows/sync-templates.yaml` | Sync apps/ → templates/ and push the update                  |
+| `.claude/workflows/sync-docs.yaml`      | Regenerate component/API docs after editing packages/ Vue/TS |
+| `.claude/workflows/plan-task.yaml`      | Analyze a request and decide execution strategy              |
 
 ---
 

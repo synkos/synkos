@@ -48,3 +48,27 @@ jobs:
 
       - name: Test
         run: pnpm test
+
+      # ── Web (synkos.dev) ────────────────────────────────────────────────────
+      # Validates that:
+      #   1. The Nuxt site type-checks and builds end-to-end.
+      #   2. The committed docs match what `pnpm sync:docs` produces from the
+      #      current package source. If they don't, the author forgot to run
+      #      sync:docs after editing a component or its JSDoc — block the PR
+      #      with a clear message instead of letting the live site go stale.
+
+      - name: Verify docs are in sync with source
+        run: |
+          pnpm sync:docs
+          if ! git diff --quiet -- apps/web/content/en/docs/components apps/web/content/en/docs/api apps/web/assets/generated; then
+            echo ""
+            echo "::error::Docs are out of sync with package source."
+            echo "::error::Run 'pnpm sync:docs' locally and commit the regenerated files."
+            echo ""
+            echo "Diff of generated files:"
+            git --no-pager diff -- apps/web/content/en/docs/components apps/web/content/en/docs/api apps/web/assets/generated
+            exit 1
+          fi
+
+      - name: Build web (synkos.dev)
+        run: pnpm --filter web build

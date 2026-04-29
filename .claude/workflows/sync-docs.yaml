@@ -1,0 +1,138 @@
+name: sync-docs
+description: Regenerate apps/web component & API docs from package source and commit them
+
+rules:
+
+  when-to-run:
+    - after editing any .vue under packages/synkos-ui/src/components/
+    - after editing any .vue under packages/synkos-client/src/vue/components/
+    - after editing any .ts that affects exports in packages/synkos-{ui,client}/src/index.ts
+    - after adding a new component (also: create JSDoc + a demo file)
+    - before pushing a branch that includes the changes above
+
+  what-gets-regenerated:
+    sources:
+      - packages/synkos-ui/src/components/**/*.vue
+      - packages/synkos-client/src/vue/**/*.vue
+      - packages/synkos-client/src/index.ts (TypeDoc walks the export graph)
+      - packages/synkos-ui/src/index.ts
+    outputs:
+      - apps/web/content/en/docs/components/*.md
+      - apps/web/content/en/docs/api/*.md
+      - apps/web/assets/generated/components.manifest.json
+      - apps/web/assets/generated/api.manifest.json
+
+  golden-rule: |
+    Generated files carry an `<!-- AUTO-GENERATED — Do not edit. Run pnpm sync:docs to regenerate. -->`
+    header. NEVER hand-edit them. If something needs to change, change the JSDoc
+    in the source .vue/.ts file and re-run sync:docs.
+
+  changeset:
+    when: never (apps/web/ is not published, and the regeneration is a
+      side-effect of the source change which already has its own changeset
+      decision via push-git.yaml).
+    note: |
+      The act of running sync:docs does not introduce new public API. The
+      changeset rule fires on the underlying packages/ change that triggered
+      sync:docs, not on sync:docs itself.
+
+  jsdoc-convention:
+    location: at the top of <script setup>, before the first statement
+    must-have:
+      - one-paragraph component description
+      - one @example block (preferably copy-pasteable, ideally what you'd put on the docs page)
+      - /** ... */ above each prop, emit and slot
+    why-script-setup-not-html-comment: |
+      vue-docgen-api's defaults don't pick up HTML comments or separate <script>
+      blocks reliably. The sync script has a fallback parser that reads the
+      first JSDoc inside <script setup>.
+
+  demo-files:
+    location: apps/web/components/<ComponentName>Demo.vue
+    when-to-create: |
+      The component is standalone-friendly — i.e. it can be rendered without
+      requiring router/Pinia/specific layout context. Buttons, list rows, OTP
+      inputs, segment controls, etc.
+    when-to-skip: |
+      The component is plumbing — layouts (MainLayout, AuthLayout, SynkosApp),
+      wrappers that need parent context (AppPage, AuthFieldGroup), or things
+      that only make sense inside a real flow (LegalBottomSheet).
+    pattern: |
+      <script setup lang="ts">
+      import { TheComponent } from '@synkos/ui'
+      const code = `...`
+      </script>
+      <template>
+        <DocsComponentDemo :code="code">
+          <TheComponent ... />
+        </DocsComponentDemo>
+      </template>
+
+  silhouette:
+    location: apps/web/components/ComponentSilhouette.vue
+    when-to-extend: |
+      A new component is added that is visually distinctive enough to deserve
+      its own card preview shape. Add a v-else-if branch with a small CSS-only
+      shape using the existing primitives (.primitive--*, .phone, etc.).
+    when-to-skip: |
+      The component is similar enough to an existing one that the fallback
+      shape is fine.
+
+phases:
+
+  - phase: regenerate
+    steps:
+      - run: pnpm sync:docs
+      - verify: |
+          inspect the script output — should report "X component pages" and
+          "Y API category pages (Z symbols)" with no errors. If a parse error
+          is logged for a component, fix the JSDoc/source before continuing.
+
+  - phase: verify
+    steps:
+      - run: git status
+      - check: |
+          all diffs in apps/web/content/en/docs/{components,api}/ and
+          apps/web/assets/generated/ are EXPECTED — they should reflect the
+          source change you just made. Unexpected diffs (e.g. unrelated
+          components changing) usually mean something in the script regressed.
+      - check: |
+          regenerated .md files still carry the AUTO-GENERATED header at the top.
+          If the header moved or duplicated, the templates.mjs assembly
+          regressed.
+
+  - phase: pre-commit
+    steps:
+      - identify: which packages/ source files changed (this drives changeset decisions in push-git)
+      - stage: source change + regenerated docs + manifests in the same commit
+        order: |
+          - packages/synkos-ui/src/...                  ← source
+          - packages/synkos-client/src/...              ← source
+          - apps/web/content/en/docs/components/...     ← regenerated
+          - apps/web/content/en/docs/api/...            ← regenerated
+          - apps/web/assets/generated/*.json            ← regenerated
+          - .changeset/<slug>.md                        ← if push-git rules require one
+      - never: stage only the regenerated docs without the source change that produced them
+
+  - phase: commit
+    steps:
+      - delegate: push-git.yaml's commit phase
+      - scope: |
+          The commit type+scope reflects the SOURCE change, not the doc regeneration:
+          - "feat(synkos-ui): add AppToggle component" (regenerated docs are part of the same commit)
+          - "fix(synkos-client): correct usePlatform return type"
+          - "docs(synkos-ui): improve AppButton JSDoc and add @example"  ← only when ONLY JSDoc changed
+        rationale: |
+          The user-facing change is the source. The regenerated files are an
+          artifact of that change. Don't lead the commit message with "docs"
+          unless docs were the only thing that changed.
+
+  - phase: push
+    steps:
+      - delegate: push-git.yaml's push phase
+
+  decision-tree:
+    only-jsdoc-improved: "commit docs(<package>): describe + improve example. No changeset."
+    new-component-added: "commit feat(<package>): add NewComponent + minor changeset + create Demo.vue"
+    breaking-prop-renamed: "commit feat(<package>): rename prop + major changeset + WARN user + update demo"
+    sync-docs-but-no-source-change: "BLOCK — investigate why sync:docs produced a diff without a source change"

@@ -9,10 +9,12 @@ phases:
         action: |
           Before touching any file, determine:
           - Goal of the task
-          - Modules affected (apps/, packages/, templates/)
+          - Modules affected (apps/, packages/, templates/, apps/web/)
           - Whether public API changes are involved
           - Whether a changeset will be needed
           - Whether template sync will be needed
+          - Whether docs sync will be needed (any change to exported components
+            or to the public API surface in packages/synkos-{ui,client}/src/index.ts)
 
       - step: classify-complexity
         action: |
@@ -52,14 +54,44 @@ phases:
                • Spawn multiple coders in parallel if modules are independent
             → Spawn `reviewer` agent — must APPROVE before committing
             → Spawn `tester` agent — must report LISTO PARA COMMIT: SÍ
+            → If a public API export was added/removed/renamed in
+              packages/synkos-{client,ui}/src/index.ts:
+                  Spawn `documenter` agent — updates CLAUDE.md and runs
+                  sync-docs workflow if components/Vue files were touched.
             → Apply post-implementation checklist
 
       - step: post-checklist
         action: |
           After ANY implementation, always check (without being asked):
-          1. Was apps/frontend/src/ modified? → propose: pnpm sync:templates
-          2. Was packages/ modified? → evaluate changeset need (see CLAUDE.md table)
-          3. Are there uncommitted changes? → follow push-git workflow
+
+          1. Was apps/frontend/src/ or apps/backend/src/ modified?
+             → propose: pnpm sync:templates (sync-templates workflow)
+
+          2. Was packages/synkos-ui/src/components/** or
+              packages/synkos-client/src/vue/components/** modified?
+             OR was an export added/changed in packages/synkos-{ui,client}/src/index.ts?
+             → propose: pnpm sync:docs (sync-docs workflow)
+             → if a component was ADDED (not just modified), also propose:
+                · JSDoc at the top of <script setup> (description + @example
+                   + /** */ on each prop, emit and slot)
+                · apps/web/components/<Name>Demo.vue if it's standalone-friendly
+                   (see sync-docs.yaml > demo-files)
+                · v-else-if branch in apps/web/components/ComponentSilhouette.vue
+                   if it deserves a distinctive card shape
+
+          3. Was packages/ modified?
+             → evaluate changeset need (see CLAUDE.md table and push-git.yaml
+                package-impact-map)
+
+          4. Was a public API export added/removed/renamed in
+              packages/synkos-{client,ui}/src/index.ts?
+             → propose spawning the `documenter` agent to update CLAUDE.md
+                ("Public API summary (@synkos/client)" / "@synkos/ui public API"
+                sections) and run sync-docs
+
+          5. Are there uncommitted changes?
+             → follow push-git workflow (which delegates to sync-templates and
+                sync-docs as needed)
 
   # ─────────────────────────────────────
 
