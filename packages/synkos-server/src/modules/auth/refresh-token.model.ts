@@ -1,5 +1,6 @@
-import type { Document } from 'mongoose';
-import mongoose, { Schema } from 'mongoose';
+import type { Document, Types } from 'mongoose';
+import { Schema } from 'mongoose';
+import { defineModel } from '@/utils/define-model';
 
 export interface IDeviceInfo {
   platform?: string;
@@ -8,7 +9,7 @@ export interface IDeviceInfo {
 }
 
 export interface IRefreshToken extends Document {
-  userId: mongoose.Types.ObjectId;
+  userId: Types.ObjectId;
   tokenHash: string;
   deviceInfo: IDeviceInfo;
   expiresAt: Date;
@@ -35,4 +36,4 @@ const RefreshTokenSchema = new Schema<IRefreshToken>(
 // MongoDB TTL: auto-delete expired tokens from the collection
 RefreshTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
-export const RefreshToken = mongoose.model<IRefreshToken>('RefreshToken', RefreshTokenSchema);
+export const RefreshToken = defineModel<IRefreshToken>('RefreshToken', RefreshTokenSchema);

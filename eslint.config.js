@@ -4,7 +4,7 @@ import globals from 'globals';
 export default [
   ...synkosConfig,
   {
-    files: ['scripts/**'],
+    files: ['scripts/**', 'packages/*/scripts/**'],
     languageOptions: { globals: globals.node },
     rules: { 'no-console': 'off' },
   },

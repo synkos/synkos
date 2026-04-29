@@ -1,5 +1,6 @@
 import type { Document, Types } from 'mongoose';
-import mongoose, { Schema } from 'mongoose';
+import { Schema } from 'mongoose';
+import { defineModel } from '@/utils/define-model';
 
 export type AuditEventType =
   | 'name_changed'
@@ -40,4 +41,4 @@ const AuditLogSchema = new Schema<IAuditLog>(
 // Efficient lookup by user + recency
 AuditLogSchema.index({ userId: 1, createdAt: -1 });
 
-export const AuditLog = mongoose.model<IAuditLog>('AuditLog', AuditLogSchema);
+export const AuditLog = defineModel<IAuditLog>('AuditLog', AuditLogSchema);

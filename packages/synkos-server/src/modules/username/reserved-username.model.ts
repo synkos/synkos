@@ -1,5 +1,6 @@
-import type { Document } from 'mongoose';
-import mongoose, { Schema } from 'mongoose';
+import type { Document, Types } from 'mongoose';
+import { Schema } from 'mongoose';
+import { defineModel } from '@/utils/define-model';
 
 export type ReservationReason = 'deleted' | 'changed';
 
@@ -8,7 +9,7 @@ export interface IReservedUsername extends Document {
   usernameNormalized: string;
   reservedUntil: Date | null; // null = permanent reservation
   reason: ReservationReason;
-  userId?: mongoose.Types.ObjectId; // which user previously held this username
+  userId?: Types.ObjectId; // which user previously held this username
   createdAt: Date;
   updatedAt: Date;
 }
@@ -27,7 +28,7 @@ const ReservedUsernameSchema = new Schema<IReservedUsername>(
 // Fast lookup by normalized name — checked on every availability query
 ReservedUsernameSchema.index({ usernameNormalized: 1, reservedUntil: 1 });
 
-export const ReservedUsername = mongoose.model<IReservedUsername>(
+export const ReservedUsername = defineModel<IReservedUsername>(
   'ReservedUsername',
   ReservedUsernameSchema
 );
