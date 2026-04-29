@@ -1,6 +1,6 @@
 {
   "name": "@synkos/server",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Synkos backend framework core (Express + Mongoose)",
   "license": "MIT",
   "type": "module",
