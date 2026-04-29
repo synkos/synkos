@@ -1,6 +1,13 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    // Build emits CommonJS via Node16 module mode (package.json "type": "commonjs"
+    // selects CJS emit automatically). Node16 resolution honors the "exports"
+    // field of @synkos/server, which the legacy "node" resolution does not —
+    // without this, the subpath imports (@synkos/server/middleware, /modules/auth,
+    // …) fail at typecheck and build with TS2307.
+    "module": "Node16",
+    "moduleResolution": "Node16",
     "rootDir": "./src",
     "outDir": "./dist",
     "noEmit": false

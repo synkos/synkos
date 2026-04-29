@@ -158,6 +158,15 @@ if (fs.existsSync(APPS_BACKEND) && fs.existsSync(TPL_BACKEND)) {
   console.log('Syncing backend src/...');
   syncDir(path.join(APPS_BACKEND, 'src'), path.join(TPL_BACKEND, 'src'));
 
+  // Root config files that must stay in sync with apps/backend
+  console.log('Syncing backend root config files...');
+  for (const file of ['tsconfig.json', 'tsconfig.build.json', 'eslint.config.js']) {
+    const src = path.join(APPS_BACKEND, file);
+    if (fs.existsSync(src)) {
+      syncFile(src, path.join(TPL_BACKEND, file), TEMPLATE_SUBSTITUTIONS);
+    }
+  }
+
   console.log('Syncing backend package.json dependencies...');
   syncPackageJsonDeps(APPS_BACKEND, TPL_BACKEND);
 } else {

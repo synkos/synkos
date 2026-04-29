@@ -2,7 +2,7 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file
 
 import { defineConfig } from '#q-app/wrappers';
-export default defineConfig(() => {
+export default defineConfig((ctx) => {
   return {
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
     // preFetch: true,
@@ -42,7 +42,13 @@ export default defineConfig(() => {
         // extendTsConfig (tsConfig) {}
       },
 
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
+      // Capacitor builds run from file:// where the browser strips the path —
+      // hash mode is mandatory there. On the web (SPA/PWA), history mode is
+      // required for OAuth: providers strip the URL fragment from redirect_uri
+      // (RFC 6749 §3.1.2), so a hash-mode app never reaches its callback page.
+      // When deploying the SPA to a static host, add a catch-all rewrite to
+      // index.html so deep links resolve.
+      vueRouterMode: ctx.mode.capacitor ? 'hash' : 'history',
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,
