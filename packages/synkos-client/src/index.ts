@@ -74,6 +74,11 @@ export type {
 export { setupSynkosRouter, synkosSettingsRoutes } from './navigation/router.js';
 export type { SynkosSetupOptions } from './navigation/router.js';
 
+// Post-auth route — single source of truth for "where to go after login/verify".
+// Read with getPostAuthRoute(), override with setPostAuthRoute() if you need to
+// route users somewhere conditional (e.g. an onboarding flow on first login).
+export { getPostAuthRoute, setPostAuthRoute } from './navigation/internal/post-auth.js';
+
 // ── Layout components ─────────────────────────────────────────────────────────
 export { default as MainLayout } from './navigation/layouts/MainLayout.vue';
 export { default as AuthLayout } from './navigation/layouts/AuthLayout.vue';

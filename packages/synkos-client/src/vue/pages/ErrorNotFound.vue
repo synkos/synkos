@@ -2,12 +2,15 @@
   <div class="not-found">
     <AppIcon name="search_off" size="64px" style="color: rgba(255, 255, 255, 0.4)" />
     <p class="not-found-text">404 — Page not found</p>
-    <router-link :to="{ name: 'home' }" class="not-found-btn">Go home</router-link>
+    <router-link :to="postAuthRoute" class="not-found-btn">Go home</router-link>
   </div>
 </template>
 
 <script setup lang="ts">
 import { AppIcon } from '@synkos/ui';
+import { getPostAuthRoute } from '../../navigation/internal/post-auth.js';
+
+const postAuthRoute = getPostAuthRoute();
 </script>
 
 <style lang="scss" scoped>

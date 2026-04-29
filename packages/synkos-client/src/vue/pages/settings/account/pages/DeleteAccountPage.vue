@@ -136,6 +136,7 @@ import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useAuthStore } from '../../../../../auth/store.js';
+import { getPostAuthRoute } from '../../../../../navigation/internal/post-auth.js';
 
 const { t } = useI18n();
 const router = useRouter();
@@ -210,7 +211,7 @@ function goBack() {
 }
 
 function goHome() {
-  void router.replace({ name: 'home' });
+  void router.replace(getPostAuthRoute());
 }
 </script>
 

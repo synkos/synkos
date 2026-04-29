@@ -47,7 +47,13 @@ const CATEGORIES = [
     title: 'Router',
     description: 'Factories and helpers for the Synkos navigation layer.',
     match: (name) =>
-      ['createSynkosRouter', 'setupSynkosRouter', 'synkosSettingsRoutes'].includes(name),
+      [
+        'createSynkosRouter',
+        'setupSynkosRouter',
+        'synkosSettingsRoutes',
+        'getPostAuthRoute',
+        'setPostAuthRoute',
+      ].includes(name),
   },
   {
     slug: 'boot',

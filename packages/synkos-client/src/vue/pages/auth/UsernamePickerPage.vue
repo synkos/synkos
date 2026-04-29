@@ -112,6 +112,7 @@ import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { useAuthStore } from '../../../auth/store.js';
 import { UsernameService } from '../../../auth/services/username.service.js';
 import { getClientConfig } from '../../../internal/app-config.js';
+import { getPostAuthRoute } from '../../../navigation/internal/post-auth.js';
 const appConfig = getClientConfig();
 
 const { t } = useI18n();
@@ -197,7 +198,7 @@ async function handleSubmit() {
   try {
     await authStore.setUsername(username.value.trim());
     void Haptics.impact({ style: ImpactStyle.Medium }).catch(() => undefined);
-    await router.replace({ name: 'home' });
+    await router.replace(getPostAuthRoute());
   } catch (err: unknown) {
     const msg = (err as { response?: { data?: { error?: { message?: string } } } })?.response?.data
       ?.error?.message;

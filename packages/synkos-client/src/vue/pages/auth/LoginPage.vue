@@ -482,6 +482,7 @@ import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 import { useAuthStore } from '../../../auth/store.js';
 import { AuthService } from '../../../auth/services/auth.service.js';
 import { UsernameService } from '../../../auth/services/username.service.js';
+import { getPostAuthRoute } from '../../../navigation/internal/post-auth.js';
 import LegalBottomSheet from '../../components/LegalBottomSheet.vue';
 import OtpInput from '../../components/auth/OtpInput.vue';
 import AuthFieldGroup from '../../components/auth/AuthFieldGroup.vue';
@@ -889,7 +890,7 @@ async function handleResetPassword() {
 async function handleGuest() {
   await Haptics.impact({ style: ImpactStyle.Light }).catch(() => undefined);
   await authStore.continueAsGuest();
-  void router.replace({ name: 'home' });
+  void router.replace(getPostAuthRoute());
 }
 
 // ── Username picker ───────────────────────────────────────────────────────────
@@ -967,7 +968,7 @@ async function continueAfterUsername() {
   mode.value = 'success';
   await new Promise<void>((resolve) => setTimeout(resolve, 1800));
   if (authStore.biometricEnabled || authStore.biometricAsked) {
-    void router.replace({ name: 'home' });
+    void router.replace(getPostAuthRoute());
   } else {
     await authStore.markBiometricAsked();
     showBiometricPrompt.value = true;
@@ -1060,7 +1061,7 @@ async function handleResendVerification() {
 async function enableBiometricAuth() {
   await authStore.enableBiometric();
   showBiometricPrompt.value = false;
-  void router.replace({ name: 'home' });
+  void router.replace(getPostAuthRoute());
 }
 
 function handleResetBack() {
@@ -1086,7 +1087,7 @@ onMounted(() => {
       verifyDigits.value = ['', '', '', '', '', ''];
       mode.value = 'verify';
     } else {
-      void router.replace({ name: 'home' });
+      void router.replace(getPostAuthRoute());
     }
   }
 });

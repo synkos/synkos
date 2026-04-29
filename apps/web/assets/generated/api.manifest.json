@@ -21,7 +21,7 @@
     "slug": "router",
     "title": "Router",
     "description": "Factories and helpers for the Synkos navigation layer.",
-    "count": 3
+    "count": 5
   },
   {
     "slug": "boot",

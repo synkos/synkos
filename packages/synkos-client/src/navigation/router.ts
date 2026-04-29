@@ -12,6 +12,7 @@ import type { AppTabRoute, TabMeta } from '../types.js';
 export type { TabMeta };
 import { setTabConfig } from './internal/tab-config.js';
 import { setSettingsConfig, ALL_SECTIONS } from './internal/settings-config.js';
+import { setPostAuthRoute, getPostAuthRoute } from './internal/post-auth.js';
 import { useAuthStore } from '../auth/store.js';
 
 // Extend RouteMeta for type-safe i18n-aware nav bar fields
@@ -347,6 +348,9 @@ export function createSynkosRouter(
     customSections: opts.settingsConfig?.customSections ?? [],
   });
 
+  // Default post-auth target: first user-declared tab route, falling back to 'home'.
+  setPostAuthRoute({ name: (opts.appTabRoutes[0]?.name as string) ?? 'home' });
+
   // Register tab config for MainLayout dynamic tab rendering
   setTabConfig([
     ...opts.appTabRoutes,
@@ -380,7 +384,7 @@ export function createSynkosRouter(
     const canAccess = authStore.isAuthenticated || authStore.isGuest;
 
     if (isPublicRoute && authStore.isAuthenticated && authStore.user?.isEmailVerified) {
-      return { name: 'home' };
+      return getPostAuthRoute();
     }
 
     if (!isPublicRoute && !canAccess) {
@@ -506,10 +510,20 @@ export function setupSynkosRouter(router: Router, options: SynkosSetupOptions = 
   const resolvedHome =
     options.homeRouteName ?? (tabRecords[0]?.name as string | undefined) ?? 'home';
 
+  // Single source of truth for "where to navigate after a successful auth event"
+  // (login, OTP verify, biometric unlock, deletion cancel, etc.). Fallback pages
+  // and user-owned auth pages should use getPostAuthRoute() instead of hardcoding.
+  setPostAuthRoute({ name: resolvedHome });
+
   router.beforeEach(async (to) => {
     const authStore = useAuthStore();
 
-    const isPublicRoute = to.meta?.requiresAuth === false || to.path.startsWith('/auth');
+    // Explicit meta wins over the path heuristic. A route that lives under
+    // /auth/* but declares requiresAuth: true (e.g. an OAuth callback that
+    // needs the bearer token) is treated as protected.
+    const isPublicRoute =
+      to.meta?.requiresAuth === false ||
+      (to.meta?.requiresAuth !== true && to.path.startsWith('/auth'));
     const canAccess = authStore.isAuthenticated || authStore.isGuest;
 
     // Already authenticated → skip login
