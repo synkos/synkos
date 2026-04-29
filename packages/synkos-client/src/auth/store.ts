@@ -7,7 +7,7 @@ import { UsernameService } from './services/username.service.js';
 import { UserService } from './services/user.service.js';
 import { notificationsService } from '../services/notifications.service.js';
 import { getClientConfig } from '../internal/app-config.js';
-import { registerTokenProvider } from '../api/token-provider.js';
+import { registerTokenProvider, registerAuthReady } from '../api/token-provider.js';
 import type { PublicUser, RegisterDto, LoginDto, OAuthDto } from '../types.js';
 
 // ── Storage key helpers ───────────────────────────────────────────────────────
@@ -109,6 +109,8 @@ async function promptBiometric(reason: string): Promise<BiometricResult> {
 
 // ── Store ─────────────────────────────────────────────────────────────────────
 
+type InitResult = 'restored' | 'biometric-cancelled' | 'no-session' | 'guest' | 'refresh-failed';
+
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<PublicUser | null>(null);
   const accessToken = ref<string | null>(null);
@@ -118,8 +120,19 @@ export const useAuthStore = defineStore('auth', () => {
   const biometricEnabled = ref(false);
   const biometricAsked = ref(false);
 
-  // Register the token provider for the API client (replaces window.__pinia hack)
+  // Promise that resolves the first time `initialize()` settles (success OR
+  // recoverable failure). The API client awaits this before each request so
+  // requests that fire from `onMounted` of a callback page still pick up the
+  // rehydrated bearer token instead of going out as anonymous.
+  let resolveReady!: (result: InitResult) => void;
+  const _ready = new Promise<InitResult>((resolve) => {
+    resolveReady = resolve;
+  });
+  const whenReady = (): Promise<InitResult> => _ready;
+
+  // Register hooks for the API client (replaces window.__pinia hack)
   registerTokenProvider(() => accessToken.value);
+  registerAuthReady(() => _ready);
 
   // ── Computed ───────────────────────────────────────────────────────────────
 
@@ -157,12 +170,24 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // ── Initialization ─────────────────────────────────────────────────────────
-
-  type InitResult = 'restored' | 'biometric-cancelled' | 'no-session' | 'guest' | 'refresh-failed';
+  // (`InitResult` is declared at module scope above the store factory.)
 
   async function initialize(): Promise<InitResult> {
     if (isInitialized.value) return 'restored';
+    let result: InitResult;
+    try {
+      result = await _runInitialize();
+    } catch (err) {
+      console.warn('[auth] initialize crashed:', err);
+      result = 'refresh-failed';
+      isInitialized.value = true;
+    } finally {
+      resolveReady(result!);
+    }
+    return result;
+  }
 
+  async function _runInitialize(): Promise<InitResult> {
     const keys = getAuthKeys();
     const config = getClientConfig();
 
@@ -455,6 +480,7 @@ export const useAuthStore = defineStore('auth', () => {
     isPendingDeletion,
     deletionScheduledAt,
     initialize,
+    whenReady,
     register,
     loginEmail,
     loginGoogle,

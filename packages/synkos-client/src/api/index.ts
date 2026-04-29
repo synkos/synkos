@@ -1,5 +1,5 @@
 import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios';
-import { getAccessToken } from './token-provider.js';
+import { getAccessToken, awaitAuthReady } from './token-provider.js';
 
 let _api: AxiosInstance | null = null;
 
@@ -10,7 +10,12 @@ export function createApiClient(baseURL: string): AxiosInstance {
     headers: { 'Content-Type': 'application/json' },
   });
 
-  api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
+    // Wait for the auth store to finish rehydrating tokens from persistent
+    // storage before attaching the bearer token. Without this, requests fired
+    // from `onMounted` of a callback page (e.g. an OAuth redirect) race the
+    // hydration and go out anonymous, even though the user is authenticated.
+    await awaitAuthReady();
     const token = getAccessToken();
     if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
