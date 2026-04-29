@@ -1,5 +1,58 @@
 # @synkos/client
 
+## 0.4.0
+
+### Minor Changes
+
+- 47ba21d: Eliminate the rehydration race that breaks OAuth callbacks:
+  - `useAuthStore().whenReady()` returns a promise that resolves the first time
+    `initialize()` settles (success or recoverable failure).
+  - The API client awaits hydration before each request via the new
+    `awaitAuthReady` hook (registered automatically by the auth store), so a
+    request fired from `onMounted` of a callback page picks up the rehydrated
+    bearer token instead of going out anonymous and 401-ing. A 5-second hard
+    timeout prevents a stuck rehydration from blocking the API client.
+
+  User-owned callback pages no longer need their own `waitForAuth(...)` polling
+  loop — `getApiClient()` is now safe to call directly from `onMounted`.
+
+- 58c3ec6: Add `getPostAuthRoute` / `setPostAuthRoute` for post-login navigation.
+
+  Built-in fallback pages (`LoginPage`, `UsernamePickerPage`, `DeleteAccountPage`,
+  `ErrorNotFound`) and both router factories (`createSynkosRouter`,
+  `setupSynkosRouter`) now route through a single helper instead of hardcoding
+  `router.replace({ name: 'home' })`. The default target is the first user-declared
+  tab route (or `homeRouteName` in `setupSynkosRouter`), falling back to `'home'`.
+
+  This unblocks renaming the root route — apps no longer need to keep `name: 'home'`
+  on their landing route to avoid `No match for {"name":"home"}` after login.
+
+  User-owned auth pages can adopt the same helper:
+
+  ```ts
+  import { getPostAuthRoute } from '@synkos/client';
+  await router.replace(getPostAuthRoute());
+  ```
+
+  Use `setPostAuthRoute(...)` to override conditionally (e.g. a one-time onboarding
+  route on first login).
+
+### Patch Changes
+
+- 58c3ec6: `setupSynkosRouter` auth guard now respects explicit `meta.requiresAuth: true`.
+
+  Routes under `/auth/*` are still treated as public by default (back-compat), but a
+  route that explicitly declares `meta: { requiresAuth: true }` is now correctly
+  treated as protected even if its path lives under `/auth/*`. This unblocks OAuth
+  callback routes mounted under `/auth/<provider>/callback`, which previously got
+  silently rewritten to the home route by the guard before the callback page could run.
+
+  No change for apps that did not declare `meta.requiresAuth` — the path heuristic is
+  preserved as the fallback.
+
+- Updated dependencies [1cf8102]
+  - @synkos/ui@0.5.0
+
 ## 0.3.0
 
 ### Minor Changes
