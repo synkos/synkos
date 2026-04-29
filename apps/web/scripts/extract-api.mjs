@@ -66,7 +66,10 @@ const CATEGORIES = [
     title: 'Utilities',
     description: 'Helper functions and runtime accessors.',
     match: (name, kind) => {
-      if (kind === td.ReflectionKind.Function && ['getIcon', 'getClientConfig'].includes(name))
+      if (
+        kind === td.ReflectionKind.Function &&
+        ['getIcon', 'getClientConfig', 'registerIcons'].includes(name)
+      )
         return true;
       if (kind === td.ReflectionKind.Variable && ['icons', 'coreEnUS', 'coreEsES'].includes(name))
         return true;

@@ -41,6 +41,11 @@ function getClientConfig(): AppConfig
 
 <small>function</small>
 
+Resolve an icon's inner SVG by name. Unknown names fall back to a visible
+`help_outline` glyph so typos surface immediately on the page (instead of
+rendering an empty `<svg>`). In dev, missing names also log a one-shot
+warning with the exact registration call.
+
 ```ts
 function getIcon(name: string): string
 ```
@@ -53,4 +58,27 @@ function getIcon(name: string): string
 
 ```ts
 const icons: Record<string, string>
+```
+
+---
+
+## registerIcons
+
+<small>function</small>
+
+Extend the icon catalog at runtime. Pass an object of name → inner SVG
+(`<path d="..."/>`, `<g>...</g>`, …). Existing names are overwritten.
+
+```ts
+function registerIcons(extra: Record<string, string>): void
+```
+
+**Example**
+
+```ts
+```ts
+registerIcons({
+  sparkle: '<path d="M12 2l2 7h7l-5.5 4 2 7-5.5-4-5.5 4 2-7L4 9h7z"/>',
+})
+```
 ```

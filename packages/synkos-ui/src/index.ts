@@ -26,7 +26,7 @@ export { default as AppBottomSheet } from './components/overlays/AppBottomSheet.
 export { default as AppDrawer } from './components/overlays/AppDrawer.vue';
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
-export { getIcon, icons } from './icons/index.js';
+export { getIcon, icons, registerIcons } from './icons/index.js';
 
 // ── Composables ───────────────────────────────────────────────────────────────
 export { useSheetDrag } from './composables/useSheetDrag';
