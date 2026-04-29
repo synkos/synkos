@@ -6,74 +6,144 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./types": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/types/index.js",
-      "require": "./dist/types/index.cjs"
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/types/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.cts",
+        "default": "./dist/types/index.cjs"
+      }
     },
     "./config": {
-      "types": "./dist/config/index.d.ts",
-      "import": "./dist/config/index.js",
-      "require": "./dist/config/index.cjs"
+      "import": {
+        "types": "./dist/config/index.d.ts",
+        "default": "./dist/config/index.js"
+      },
+      "require": {
+        "types": "./dist/config/index.d.cts",
+        "default": "./dist/config/index.cjs"
+      }
     },
     "./utils": {
-      "types": "./dist/utils/index.d.ts",
-      "import": "./dist/utils/index.js",
-      "require": "./dist/utils/index.cjs"
+      "import": {
+        "types": "./dist/utils/index.d.ts",
+        "default": "./dist/utils/index.js"
+      },
+      "require": {
+        "types": "./dist/utils/index.d.cts",
+        "default": "./dist/utils/index.cjs"
+      }
     },
     "./middleware": {
-      "types": "./dist/middleware/index.d.ts",
-      "import": "./dist/middleware/index.js",
-      "require": "./dist/middleware/index.cjs"
+      "import": {
+        "types": "./dist/middleware/index.d.ts",
+        "default": "./dist/middleware/index.js"
+      },
+      "require": {
+        "types": "./dist/middleware/index.d.cts",
+        "default": "./dist/middleware/index.cjs"
+      }
     },
     "./events": {
-      "types": "./dist/events/index.d.ts",
-      "import": "./dist/events/index.js",
-      "require": "./dist/events/index.cjs"
+      "import": {
+        "types": "./dist/events/index.d.ts",
+        "default": "./dist/events/index.js"
+      },
+      "require": {
+        "types": "./dist/events/index.d.cts",
+        "default": "./dist/events/index.cjs"
+      }
     },
     "./adapters": {
-      "types": "./dist/adapters/index.d.ts",
-      "import": "./dist/adapters/index.js",
-      "require": "./dist/adapters/index.cjs"
+      "import": {
+        "types": "./dist/adapters/index.d.ts",
+        "default": "./dist/adapters/index.js"
+      },
+      "require": {
+        "types": "./dist/adapters/index.d.cts",
+        "default": "./dist/adapters/index.cjs"
+      }
     },
     "./ports": {
-      "types": "./dist/ports/index.d.ts",
-      "import": "./dist/ports/index.js",
-      "require": "./dist/ports/index.cjs"
+      "import": {
+        "types": "./dist/ports/index.d.ts",
+        "default": "./dist/ports/index.js"
+      },
+      "require": {
+        "types": "./dist/ports/index.d.cts",
+        "default": "./dist/ports/index.cjs"
+      }
     },
     "./modules/auth": {
-      "types": "./dist/modules/auth/index.d.ts",
-      "import": "./dist/modules/auth/index.js",
-      "require": "./dist/modules/auth/index.cjs"
+      "import": {
+        "types": "./dist/modules/auth/index.d.ts",
+        "default": "./dist/modules/auth/index.js"
+      },
+      "require": {
+        "types": "./dist/modules/auth/index.d.cts",
+        "default": "./dist/modules/auth/index.cjs"
+      }
     },
     "./modules/user": {
-      "types": "./dist/modules/user/index.d.ts",
-      "import": "./dist/modules/user/index.js",
-      "require": "./dist/modules/user/index.cjs"
+      "import": {
+        "types": "./dist/modules/user/index.d.ts",
+        "default": "./dist/modules/user/index.js"
+      },
+      "require": {
+        "types": "./dist/modules/user/index.d.cts",
+        "default": "./dist/modules/user/index.cjs"
+      }
     },
     "./modules/account": {
-      "types": "./dist/modules/account/index.d.ts",
-      "import": "./dist/modules/account/index.js",
-      "require": "./dist/modules/account/index.cjs"
+      "import": {
+        "types": "./dist/modules/account/index.d.ts",
+        "default": "./dist/modules/account/index.js"
+      },
+      "require": {
+        "types": "./dist/modules/account/index.d.cts",
+        "default": "./dist/modules/account/index.cjs"
+      }
     },
     "./modules/username": {
-      "types": "./dist/modules/username/index.d.ts",
-      "import": "./dist/modules/username/index.js",
-      "require": "./dist/modules/username/index.cjs"
+      "import": {
+        "types": "./dist/modules/username/index.d.ts",
+        "default": "./dist/modules/username/index.js"
+      },
+      "require": {
+        "types": "./dist/modules/username/index.d.cts",
+        "default": "./dist/modules/username/index.cjs"
+      }
     },
     "./modules/notifications": {
-      "types": "./dist/modules/notifications/index.d.ts",
-      "import": "./dist/modules/notifications/index.js",
-      "require": "./dist/modules/notifications/index.cjs"
+      "import": {
+        "types": "./dist/modules/notifications/index.d.ts",
+        "default": "./dist/modules/notifications/index.js"
+      },
+      "require": {
+        "types": "./dist/modules/notifications/index.d.cts",
+        "default": "./dist/modules/notifications/index.cjs"
+      }
     },
     "./context": {
-      "types": "./dist/context/index.d.ts",
-      "import": "./dist/context/index.js",
-      "require": "./dist/context/index.cjs"
+      "import": {
+        "types": "./dist/context/index.d.ts",
+        "default": "./dist/context/index.js"
+      },
+      "require": {
+        "types": "./dist/context/index.d.cts",
+        "default": "./dist/context/index.cjs"
+      }
     }
   },
   "main": "./dist/index.cjs",
