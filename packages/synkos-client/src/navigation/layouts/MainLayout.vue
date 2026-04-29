@@ -74,6 +74,31 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * Main app layout — iOS-style nav bar at the top, tab bar at the bottom, and
+ * a scrollable page area in between. Use it as the `component` of the parent
+ * route under `/`. Tabs are auto-discovered from `meta.tab` on child routes
+ * (see the [routing guide](/docs/guide/routing)).
+ *
+ * The layout provides the `synkos:set-nav-title` inject token so
+ * `AppPageLargeTitle` can crossfade collapsed titles into the nav bar.
+ *
+ * @example
+ * import { MainLayout, setupSynkosRouter } from '@synkos/client'
+ *
+ * createRouter({
+ *   routes: [
+ *     {
+ *       path: '/',
+ *       component: MainLayout,
+ *       children: [
+ *         { path: '', meta: { tab: { icon: 'home', labelKey: 'tabs.home' } }, component: HomePage },
+ *         ...
+ *       ],
+ *     },
+ *   ],
+ * })
+ */
 import { computed, isRef, provide, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';

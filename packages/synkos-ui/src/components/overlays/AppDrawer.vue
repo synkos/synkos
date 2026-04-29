@@ -20,10 +20,40 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * Side drawer that slides in from the right edge. Pair with `useDrawer()` for
+ * the easiest two-way binding. Renders teleported to `<body>` and dismisses
+ * on backdrop tap.
+ *
+ * @example
+ * <script setup lang="ts">
+ * import { AppDrawer, useDrawer } from '@synkos/ui'
+ * const menu = useDrawer()
+ * <\/script>
+ *
+ * <template>
+ *   <AppButton variant="ghost" @click="menu.open">Menu</AppButton>
+ *   <AppDrawer v-bind="menu.bindings">
+ *     <nav class="my-drawer"> ... </nav>
+ *   </AppDrawer>
+ * </template>
+ */
 import { ref } from 'vue';
 
-defineProps<{ modelValue: boolean }>();
-defineEmits<{ 'update:modelValue': [value: boolean] }>();
+defineProps<{
+  /** Drawer visibility. Use `v-model` or `useDrawer()`. */
+  modelValue: boolean;
+}>();
+
+defineEmits<{
+  /** Fired when the user dismisses the drawer (backdrop tap). */
+  'update:modelValue': [value: boolean];
+}>();
+
+defineSlots<{
+  /** Drawer panel content. */
+  default: () => unknown;
+}>();
 
 const backdropEl = ref<HTMLElement | null>(null);
 const currentTransition = ref('app-drawer-slide');

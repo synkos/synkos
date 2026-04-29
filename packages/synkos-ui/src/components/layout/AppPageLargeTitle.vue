@@ -9,11 +9,37 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * iOS-style large title that collapses into the nav bar as the page scrolls.
+ * Place it at the top of an `AppPage` inside `MainLayout` — the layout
+ * provides the inject token (`synkos:set-nav-title`) the component uses to
+ * crossfade the compact title into the chrome.
+ *
+ * Used outside a Synkos layout, it falls back gracefully (renders the title
+ * but doesn't drive the nav bar).
+ *
+ * @example
+ * <AppPage>
+ *   <AppPageLargeTitle title="Inbox" subtitle="3 new messages">
+ *     <template #right>
+ *       <AppButton variant="ghost" @click="compose">New</AppButton>
+ *     </template>
+ *   </AppPageLargeTitle>
+ *   <!-- list of messages -->
+ * </AppPage>
+ */
 import { inject, onMounted, onUnmounted, ref, watch } from 'vue';
 
 const props = defineProps<{
+  /** Title shown large at the top and crossfaded into the nav bar on scroll. */
   title: string;
+  /** Optional secondary line under the title. */
   subtitle?: string;
+}>();
+
+defineSlots<{
+  /** Trailing slot rendered next to the title (e.g. an action button). */
+  right: () => unknown;
 }>();
 
 // Injected by MainLayout — collapses the title into the nav bar on scroll.

@@ -1,3 +1,21 @@
+<script setup lang="ts">
+/**
+ * Card wrapper that groups consecutive `AuthFieldRow` instances and draws
+ * hairlines between them. The visual base of every form on `LoginPage`,
+ * `ChangePasswordPage`, and other auth screens.
+ *
+ * @example
+ * <AuthFieldGroup>
+ *   <AuthFieldRow v-model="email" type="email" placeholder="Email" />
+ *   <AuthFieldRow v-model="password" type="password" placeholder="Password" />
+ * </AuthFieldGroup>
+ */
+defineSlots<{
+  /** Field rows. Typically `AuthFieldRow` instances. */
+  default: () => unknown;
+}>();
+</script>
+
 <template>
   <div class="auth-field-group">
     <slot />

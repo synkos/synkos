@@ -33,6 +33,19 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * Circular progress indicator. Two modes:
+ *
+ * - **Determinate** — pass `value` (0-100). The arc grows as work progresses.
+ * - **Indeterminate** — set `indeterminate` to true. The arc spins continuously.
+ *
+ * @example
+ * <!-- Determinate progress for an upload -->
+ * <AppCircularProgress :value="uploadPct" size="32px" />
+ *
+ * <!-- Indeterminate while waiting for a server response -->
+ * <AppCircularProgress indeterminate color="primary" track-color="rgba(255,255,255,0.1)" />
+ */
 import { computed } from 'vue';
 
 const COLOR_MAP: Record<string, string> = {
@@ -44,10 +57,15 @@ const COLOR_MAP: Record<string, string> = {
 
 const props = withDefaults(
   defineProps<{
+    /** CSS size (e.g. `"24px"`, `"2rem"`). */
     size?: string;
+    /** Indicator color. Framework name or any CSS color. */
     color?: string;
+    /** Track (background ring) color. `"transparent"` hides the track. */
     trackColor?: string;
+    /** Progress value 0-100. Ignored when `indeterminate` is true. */
     value?: number;
+    /** Spin continuously instead of using `value`. */
     indeterminate?: boolean;
   }>(),
   {

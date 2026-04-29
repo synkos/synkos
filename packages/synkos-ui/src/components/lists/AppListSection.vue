@@ -8,8 +8,25 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * Wraps a group of `AppListRow` (or any content) inside a card with rounded
+ * corners and an optional uppercase section header above it. The standard way
+ * to lay out settings pages.
+ *
+ * @example
+ * <AppListSection title="Notifications">
+ *   <AppListRow icon="bell" label="Push" @click="..." />
+ *   <AppListRow icon="mail" label="Email" @click="..." />
+ * </AppListSection>
+ */
 defineProps<{
+  /** Uppercase header rendered above the card. Optional. */
   title?: string;
+}>();
+
+defineSlots<{
+  /** Section content — typically `AppListRow` instances. */
+  default: () => unknown;
 }>();
 </script>
 

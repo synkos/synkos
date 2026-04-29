@@ -45,17 +45,39 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * Pre-built bottom sheet that renders the framework's terms or privacy text
+ * (configured via `defineAppConfig({ links: { terms, privacy } })`). Includes
+ * drag-to-dismiss and an iOS-style close button. Use it from auth pages to
+ * surface the legal documents without authoring a sheet.
+ *
+ * @example
+ * <script setup lang="ts">
+ * import { ref } from 'vue'
+ * import { LegalBottomSheet } from '@synkos/client'
+ *
+ * const showTerms = ref(false)
+ * <\/script>
+ *
+ * <template>
+ *   <button @click="showTerms = true">Read terms</button>
+ *   <LegalBottomSheet v-model:show="showTerms" type="terms" />
+ * </template>
+ */
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { getLegalContent } from '../../legal/legalContent.js';
 import { AppBottomSheet } from '@synkos/ui';
 
 const props = defineProps<{
+  /** Sheet visibility. Use `v-model:show`. */
   show: boolean;
+  /** Which document to render. */
   type: 'terms' | 'privacy';
 }>();
 
 const emit = defineEmits<{
+  /** Emitted when the user dismisses the sheet (drag, Escape, close button). */
   'update:show': [value: boolean];
 }>();
 

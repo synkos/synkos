@@ -31,19 +31,43 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * A single row inside a list section. Renders as a `<button>` (interactive) or
+ * a `<div>` when a static `value` is provided (read-only display row).
+ *
+ * Use it for settings entries, navigation items, and key/value displays.
+ *
+ * @example
+ * <AppListSection title="Account">
+ *   <AppListRow icon="person" label="Profile" @click="open('profile')" />
+ *   <AppListRow icon="lock" label="Password" @click="open('password')" />
+ *   <AppListRow icon="trash" label="Delete account" danger @click="confirmDelete" />
+ * </AppListSection>
+ */
+
 import AppIcon from '../media/AppIcon.vue';
 
 withDefaults(
   defineProps<{
+    /** Icon name from the synkos-ui icon registry. Omit for text-only rows. */
     icon?: string;
+    /** Foreground color for the icon (CSS color). */
     iconColor?: string;
+    /** Background color of the icon tile. */
     iconBg?: string;
+    /** Primary label of the row. Required. */
     label: string;
+    /** Secondary hint shown under the label. */
     hint?: string;
+    /** Dim the row and block interaction. */
     disabled?: boolean;
+    /** Render label in the destructive color (delete actions). */
     danger?: boolean;
+    /** Show a "coming soon" badge instead of the chevron. */
     comingSoon?: boolean;
+    /** Override the badge label when `comingSoon` is true. */
     comingSoonLabel?: string;
+    /** Read-only value (e.g. "Premium", "v1.2.3"). When set the row is non-interactive. */
     value?: string;
   }>(),
   {
@@ -51,7 +75,10 @@ withDefaults(
   }
 );
 
-defineEmits<{ click: [] }>();
+defineEmits<{
+  /** Fired when the row is tapped. Not emitted on disabled or value rows. */
+  click: [];
+}>();
 </script>
 
 <style lang="scss" scoped>

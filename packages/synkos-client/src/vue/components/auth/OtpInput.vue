@@ -23,20 +23,53 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * 6-digit (configurable) OTP input. Auto-advances on type, supports paste of
+ * the whole code, accepts only digits, and emits `complete` when every cell
+ * is filled. Toggle the `shake` prop to play an error animation.
+ *
+ * The `modelValue` is an array of single-digit strings — one per cell —
+ * for easy two-way binding with reactive cells.
+ *
+ * @example
+ * <script setup lang="ts">
+ * import { ref } from 'vue'
+ * import { OtpInput } from '@synkos/client'
+ *
+ * const code = ref<string[]>(Array(6).fill(''))
+ * const error = ref(false)
+ * const shake = ref(false)
+ *
+ * function onComplete() {
+ *   // submit code.value.join('')
+ * }
+ * <\/script>
+ *
+ * <template>
+ *   <OtpInput v-model="code" :error="error" :shake="shake" @complete="onComplete" />
+ * </template>
+ */
 import { nextTick } from 'vue';
 
 interface Props {
+  /** Array of digit strings. Length matches `length`. */
   modelValue: string[];
+  /** Number of digit cells. Defaults to 6. */
   length?: number;
+  /** Apply the error styling (red border, error background). */
   error?: boolean;
+  /** Trigger the shake animation once. Set back to false in `shakeEnd`. */
   shake?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), { length: 6 });
 
 const emit = defineEmits<{
+  /** Fired on every change. The new array is passed. */
   'update:modelValue': [value: string[]];
+  /** Fired when the user has filled every cell. */
   complete: [];
+  /** Fired when the shake animation ends (use to reset the `shake` prop). */
   shakeEnd: [];
 }>();
 

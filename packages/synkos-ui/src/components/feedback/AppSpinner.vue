@@ -8,6 +8,16 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * Indeterminate loading spinner. Use it inline (next to text) or as a
+ * page-level loader. Colors map to the framework palette: pass a semantic name
+ * (`primary`, `negative`, `white`...) or any CSS color.
+ *
+ * @example
+ * <AppSpinner /> <!-- 24px white spinner -->
+ * <AppSpinner size="32px" color="primary" />
+ * <AppSpinner color="#ff0099" />
+ */
 import { computed } from 'vue';
 
 const COLOR_MAP: Record<string, string> = {
@@ -23,7 +33,9 @@ const COLOR_MAP: Record<string, string> = {
 
 const props = withDefaults(
   defineProps<{
+    /** CSS size of the spinner (e.g. `"24px"`, `"2rem"`). */
     size?: string;
+    /** Spinner color: a framework name (`primary`, `negative`, `white`, ...) or any CSS color. */
     color?: string;
   }>(),
   {

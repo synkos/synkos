@@ -13,17 +13,39 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * Centered placeholder shown when a list, page or feed has nothing to display.
+ * Optionally takes a single primary action that the user can tap to recover
+ * (refresh, create the first item, change a filter).
+ *
+ * @example
+ * <AppEmptyState
+ *   icon="inbox"
+ *   title="Inbox is empty"
+ *   subtitle="You're all caught up. New messages will appear here."
+ *   :action="{ label: 'Refresh', icon: 'refresh', onClick: refetch }"
+ * />
+ */
 import AppIcon from '../media/AppIcon.vue';
+
+/** Primary action shown as a CTA below the title. */
 interface EmptyAction {
+  /** Button label. */
   label: string;
+  /** Optional leading icon (from the synkos-ui icon registry). */
   icon?: string;
+  /** Called when the CTA is pressed. */
   onClick: () => void;
 }
 
 defineProps<{
+  /** Icon name shown in the rounded square above the title. */
   icon: string;
+  /** Bold headline communicating the empty state. */
   title: string;
+  /** Optional helper text under the title (line breaks preserved). */
   subtitle?: string;
+  /** Optional primary action. Renders a CTA below the subtitle. */
   action?: EmptyAction;
 }>();
 </script>

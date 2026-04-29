@@ -12,13 +12,36 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * Visual feedback for password strength — a colored bar plus a textual label.
+ * Drive it from the `usePasswordStrength()` composable, which evaluates the
+ * password and exposes both the level and the percentage you pass in here.
+ *
+ * @example
+ * <script setup lang="ts">
+ * import { ref } from 'vue'
+ * import { PasswordStrengthBar, usePasswordStrength } from '@synkos/client'
+ *
+ * const password = ref('')
+ * const strength = usePasswordStrength(password)
+ * <\/script>
+ *
+ * <template>
+ *   <input v-model="password" type="password" />
+ *   <PasswordStrengthBar :level="strength.level" :pct="strength.pct" />
+ * </template>
+ */
 import { computed } from 'vue';
 
+/** Strength buckets returned by `usePasswordStrength`. */
 type StrengthLevel = 'weak' | 'fair' | 'good' | 'strong';
 
 interface Props {
+  /** Strength level, or `null` while no password has been entered. */
   level: StrengthLevel | null;
+  /** Width of the colored bar as a percentage (0-100). */
   pct: number;
+  /** Override the default labels per level (i18n). */
   labels?: Record<StrengthLevel, string>;
 }
 
@@ -27,6 +50,11 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const label = computed(() => (props.level ? props.labels[props.level] : ''));
+
+defineSlots<{
+  /** Override the label rendering. Receives `{ level, pct }`. */
+  default: (props: { level: StrengthLevel; pct: number }) => unknown;
+}>();
 </script>
 
 <style lang="scss" scoped>

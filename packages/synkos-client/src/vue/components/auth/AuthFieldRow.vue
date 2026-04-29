@@ -23,24 +23,56 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * A single input row for the auth screens. Designed to be placed inside
+ * `AuthFieldGroup`. When `type="password"` it renders a built-in eye toggle
+ * for visibility. Forwards unknown attributes (autocomplete, inputmode,
+ * placeholder...) to the underlying `<input>`.
+ *
+ * @example
+ * <AuthFieldGroup>
+ *   <AuthFieldRow
+ *     v-model="email"
+ *     type="email"
+ *     autocomplete="email"
+ *     placeholder="Email"
+ *     :error="!!errors.email"
+ *   />
+ *   <AuthFieldRow v-model="password" type="password" placeholder="Password" />
+ * </AuthFieldGroup>
+ */
 import { ref, computed, useAttrs } from 'vue';
 import { AppIcon } from '@synkos/ui';
 
 defineOptions({ inheritAttrs: false });
 
 interface Props {
+  /** Bound value. Use `v-model`. */
   modelValue?: string;
+  /** HTML `type` attribute. `password` enables the visibility toggle. */
   type?: string;
+  /** Apply error styling to the row. */
   error?: boolean;
+  /** Force the password to be visible (overrides the internal toggle). */
   showPassword?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), { type: 'text' });
 
 const emit = defineEmits<{
+  /** Emitted on input. */
   'update:modelValue': [value: string];
+  /** Emitted when the user toggles password visibility. */
   'update:showPassword': [value: boolean];
+  /** Re-emitted native `input` event. */
   input: [event: Event];
+}>();
+
+defineSlots<{
+  /** Slot rendered before the `<input>` (icon, country flag, currency, ...). */
+  prefix: () => unknown;
+  /** Slot rendered after the `<input>` (clear button, status icon, ...). */
+  suffix: () => unknown;
 }>();
 
 const attrs = useAttrs();

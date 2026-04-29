@@ -13,12 +13,29 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * iOS-style segmented selector. Use it when there are 2-4 mutually exclusive
+ * options that fit on a single line. Bind via `v-model`.
+ *
+ * @example
+ * <SegmentControl
+ *   v-model="filter"
+ *   :options="[
+ *     { value: 'all', label: 'All' },
+ *     { value: 'unread', label: 'Unread' },
+ *     { value: 'flagged', label: 'Flagged' },
+ *   ]"
+ * />
+ */
 defineProps<{
+  /** Available options. Each item has a value and a display label. */
   options: { value: string; label: string }[];
+  /** Currently selected value. Use `v-model` to bind. */
   modelValue: string;
 }>();
 
 defineEmits<{
+  /** Emitted when the user selects a different option. */
   'update:modelValue': [value: string];
 }>();
 </script>

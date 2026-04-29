@@ -6,10 +6,22 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * Primary button component for user actions. Adapts its size, weight and radius
+ * to the active platform tokens and supports an inline loading state that
+ * disables interaction while async work is in flight.
+ *
+ * @example
+ * <AppButton variant="primary" :loading="saving" @click="save">Save</AppButton>
+ */
+
 withDefaults(
   defineProps<{
+    /** Visual variant. `primary` is the dominant action, `ghost` is a low-emphasis alternative, `link` is text-only. */
     variant?: 'primary' | 'ghost' | 'link';
+    /** When true, replaces the slot with a spinner and disables the button. */
     loading?: boolean;
+    /** When true, dims the button and blocks interaction. */
     disabled?: boolean;
   }>(),
   {

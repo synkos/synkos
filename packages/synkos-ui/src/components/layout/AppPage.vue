@@ -5,7 +5,24 @@
 </template>
 
 <script setup lang="ts">
-// Fills its container and applies the themed page background.
+/**
+ * Page wrapper that fills its container with the active theme's background.
+ * Use it as the root of your page components so they pick up the surface
+ * color and full-height layout consistently.
+ *
+ * @example
+ * <template>
+ *   <AppPage>
+ *     <AppPageLargeTitle title="Inbox" />
+ *     <!-- page content -->
+ *   </AppPage>
+ * </template>
+ */
+
+defineSlots<{
+  /** Page content. */
+  default: () => unknown;
+}>();
 </script>
 
 <style lang="scss" scoped>

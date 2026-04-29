@@ -9,6 +9,25 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * Root component of a Synkos app. Wraps the route view with the
+ * platform-aware page transitions (slide for tabs, fade for fullscreen flows,
+ * vertical push for entering/leaving the auth stack), drives the splash
+ * overlay on native, and applies the active theme via `useTheme()`.
+ *
+ * Use it as the root of your `app.vue` (or equivalent). Optionally pass a
+ * logo source for the splash overlay shown during native app boot.
+ *
+ * @example
+ * <script setup lang="ts">
+ * import { SynkosApp } from '@synkos/client'
+ * import logo from '~/assets/logo.svg'
+ * <\/script>
+ *
+ * <template>
+ *   <SynkosApp :logo-src="logo" />
+ * </template>
+ */
 import { ref, watch, watchEffect } from 'vue';
 import { useRoute } from 'vue-router';
 import { Capacitor } from '@capacitor/core';

@@ -23,15 +23,43 @@
 </template>
 
 <script setup lang="ts">
+/**
+ * Modal sheet that slides up from the bottom edge. Pair with `useBottomSheet()`
+ * for the easiest two-way binding. The component itself is unstyled — pass a
+ * card surface inside the slot for the visible body.
+ *
+ * @example
+ * <script setup lang="ts">
+ * import { AppBottomSheet, useBottomSheet } from '@synkos/ui'
+ * const sheet = useBottomSheet()
+ * <\/script>
+ *
+ * <template>
+ *   <AppButton @click="sheet.open">Open sheet</AppButton>
+ *   <AppBottomSheet v-bind="sheet.bindings">
+ *     <div class="my-sheet"> ... </div>
+ *   </AppBottomSheet>
+ * </template>
+ */
 withDefaults(
   defineProps<{
+    /** Visibility of the sheet. Use with `v-model` or via `useBottomSheet()`. */
     modelValue: boolean;
+    /** Hide the dimmed backdrop and pass pointer events to underlying UI. */
     seamless?: boolean;
   }>(),
   { seamless: false }
 );
 
-defineEmits<{ 'update:modelValue': [value: boolean] }>();
+defineEmits<{
+  /** Fired when the user dismisses the sheet (backdrop tap, Escape key). */
+  'update:modelValue': [value: boolean];
+}>();
+
+defineSlots<{
+  /** Sheet body. Render your card surface and content here. */
+  default: () => unknown;
+}>();
 </script>
 
 <style lang="scss" scoped>
