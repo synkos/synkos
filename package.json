@@ -13,6 +13,8 @@
     "dev": "pnpm -r --parallel --filter './packages/*' dev",
     "dev:backend": "pnpm --filter backend dev",
     "dev:frontend": "pnpm --filter frontend dev",
+    "dev:web": "pnpm --filter web dev",
+    "build:web": "pnpm --filter web build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
@@ -21,6 +23,7 @@
     "test": "pnpm -r --filter './packages/*' test",
     "clean": "pnpm -r --filter './packages/*' clean",
     "sync:templates": "node scripts/sync-templates.mjs",
+    "sync:docs": "pnpm --filter web sync:docs",
     "changeset": "changeset",
     "version-packages": "changeset version && pnpm sync:templates",
     "release": "pnpm build && changeset publish"
@@ -31,7 +34,8 @@
       "msgpackr-extract",
       "mongodb-memory-server",
       "sharp",
-      "@parcel/watcher"
+      "@parcel/watcher",
+      "better-sqlite3"
     ]
   },
   "devDependencies": {

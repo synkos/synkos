@@ -1,0 +1,84 @@
+// ============================================================
+// Synkos web — runtime theme tokens (CSS custom properties)
+// Switch via <html data-theme="dark | light">.
+// Dark is the default.
+// ============================================================
+
+:root,
+[data-theme='dark'] {
+  // Brand
+  --color-primary: #7c3aed;
+  --color-primary-hover: #8b5cf6;
+  --color-primary-active: #6d28d9;
+  --color-primary-soft: rgba(124, 58, 237, 0.14);
+
+  --color-accent: #22d3ee;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+
+  // Surfaces
+  --bg-canvas: #0a0a0b;
+  --bg-elevated: #111114;
+  --bg-overlay: rgba(20, 20, 24, 0.85);
+  --bg-code: #131318;
+  --bg-inline-code: rgba(255, 255, 255, 0.08);
+
+  // Text
+  --text-primary: #f4f4f5;
+  --text-secondary: #a1a1aa;
+  --text-tertiary: #71717a;
+  --text-on-primary: #ffffff;
+
+  // Borders
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.18);
+
+  // Effects
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
+  --shadow-glow: 0 0 60px rgba(124, 58, 237, 0.35);
+
+  // Gradients
+  --gradient-hero:
+    radial-gradient(circle at 20% -10%, rgba(124, 58, 237, 0.35), transparent 50%),
+    radial-gradient(circle at 80% 10%, rgba(34, 211, 238, 0.25), transparent 50%);
+}
+
+[data-theme='light'] {
+  --color-primary: #6d28d9;
+  --color-primary-hover: #7c3aed;
+  --color-primary-active: #5b21b6;
+  --color-primary-soft: rgba(109, 40, 217, 0.1);
+
+  --color-accent: #0891b2;
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+  --color-danger: #dc2626;
+
+  --bg-canvas: #ffffff;
+  --bg-elevated: #fafafa;
+  --bg-overlay: rgba(255, 255, 255, 0.9);
+  --bg-code: #f4f4f5;
+  --bg-inline-code: rgba(0, 0, 0, 0.05);
+
+  --text-primary: #0a0a0b;
+  --text-secondary: #52525b;
+  --text-tertiary: #a1a1aa;
+  --text-on-primary: #ffffff;
+
+  --border-subtle: rgba(0, 0, 0, 0.05);
+  --border-default: rgba(0, 0, 0, 0.1);
+  --border-strong: rgba(0, 0, 0, 0.18);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12);
+  --shadow-glow: 0 0 60px rgba(109, 40, 217, 0.2);
+
+  --gradient-hero:
+    radial-gradient(circle at 20% -10%, rgba(109, 40, 217, 0.18), transparent 50%),
+    radial-gradient(circle at 80% 10%, rgba(8, 145, 178, 0.12), transparent 50%);
+}

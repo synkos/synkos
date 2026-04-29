@@ -1,0 +1,43 @@
+{
+  "name": "web",
+  "version": "0.0.1",
+  "description": "Synkos website — landing, documentation and blog",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "start": "node .output/server/index.mjs",
+    "generate": "nuxt generate",
+    "postinstall": "nuxt prepare",
+    "typecheck": "nuxt typecheck",
+    "lint": "eslint . --ext .ts,.vue",
+    "format": "prettier --write \"**/*.{ts,vue,md,json,scss}\"",
+    "sync:docs": "node scripts/sync-docs.mjs",
+    "prebuild": "node scripts/sync-docs.mjs"
+  },
+  "dependencies": {
+    "@nuxt/content": "^3.0.0",
+    "@nuxtjs/i18n": "^9.0.0",
+    "@synkos/client": "workspace:*",
+    "@synkos/ui": "workspace:*",
+    "better-sqlite3": "^12.5.0",
+    "nuxt": "^3.16.0",
+    "vue": "^3.5.22",
+    "vue-router": "^4.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.11",
+    "sass": "^1.83.0",
+    "tinyglobby": "^0.2.10",
+    "typedoc": "^0.28.0",
+    "typescript": "^5.9.3",
+    "vue-docgen-api": "^4.79.0",
+    "vue-tsc": "^3.2.6"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=10.0.0"
+  }
+}

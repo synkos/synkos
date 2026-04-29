@@ -1,0 +1,115 @@
+{
+  "common": {
+    "brand": "Synkos",
+    "toggleTheme": "Toggle theme",
+    "changeLanguage": "Change language"
+  },
+  "nav": {
+    "primary": "Primary",
+    "docs": "Docs",
+    "guide": "Guide",
+    "components": "Components",
+    "api": "API",
+    "blog": "Blog",
+    "gettingStarted": "Getting started"
+  },
+  "footer": {
+    "tagline": "The fullstack mobile framework. Build once, deploy everywhere.",
+    "docs": "Docs",
+    "community": "Community",
+    "resources": "Resources",
+    "rights": "All rights reserved."
+  },
+  "landing": {
+    "hero": {
+      "tag": "v0.1 — early access",
+      "titleA": "Ship fullstack mobile apps,",
+      "titleB": "in days not months.",
+      "subtitle": "Synkos is a Vue + Capacitor + Node framework with auth, theming, i18n, native gestures and a polished UI library — all wired up. Just write your features.",
+      "cta": "Get started"
+    },
+    "features": {
+      "title": "Everything you need, nothing you don't",
+      "subtitle": "An opinionated framework that gets out of your way.",
+      "mobile": {
+        "title": "Mobile-first, web-ready",
+        "desc": "iOS, Android and PWA from a single Vue 3 codebase. Native feel, web ergonomics."
+      },
+      "auth": {
+        "title": "Auth, batteries included",
+        "desc": "Email + OTP, social login, biometric unlock, account management. All wired up, all editable."
+      },
+      "theme": {
+        "title": "Themable down to the bone",
+        "desc": "CSS custom properties, SCSS tokens, platform-aware tokens. Dark and light, your brand."
+      },
+      "i18n": {
+        "title": "i18n by default",
+        "desc": "vue-i18n with auto-merge of framework strings. Reach every market from day one."
+      },
+      "native": {
+        "title": "Native, when you need it",
+        "desc": "Capacitor plugins curated and pre-configured. Push, biometric, camera, splash, haptics."
+      },
+      "dx": {
+        "title": "DX you'll love",
+        "desc": "Live reload, typed router, headless stores, and a CLI that actually helps."
+      }
+    },
+    "code": {
+      "title": "Configure once, build forever",
+      "subtitle": "An app config file, a router, and your pages. That's the contract."
+    },
+    "cta": {
+      "title": "Ready to build?",
+      "subtitle": "One command. Your project, scaffolded with everything wired up.",
+      "start": "Read the docs",
+      "read": "Explore the guide"
+    }
+  },
+  "docs": {
+    "editOnGitHub": "Edit on GitHub",
+    "notFound": "This page is missing or has been moved.",
+    "englishOnly": "Note: this section is only available in English. The conceptual guides are translated.",
+    "copyCode": "Copy code",
+    "nav": {
+      "label": "Documentation",
+      "intro": "Introduction",
+      "gettingStarted": "Getting started",
+      "philosophy": "Philosophy",
+      "guide": "Guide",
+      "routing": "Routing",
+      "auth": "Authentication",
+      "theming": "Theming",
+      "i18n": "i18n",
+      "capacitor": "Capacitor",
+      "deployment": "Deployment",
+      "components": "Components",
+      "componentsOverview": "Overview",
+      "api": "API",
+      "apiOverview": "Overview",
+      "composables": "Composables",
+      "stores": "Stores",
+      "services": "Services",
+      "router": "Router",
+      "boot": "Boot factories",
+      "types": "Types"
+    },
+    "toc": {
+      "label": "On this page"
+    }
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Releases, deep-dives and updates from the Synkos team.",
+    "empty": "No posts yet. Stay tuned.",
+    "back": "Back to blog",
+    "notFound": "Post not found."
+  },
+  "error": {
+    "notFoundTitle": "Page not found",
+    "notFoundMessage": "The page you're looking for doesn't exist or has been moved.",
+    "genericTitle": "Something went wrong",
+    "goHome": "Go home"
+  }
+}

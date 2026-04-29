@@ -1,0 +1,115 @@
+{
+  "common": {
+    "brand": "Synkos",
+    "toggleTheme": "Cambiar tema",
+    "changeLanguage": "Cambiar idioma"
+  },
+  "nav": {
+    "primary": "Principal",
+    "docs": "Docs",
+    "guide": "Guía",
+    "components": "Componentes",
+    "api": "API",
+    "blog": "Blog",
+    "gettingStarted": "Empezar"
+  },
+  "footer": {
+    "tagline": "El framework fullstack para apps móviles. Escríbelo una vez, despliégalo en todas partes.",
+    "docs": "Docs",
+    "community": "Comunidad",
+    "resources": "Recursos",
+    "rights": "Todos los derechos reservados."
+  },
+  "landing": {
+    "hero": {
+      "tag": "v0.1 — acceso anticipado",
+      "titleA": "Lanza apps fullstack",
+      "titleB": "en días, no meses.",
+      "subtitle": "Synkos es un framework Vue + Capacitor + Node con auth, theming, i18n, gestos nativos y una librería de componentes pulida — todo conectado. Tú solo escribes tus features.",
+      "cta": "Empezar"
+    },
+    "features": {
+      "title": "Todo lo que necesitas, nada que sobre",
+      "subtitle": "Un framework con criterio que no te pone obstáculos.",
+      "mobile": {
+        "title": "Mobile-first, listo para web",
+        "desc": "iOS, Android y PWA desde un único código Vue 3. Sensación nativa, ergonomía web."
+      },
+      "auth": {
+        "title": "Auth, incluida",
+        "desc": "Email + OTP, login social, biometría, gestión de cuenta. Todo cableado, todo editable."
+      },
+      "theme": {
+        "title": "Tematizable hasta el hueso",
+        "desc": "CSS custom properties, tokens SCSS, tokens conscientes de plataforma. Claro y oscuro, con tu marca."
+      },
+      "i18n": {
+        "title": "i18n por defecto",
+        "desc": "vue-i18n con merge automático de strings del framework. Llega a todos los mercados desde el día uno."
+      },
+      "native": {
+        "title": "Nativo, cuando lo necesitas",
+        "desc": "Plugins de Capacitor seleccionados y preconfigurados. Push, biometría, cámara, splash, haptics."
+      },
+      "dx": {
+        "title": "DX que te va a encantar",
+        "desc": "Live reload, router tipado, stores headless y un CLI que ayuda de verdad."
+      }
+    },
+    "code": {
+      "title": "Configúralo una vez, constrúyelo siempre",
+      "subtitle": "Un archivo de configuración, un router y tus páginas. Ese es el contrato."
+    },
+    "cta": {
+      "title": "¿Listo para construir?",
+      "subtitle": "Un solo comando. Tu proyecto, montado con todo conectado.",
+      "start": "Lee la documentación",
+      "read": "Explora la guía"
+    }
+  },
+  "docs": {
+    "editOnGitHub": "Editar en GitHub",
+    "notFound": "Esta página no existe o ha sido movida.",
+    "englishOnly": "Nota: esta sección solo está disponible en inglés. Las guías conceptuales sí están traducidas.",
+    "copyCode": "Copiar código",
+    "nav": {
+      "label": "Documentación",
+      "intro": "Introducción",
+      "gettingStarted": "Empezar",
+      "philosophy": "Filosofía",
+      "guide": "Guía",
+      "routing": "Routing",
+      "auth": "Autenticación",
+      "theming": "Theming",
+      "i18n": "i18n",
+      "capacitor": "Capacitor",
+      "deployment": "Despliegue",
+      "components": "Componentes",
+      "componentsOverview": "Resumen",
+      "api": "API",
+      "apiOverview": "Resumen",
+      "composables": "Composables",
+      "stores": "Stores",
+      "services": "Services",
+      "router": "Router",
+      "boot": "Boot factories",
+      "types": "Types"
+    },
+    "toc": {
+      "label": "En esta página"
+    }
+  },
+  "blog": {
+    "title": "Blog",
+    "subtitle": "Releases, análisis profundos y novedades del equipo de Synkos.",
+    "empty": "Aún no hay publicaciones. Atento.",
+    "back": "Volver al blog",
+    "notFound": "Publicación no encontrada."
+  },
+  "error": {
+    "notFoundTitle": "Página no encontrada",
+    "notFoundMessage": "La página que buscas no existe o ha sido movida.",
+    "genericTitle": "Algo ha ido mal",
+    "goHome": "Volver al inicio"
+  }
+}

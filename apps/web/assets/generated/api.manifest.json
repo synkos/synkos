@@ -1,0 +1,44 @@
+[
+  {
+    "slug": "composables",
+    "title": "Composables",
+    "description": "Reactive primitives that drop into any component setup.",
+    "count": 11
+  },
+  {
+    "slug": "stores",
+    "title": "Stores",
+    "description": "Pinia stores managing cross-cutting state.",
+    "count": 2
+  },
+  {
+    "slug": "services",
+    "title": "Services",
+    "description": "Stateless service objects for HTTP and platform integrations.",
+    "count": 7
+  },
+  {
+    "slug": "router",
+    "title": "Router",
+    "description": "Factories and helpers for the Synkos navigation layer.",
+    "count": 3
+  },
+  {
+    "slug": "boot",
+    "title": "Boot factories",
+    "description": "Factories used in your `boot/synkos.ts` to register the framework with Vue.",
+    "count": 5
+  },
+  {
+    "slug": "utilities",
+    "title": "Utilities",
+    "description": "Helper functions and runtime accessors.",
+    "count": 5
+  },
+  {
+    "slug": "types",
+    "title": "Types",
+    "description": "Public TypeScript type aliases and interfaces.",
+    "count": 32
+  }
+]

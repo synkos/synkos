@@ -1,0 +1,156 @@
+[
+  {
+    "name": "AppBottomSheet",
+    "slug": "app-bottom-sheet",
+    "sourcePackage": "@synkos/ui",
+    "category": "Overlays",
+    "shortDescription": "Modal sheet that slides up from the bottom edge. Pair with `useBottomSheet()`"
+  },
+  {
+    "name": "AppButton",
+    "slug": "app-button",
+    "sourcePackage": "@synkos/ui",
+    "category": "Actions",
+    "shortDescription": "Primary button component for user actions. Adapts its size, weight and radius"
+  },
+  {
+    "name": "AppCircularProgress",
+    "slug": "app-circular-progress",
+    "sourcePackage": "@synkos/ui",
+    "category": "Feedback",
+    "shortDescription": "Circular progress indicator. Two modes:"
+  },
+  {
+    "name": "AppDrawer",
+    "slug": "app-drawer",
+    "sourcePackage": "@synkos/ui",
+    "category": "Overlays",
+    "shortDescription": "Side drawer that slides in from the right edge. Pair with `useDrawer()` for"
+  },
+  {
+    "name": "AppEmptyState",
+    "slug": "app-empty-state",
+    "sourcePackage": "@synkos/ui",
+    "category": "Feedback",
+    "shortDescription": "Centered placeholder shown when a list, page or feed has nothing to display."
+  },
+  {
+    "name": "AppIcon",
+    "slug": "app-icon",
+    "sourcePackage": "@synkos/ui",
+    "category": "Media",
+    "shortDescription": "Renders an icon from the synkos-ui icon registry as inline SVG. Color is"
+  },
+  {
+    "name": "AppListDivider",
+    "slug": "app-list-divider",
+    "sourcePackage": "@synkos/ui",
+    "category": "Lists",
+    "shortDescription": "A hairline separator drawn between list rows. Defaults to indenting past the"
+  },
+  {
+    "name": "AppListRow",
+    "slug": "app-list-row",
+    "sourcePackage": "@synkos/ui",
+    "category": "Lists",
+    "shortDescription": "A single row inside a list section. Renders as a `<button>` (interactive) or"
+  },
+  {
+    "name": "AppListSection",
+    "slug": "app-list-section",
+    "sourcePackage": "@synkos/ui",
+    "category": "Lists",
+    "shortDescription": "Wraps a group of `AppListRow` (or any content) inside a card with rounded"
+  },
+  {
+    "name": "AppPage",
+    "slug": "app-page",
+    "sourcePackage": "@synkos/ui",
+    "category": "Layout",
+    "shortDescription": "Page wrapper that fills its container with the active theme's background."
+  },
+  {
+    "name": "AppPageLargeTitle",
+    "slug": "app-page-large-title",
+    "sourcePackage": "@synkos/ui",
+    "category": "Layout",
+    "shortDescription": "iOS-style large title that collapses into the nav bar as the page scrolls."
+  },
+  {
+    "name": "AppSpinner",
+    "slug": "app-spinner",
+    "sourcePackage": "@synkos/ui",
+    "category": "Feedback",
+    "shortDescription": "Indeterminate loading spinner. Use it inline (next to text) or as a"
+  },
+  {
+    "name": "AuthFeedback",
+    "slug": "auth-feedback",
+    "sourcePackage": "@synkos/client",
+    "category": "Auth",
+    "shortDescription": "Feedback strip used in auth forms — renders one of four states based on"
+  },
+  {
+    "name": "AuthFieldGroup",
+    "slug": "auth-field-group",
+    "sourcePackage": "@synkos/client",
+    "category": "Auth",
+    "shortDescription": "Card wrapper that groups consecutive `AuthFieldRow` instances and draws"
+  },
+  {
+    "name": "AuthFieldRow",
+    "slug": "auth-field-row",
+    "sourcePackage": "@synkos/client",
+    "category": "Auth",
+    "shortDescription": "A single input row for the auth screens. Designed to be placed inside"
+  },
+  {
+    "name": "AuthLayout",
+    "slug": "auth-layout",
+    "sourcePackage": "@synkos/client",
+    "category": "Layout",
+    "shortDescription": "Layout for `/auth/*` routes — a thin wrapper around `<router-view>` that"
+  },
+  {
+    "name": "LegalBottomSheet",
+    "slug": "legal-bottom-sheet",
+    "sourcePackage": "@synkos/client",
+    "category": "Other",
+    "shortDescription": "Pre-built bottom sheet that renders the framework's terms or privacy text"
+  },
+  {
+    "name": "MainLayout",
+    "slug": "main-layout",
+    "sourcePackage": "@synkos/client",
+    "category": "Layout",
+    "shortDescription": "Main app layout — iOS-style nav bar at the top, tab bar at the bottom, and"
+  },
+  {
+    "name": "OtpInput",
+    "slug": "otp-input",
+    "sourcePackage": "@synkos/client",
+    "category": "Auth",
+    "shortDescription": "6-digit (configurable) OTP input. Auto-advances on type, supports paste of"
+  },
+  {
+    "name": "PasswordStrengthBar",
+    "slug": "password-strength-bar",
+    "sourcePackage": "@synkos/client",
+    "category": "Auth",
+    "shortDescription": "Visual feedback for password strength — a colored bar plus a textual label."
+  },
+  {
+    "name": "SegmentControl",
+    "slug": "segment-control",
+    "sourcePackage": "@synkos/ui",
+    "category": "Forms",
+    "shortDescription": "iOS-style segmented selector. Use it when there are 2-4 mutually exclusive"
+  },
+  {
+    "name": "SynkosApp",
+    "slug": "synkos-app",
+    "sourcePackage": "@synkos/client",
+    "category": "Layout",
+    "shortDescription": "Root component of a Synkos app. Wraps the route view with the"
+  }
+]
