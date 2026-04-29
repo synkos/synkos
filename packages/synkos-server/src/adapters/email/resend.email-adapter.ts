@@ -1,5 +1,5 @@
 import { createLogger } from '@/utils/logger';
-import type { EmailPort, EmailTemplates } from '@/ports/email.port';
+import type { EmailPort, EmailTemplates, SendCustomEmailOptions } from '@/ports/email.port';
 
 const log = createLogger('email:resend');
 
@@ -136,7 +136,12 @@ export class ResendEmailAdapter implements EmailPort {
     return this.isDev && this.devOverrideTo ? this.devOverrideTo : to;
   }
 
-  private async send(to: string, subject: string, html: string): Promise<void> {
+  private async send(
+    to: string,
+    subject: string,
+    html: string,
+    extras: { text?: string; replyTo?: string; headers?: Record<string, string> } = {}
+  ): Promise<void> {
     const recipient = this.resolveRecipient(to);
     const from = this.isDev ? this.fromDev : this.from;
 
@@ -144,13 +149,18 @@ export class ResendEmailAdapter implements EmailPort {
       log.debug({ recipient, original: to }, 'Dev override applied');
     }
 
+    const payload: Record<string, unknown> = { from, to: recipient, subject, html };
+    if (extras.text) payload.text = extras.text;
+    if (extras.replyTo) payload.reply_to = extras.replyTo;
+    if (extras.headers) payload.headers = extras.headers;
+
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.apiKey}`,
       },
-      body: JSON.stringify({ from, to: recipient, subject, html }),
+      body: JSON.stringify(payload),
     });
 
     if (!res.ok) {
@@ -179,5 +189,13 @@ export class ResendEmailAdapter implements EmailPort {
   async sendDeletionCancelled(to: string): Promise<void> {
     const { subject, html } = this.templates.deletionCancelled();
     await this.send(to, subject, html);
+  }
+
+  async sendCustom(options: SendCustomEmailOptions): Promise<void> {
+    await this.send(options.to, options.subject, options.html, {
+      text: options.text,
+      replyTo: options.replyTo,
+      headers: options.headers,
+    });
   }
 }

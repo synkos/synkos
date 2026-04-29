@@ -1,5 +1,5 @@
 import { createLogger } from '@/utils/logger';
-import type { EmailPort } from '@/ports/email.port';
+import type { EmailPort, SendCustomEmailOptions } from '@/ports/email.port';
 
 const log = createLogger('email:console');
 
@@ -24,5 +24,17 @@ export class ConsoleEmailAdapter implements EmailPort {
 
   async sendDeletionCancelled(to: string): Promise<void> {
     log.info({ to }, '📧 [email:deletion-cancelled]');
+  }
+
+  async sendCustom(options: SendCustomEmailOptions): Promise<void> {
+    log.info(
+      {
+        to: options.to,
+        subject: options.subject,
+        replyTo: options.replyTo,
+        htmlBytes: options.html.length,
+      },
+      '📧 [email:custom]'
+    );
   }
 }

@@ -1,16 +1,18 @@
-import type { EmailPort } from '@synkos/server/ports';
+import type { EmailPort, SendCustomEmailOptions } from '@synkos/server/ports';
 
 export class CapturingEmailAdapter implements EmailPort {
   verifications: Array<{ to: string; code: string }> = [];
   passwordResets: Array<{ to: string; code: string }> = [];
   deletionConfirmations: Array<{ to: string; scheduledAt: Date }> = [];
   deletionCancellations: Array<{ to: string }> = [];
+  customs: SendCustomEmailOptions[] = [];
 
   reset(): void {
     this.verifications = [];
     this.passwordResets = [];
     this.deletionConfirmations = [];
     this.deletionCancellations = [];
+    this.customs = [];
   }
 
   async sendEmailVerification(to: string, code: string): Promise<void> {
@@ -27,6 +29,10 @@ export class CapturingEmailAdapter implements EmailPort {
 
   async sendDeletionCancelled(to: string): Promise<void> {
     this.deletionCancellations.push({ to });
+  }
+
+  async sendCustom(options: SendCustomEmailOptions): Promise<void> {
+    this.customs.push(options);
   }
 }
 

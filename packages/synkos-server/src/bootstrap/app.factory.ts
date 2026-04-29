@@ -27,6 +27,11 @@ const CORE_MODULES: ModuleDefinition[] = [
   notificationsModule,
 ];
 
+export interface BodyParserOptions {
+  /** Body size limit forwarded to express.json. Default: '1mb'. */
+  jsonLimit?: string | number;
+}
+
 export interface AppConfig {
   modules: ModuleDefinition[];
   /** Called first — Mongoose schema patches and core hooks */
@@ -43,28 +48,47 @@ export interface AppConfig {
   serviceName?: string;
   /** Core module paths to exclude, e.g. ["/auth", "/notifications"] */
   disableCoreModules?: string[];
+  /** Tune the body parser (size limit). The raw JSON body is always captured
+   *  on `req.rawBody` so routes can validate webhook HMAC signatures. */
+  bodyParser?: BodyParserOptions;
+}
+
+/**
+ * Synchronously construct the Express application without connecting to the
+ * database, running startup hooks, or starting the HTTP listener. Use this in
+ * tests with `supertest(buildApp(config))`, or anywhere the caller wants to
+ * own the lifecycle (custom listeners, multi-port serving, in-process testing).
+ *
+ * Runs the same `extensions` / `listeners` / `wireCoreAdapters` / `adapters`
+ * hooks that `createApp` runs, in the same order, so middleware and adapter
+ * registrations are in place before module routers are mounted.
+ */
+export function buildApp(config: AppConfig): express.Application {
+  config.extensions?.();
+  config.listeners?.();
+  wireCoreAdapters();
+  config.adapters?.();
+
+  return _buildApp({
+    modules: config.modules,
+    apiPrefix: config.apiPrefix ?? '/api/v1',
+    serviceName: config.serviceName ?? 'API',
+    disableCoreModules: config.disableCoreModules ?? [],
+    bodyParser: config.bodyParser,
+  });
 }
 
 /**
  * Boots the full server: runs the extension/listener/adapter hooks, connects
  * to the database, mounts all modules, and starts listening on env.PORT.
- * Returns the underlying http.Server so callers can shut it down cleanly.
  */
-export async function createApp({
-  modules,
-  extensions,
-  listeners,
-  adapters,
-  startupHooks = [],
-  apiPrefix = '/api/v1',
-  serviceName = 'API',
-  disableCoreModules = [],
-}: AppConfig): Promise<void> {
+export async function createApp(config: AppConfig): Promise<void> {
+  const { startupHooks = [], serviceName = 'API' } = config;
   try {
-    extensions?.();
-    listeners?.();
+    config.extensions?.();
+    config.listeners?.();
     wireCoreAdapters();
-    adapters?.();
+    config.adapters?.();
 
     await connectDatabase();
 
@@ -72,7 +96,13 @@ export async function createApp({
       await hook();
     }
 
-    const app = _buildApp({ modules, apiPrefix, serviceName, disableCoreModules });
+    const app = _buildApp({
+      modules: config.modules,
+      apiPrefix: config.apiPrefix ?? '/api/v1',
+      serviceName,
+      disableCoreModules: config.disableCoreModules ?? [],
+      bodyParser: config.bodyParser,
+    });
 
     const server = app.listen(env.PORT, () => {
       logger.info({ port: env.PORT }, `${serviceName} started`);
@@ -96,9 +126,9 @@ function _buildApp({
   apiPrefix,
   serviceName,
   disableCoreModules,
-}: Required<
-  Pick<AppConfig, 'modules' | 'apiPrefix' | 'serviceName' | 'disableCoreModules'>
->): express.Application {
+  bodyParser,
+}: Required<Pick<AppConfig, 'modules' | 'apiPrefix' | 'serviceName' | 'disableCoreModules'>> &
+  Pick<AppConfig, 'bodyParser'>): express.Application {
   const app = express();
 
   // Trust the first hop (reverse proxy / Cloudflare) so req.ip contains the real client IP
@@ -144,7 +174,17 @@ function _buildApp({
       credentials: true,
     })
   );
-  app.use(express.json());
+  // Capture the raw JSON body on every request so route handlers can validate
+  // webhook HMAC signatures (GitHub, Stripe, …) without re-serializing the
+  // parsed JSON, which is not byte-equal to what the provider signed.
+  app.use(
+    express.json({
+      limit: bodyParser?.jsonLimit ?? '1mb',
+      verify: (req, _res, buf) => {
+        (req as Request & { rawBody?: Buffer }).rawBody = Buffer.from(buf);
+      },
+    })
+  );
 
   // Metrics — before rate limiter so scraping is never throttled.
   // Returns 404 if no metrics adapter is configured (noop default).

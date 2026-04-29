@@ -1,6 +1,6 @@
 import request, { type Test } from 'supertest';
 import type { Application } from 'express';
-import { createApp } from '@synkos/server';
+import { buildApp } from '@synkos/server';
 import { setEmailAdapter } from '@synkos/server/adapters';
 import { authModule } from '@synkos/server/modules/auth';
 import { userModule } from '@synkos/server/modules/user';
@@ -19,17 +19,22 @@ let _app: Application | null = null;
 /**
  * Returns the singleton test Express application.
  * Bootstrap runs once per worker process. Subsequent calls return the same app.
+ *
+ * Uses `buildApp` (sync, no DB connect, no listen) so tests own the lifecycle:
+ * the DB connection is set up by `tests/setup.ts` via mongodb-memory-server.
  */
 export function getApp(): Application {
   if (_app) return _app;
-
-  applyExtensions();
-  registerListeners();
-  wireAdapters();
-  // Override email adapter AFTER wireAdapters() so we capture all sends
-  setEmailAdapter(capturingEmail);
-
-  _app = createApp({ modules: testModules });
+  _app = buildApp({
+    modules: testModules,
+    extensions: applyExtensions,
+    listeners: registerListeners,
+    adapters: () => {
+      wireAdapters();
+      // Override the email adapter AFTER wireAdapters() so we capture all sends
+      setEmailAdapter(capturingEmail);
+    },
+  });
   return _app;
 }
 
