@@ -28,17 +28,29 @@ jobs:
           node-version: 22
           cache: 'pnpm'
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      # apps/frontend's postinstall runs `quasar prepare`, which loads
+      # quasar.config.ts. That config now imports `synkos/vite` (the
+      # framework helper), so the framework packages must be built before
+      # frontend's postinstall executes. Two-step install:
+      #   1. install with --ignore-scripts so postinstall doesn't fire
+      #   2. build framework packages so their dist/ exists
+      #   3. run the previously-skipped postinstall scripts manually
+      - name: Install dependencies (skip lifecycle scripts)
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Build framework packages (so apps/* postinstalls resolve workspace deps)
+        run: pnpm --filter ./packages/synkos --filter @synkos/ui --filter @synkos/client build
+
+      - name: Run apps/* postinstall scripts (Capacitor sync, quasar prepare, nuxt prepare)
+        run: |
+          pnpm --filter frontend run postinstall
+          pnpm --filter web run postinstall
 
       - name: Lint
         run: pnpm lint
 
       - name: Format check
         run: pnpm format:check
-
-      - name: Build type dependencies
-        run: pnpm --filter synkos --filter @synkos/ui build
 
       - name: Typecheck
         run: pnpm typecheck
