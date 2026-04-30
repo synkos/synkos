@@ -25,7 +25,25 @@ import { useAuthStore } from '../auth/store.js';
 // every other navigation source on a stale direction.
 //
 // Names match the CSS classes in MainLayout's non-scoped <style> block:
-// `tab-slide-left`, `tab-slide-right`, `tab-fade`.
+// `tab-slide-left`, `tab-slide-right`, `tab-fade`, `nav-push-forward`,
+// `nav-push-back`.
+
+/**
+ * How tab-to-tab navigation animates inside MainLayout.
+ *
+ * - `'push'` — horizontal slide between adjacent tabs (left/right based on
+ *   index). The default since launch; closest to Material BottomNavigation.
+ * - `'fade'` — crossfade between tabs. Closer to Apple's own apps which
+ *   tend to use cuts or subtle dissolves rather than horizontal motion.
+ * - `'none'` — instant cut, no animation. The most native-feeling option
+ *   on iOS — UITabBarController itself does not animate tab swaps.
+ *
+ * Sub-route push (e.g. /projects → /projects/:id) is unaffected by this
+ * option and always uses the dedicated `nav-push-*` transitions.
+ */
+export type TabTransitionMode = 'push' | 'fade' | 'none';
+
+let _tabTransitionMode: TabTransitionMode = 'push';
 
 function tabIndexOf(path: string): number {
   const tabs = getTabConfig();
@@ -49,20 +67,53 @@ function tabIndexOf(path: string): number {
   return tabs.findIndex((t) => t.path === '/' && (path === '/' || path === ''));
 }
 
-function computeTabTransitionName(toPath: string, fromPath: string | undefined): string {
-  // Initial mount (no previous route) — never slide; cold start should not look
-  // like a navigation animation.
-  if (!fromPath) return 'tab-fade';
-  if (toPath === fromPath) return 'tab-fade';
+/** Whether a path is a sub-route of a tab path (`/projects/123` of `/projects`). */
+function isSubRouteOf(path: string, tabPath: string): boolean {
+  if (tabPath === '/') return false;
+  return path.startsWith(tabPath + '/');
+}
 
+function computeTabTransitionName(toPath: string, fromPath: string | undefined): string {
+  // Initial mount (no previous route) — never animate; cold start should not
+  // look like a navigation animation.
+  if (!fromPath) return '';
+  if (toPath === fromPath) return '';
+
+  const tabs = getTabConfig();
+  const toTab = tabs.findIndex((t) => t.path === toPath);
+  const fromTab = tabs.findIndex((t) => t.path === fromPath);
+
+  // ── Sub-route push (forward / back) ────────────────────────────────────────
+  // Tab → sub-route of that tab: push forward. Sub-route of tab → tab: push
+  // back. Mirrors UINavigationController on iOS independently of the
+  // tabTransition option.
+  if (fromTab !== -1 && toTab === -1) {
+    if (isSubRouteOf(toPath, fromPath)) return 'nav-push-forward';
+  }
+  if (toTab !== -1 && fromTab === -1) {
+    if (isSubRouteOf(fromPath, toPath)) return 'nav-push-back';
+  }
+  // Sub-route → sub-route on the same stack: deeper or shallower.
+  if (toTab === -1 && fromTab === -1) {
+    if (isSubRouteOf(toPath, fromPath)) return 'nav-push-forward';
+    if (isSubRouteOf(fromPath, toPath)) return 'nav-push-back';
+  }
+
+  // ── Tab → tab ──────────────────────────────────────────────────────────────
   const ti = tabIndexOf(toPath);
   const fi = tabIndexOf(fromPath);
-
-  // At least one side isn't a tab (auth, modal, sub-route) → fade.
-  // Phase C will introduce a dedicated push transition for sub-routes.
   if (ti === -1 || fi === -1) return 'tab-fade';
   if (ti === fi) return 'tab-fade';
-  return ti > fi ? 'tab-slide-left' : 'tab-slide-right';
+
+  switch (_tabTransitionMode) {
+    case 'none':
+      return '';
+    case 'fade':
+      return 'tab-fade';
+    case 'push':
+    default:
+      return ti > fi ? 'tab-slide-left' : 'tab-slide-right';
+  }
 }
 
 function installTabTransitionGuard(router: Router): void {
@@ -158,6 +209,12 @@ export interface SynkosRouterOptions {
    * If omitted, all sections are included.
    */
   settingsConfig?: SettingsConfig;
+  /**
+   * How tab-to-tab navigation animates. Defaults to `'push'` (horizontal slide).
+   * Use `'fade'` for a crossfade or `'none'` for instant cut (most iOS-native).
+   * See {@link TabTransitionMode}.
+   */
+  tabTransition?: TabTransitionMode;
 }
 
 // ── Settings route map ─────────────────────────────────────────────────────────
@@ -408,6 +465,9 @@ export function createSynkosRouter(
   // Default post-auth target: first user-declared tab route, falling back to 'home'.
   setPostAuthRoute({ name: (opts.appTabRoutes[0]?.name as string) ?? 'home' });
 
+  // Persist the tab transition mode for the router guard to read on each nav.
+  if (opts.tabTransition) _tabTransitionMode = opts.tabTransition;
+
   // Register tab config for MainLayout dynamic tab rendering
   setTabConfig([
     ...opts.appTabRoutes,
@@ -530,10 +590,19 @@ export interface SynkosSetupOptions {
    * Default: the first route with meta.tab, or 'home'.
    */
   homeRouteName?: string;
+  /**
+   * How tab-to-tab navigation animates. Defaults to `'push'` (horizontal slide).
+   * Use `'fade'` for a crossfade or `'none'` for instant cut (most iOS-native).
+   * See {@link TabTransitionMode}.
+   */
+  tabTransition?: TabTransitionMode;
 }
 
 export function setupSynkosRouter(router: Router, options: SynkosSetupOptions = {}): void {
   const loginRoute = options.loginRouteName ?? 'auth-login';
+
+  // Persist the tab transition mode for the router guard to read on each nav.
+  if (options.tabTransition) _tabTransitionMode = options.tabTransition;
 
   // ── Discover tabs from meta.tab declarations ───────────────────────────────
   // router.getRoutes() returns all flat route records with resolved absolute paths.

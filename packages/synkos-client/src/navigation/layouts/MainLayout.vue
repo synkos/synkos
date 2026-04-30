@@ -3,31 +3,38 @@
     <!-- ── iOS Navigation Bar ────────────────────────────────────── -->
     <header class="ios-nav-bar" :class="{ 'is-scrolled': scrolledFromTop }">
       <div class="ios-nav-content">
-        <!-- Back button — visible on sub-routes -->
-        <button v-if="isSubRoute" class="ios-back-btn" @click="goBack">
-          <AppIcon name="chevron_left" size="28px" />
-          <span class="ios-back-label">{{ parentTitle }}</span>
-        </button>
+        <!-- Leading slot. Default: back button on sub-routes. -->
+        <slot name="header-left" :is-sub-route="isSubRoute" :parent-title="parentTitle" :go-back="goBack">
+          <button v-if="isSubRoute" class="ios-back-btn" @click="goBack">
+            <AppIcon name="chevron_left" size="28px" />
+            <span class="ios-back-label">{{ parentTitle }}</span>
+          </button>
+        </slot>
 
-        <!-- Page title — crossfades when large title collapses into nav bar -->
-        <Transition name="nav-title-fade">
-          <span
-            :key="pageTitle"
-            class="ios-nav-title"
-            :class="{ 'ios-nav-title--sub': isSubRoute }"
+        <!-- Center slot. Default: title with the large-title-collapse crossfade. -->
+        <slot name="header-center" :title="pageTitle" :is-sub-route="isSubRoute">
+          <Transition name="nav-title-fade">
+            <span
+              :key="pageTitle"
+              class="ios-nav-title"
+              :class="{ 'ios-nav-title--sub': isSubRoute }"
+            >
+              {{ pageTitle }}
+            </span>
+          </Transition>
+        </slot>
+
+        <!-- Trailing slot. Default: nav action injected via useNavAction, or
+             the menu drawer button on /profile. -->
+        <slot name="header-right" :action="navTrailingAction" :open-menu="() => (showMenu = true)">
+          <button
+            v-if="navTrailingAction || route.path === '/profile'"
+            class="ios-menu-btn"
+            @click="navTrailingAction ? navTrailingAction.onClick() : (showMenu = true)"
           >
-            {{ pageTitle }}
-          </span>
-        </Transition>
-
-        <!-- Trailing action: injected by page via useNavAction, or menu on /profile -->
-        <button
-          v-if="navTrailingAction || route.path === '/profile'"
-          class="ios-menu-btn"
-          @click="navTrailingAction ? navTrailingAction.onClick() : (showMenu = true)"
-        >
-          <AppIcon :name="navTrailingAction?.icon ?? 'menu'" size="22px" />
-        </button>
+            <AppIcon :name="navTrailingAction?.icon ?? 'menu'" size="22px" />
+          </button>
+        </slot>
       </div>
     </header>
 
@@ -51,25 +58,33 @@
     </main>
 
     <!-- ── iOS Tab Bar ────────────────────────────────────────────── -->
-    <footer v-if="!route.meta.hideTabBar" class="ios-tab-bar">
-      <div class="ios-tabs">
-        <button
-          v-for="tab in tabs"
-          :key="tab.path"
-          class="ios-tab"
-          :class="{ 'ios-tab--active': isTabActive(tab) }"
-          @click="navigate(tab.path)"
-        >
-          <div class="ios-tab-icon-wrap">
-            <AppIcon :name="tab.icon" size="22px" class="ios-tab-icon" />
-            <span v-if="tab.badge > 0" class="ios-tab-badge">
-              {{ tab.badge > 99 ? '99+' : tab.badge }}
-            </span>
-          </div>
-          <span class="ios-tab-label">{{ tab.label }}</span>
-        </button>
-      </div>
-    </footer>
+    <slot
+      v-if="!route.meta.hideTabBar"
+      name="tab-bar"
+      :tabs="tabs"
+      :is-active="isTabActive"
+      :navigate="navigate"
+    >
+      <footer class="ios-tab-bar">
+        <div class="ios-tabs">
+          <button
+            v-for="tab in tabs"
+            :key="tab.path"
+            class="ios-tab"
+            :class="{ 'ios-tab--active': isTabActive(tab) }"
+            @click="navigate(tab.path)"
+          >
+            <div class="ios-tab-icon-wrap">
+              <AppIcon :name="tab.icon" size="22px" class="ios-tab-icon" />
+              <span v-if="tab.badge > 0" class="ios-tab-badge">
+                {{ tab.badge > 99 ? '99+' : tab.badge }}
+              </span>
+            </div>
+            <span class="ios-tab-label">{{ tab.label }}</span>
+          </button>
+        </div>
+      </footer>
+    </slot>
   </div>
 </template>
 
@@ -462,15 +477,19 @@ function goBack() {
   will-change: transform;
 }
 
-// ─── Tab transitions: shared base ─────────────────────────────────
-// All tab-* transitions share the same absolute-fill positioning so the
-// leaving page and the entering page can overlap during the swap.
+// ─── Tab + push transitions: shared base ──────────────────────────
+// All transitions share the same absolute-fill positioning so the leaving
+// and entering pages can overlap during the swap.
 .tab-slide-left-enter-active,
 .tab-slide-left-leave-active,
 .tab-slide-right-enter-active,
 .tab-slide-right-leave-active,
 .tab-fade-enter-active,
-.tab-fade-leave-active {
+.tab-fade-leave-active,
+.nav-push-forward-enter-active,
+.nav-push-forward-leave-active,
+.nav-push-back-enter-active,
+.nav-push-back-leave-active {
   position: absolute;
   inset: 0;
 }
@@ -481,6 +500,32 @@ function goBack() {
 .tab-slide-right-enter-active,
 .tab-slide-right-leave-active {
   transition: transform var(--platform-transition-push, 0.32s cubic-bezier(0.36, 0.66, 0.04, 1));
+}
+
+// ─── Sub-route push (UINavigationController) ──────────────────────
+// Forward: enter slides in from the right, leaving page parallaxes 30% to
+// the left. Back: mirror. The `cubic-bezier(0.32, 0.72, 0, 1)` curve is the
+// reverse-engineered approximation of UIViewAnimationCurve's "ease out" that
+// iOS uses for push/pop and is much closer to native than a generic ease-out.
+.nav-push-forward-enter-active,
+.nav-push-forward-leave-active,
+.nav-push-back-enter-active,
+.nav-push-back-leave-active {
+  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.nav-push-forward-enter-from {
+  transform: translateX(100%);
+}
+.nav-push-forward-leave-to {
+  transform: translateX(-30%);
+}
+
+.nav-push-back-enter-from {
+  transform: translateX(-30%);
+}
+.nav-push-back-leave-to {
+  transform: translateX(100%);
 }
 
 .tab-slide-left-enter-from {
@@ -537,6 +582,10 @@ function goBack() {
   .tab-slide-right-leave-active,
   .tab-fade-enter-active,
   .tab-fade-leave-active,
+  .nav-push-forward-enter-active,
+  .nav-push-forward-leave-active,
+  .nav-push-back-enter-active,
+  .nav-push-back-leave-active,
   .nav-title-fade-enter-active,
   .nav-title-fade-leave-active {
     transition-duration: 0.01ms !important;

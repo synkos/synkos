@@ -72,7 +72,7 @@ export type {
 
 // setupSynkosRouter + synkosSettingsRoutes — headless routing (full control)
 export { setupSynkosRouter, synkosSettingsRoutes } from './navigation/router.js';
-export type { SynkosSetupOptions } from './navigation/router.js';
+export type { SynkosSetupOptions, TabTransitionMode } from './navigation/router.js';
 
 // Post-auth route — single source of truth for "where to go after login/verify".
 // Read with getPostAuthRoute(), override with setPostAuthRoute() if you need to
