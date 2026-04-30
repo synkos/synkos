@@ -1,6 +1,6 @@
 {
   "name": "@synkos/ui",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Synkos component library (Vue 3 + Quasar)",
   "type": "module",
   "exports": {
