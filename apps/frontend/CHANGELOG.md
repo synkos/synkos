@@ -1,5 +1,13 @@
 # frontend
 
+## 1.0.8
+
+### Patch Changes
+
+- Updated dependencies [a022d15]
+  - synkos@0.3.1
+  - @synkos/client@0.5.1
+
 ## 1.0.7
 
 ### Patch Changes
