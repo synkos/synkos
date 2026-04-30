@@ -49,7 +49,7 @@ export default defineConfig((ctx) => {
       // (RFC 6749 §3.1.2), so a hash-mode app never reaches its callback page.
       // When deploying the SPA to a static host, add a catch-all rewrite to
       // index.html so deep links resolve.
-      vueRouterMode: ctx.mode.capacitor ? 'hash' : 'history',
+      vueRouterMode: ctx.modeName === 'capacitor' ? 'hash' : 'history',
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,
