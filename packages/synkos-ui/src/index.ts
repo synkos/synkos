@@ -8,6 +8,7 @@ export { default as AppCircularProgress } from './components/feedback/AppCircula
 
 // ── Forms ─────────────────────────────────────────────────────────────────────
 export { default as SegmentControl } from './components/forms/SegmentControl.vue';
+export { default as AppSwitch } from './components/forms/AppSwitch.vue';
 
 // ── Layout ────────────────────────────────────────────────────────────────────
 export { default as AppPage } from './components/layout/AppPage.vue';
@@ -24,6 +25,10 @@ export { default as AppIcon } from './components/media/AppIcon.vue';
 // ── Overlays ──────────────────────────────────────────────────────────────────
 export { default as AppBottomSheet } from './components/overlays/AppBottomSheet.vue';
 export { default as AppDrawer } from './components/overlays/AppDrawer.vue';
+export { default as AppActionSheet } from './components/overlays/AppActionSheet.vue';
+export type { ActionSheetAction } from './components/overlays/AppActionSheet.vue';
+export { default as AppAlert } from './components/overlays/AppAlert.vue';
+export type { AlertAction } from './components/overlays/AppAlert.vue';
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 export { getIcon, icons, registerIcons } from './icons/index.js';

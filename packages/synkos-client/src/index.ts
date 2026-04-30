@@ -39,6 +39,8 @@ export { useSignOut } from './composables/useSignOut.js';
 export { usePullToRefresh } from './composables/usePullToRefresh.js';
 export { useTheme } from './composables/useTheme.js';
 export type { AppTheme } from './composables/useTheme.js';
+export { useHaptic } from './composables/useHaptic.js';
+export type { HapticEvent } from './composables/useHaptic.js';
 export { usePlatform } from './composables/usePlatform.js';
 export type { AppPlatform } from './composables/usePlatform.js';
 export { useNavAction } from './navigation/composables/useNavAction.js';
