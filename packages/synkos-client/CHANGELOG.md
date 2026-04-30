@@ -1,5 +1,12 @@
 # @synkos/client
 
+## 0.5.1
+
+### Patch Changes
+
+- Updated dependencies [a022d15]
+  - synkos@0.3.1
+
 ## 0.5.0
 
 ### Minor Changes

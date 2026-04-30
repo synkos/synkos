@@ -1,5 +1,11 @@
 # web
 
+## 0.0.4
+
+### Patch Changes
+
+- @synkos/client@0.5.1
+
 ## 0.0.3
 
 ### Patch Changes
