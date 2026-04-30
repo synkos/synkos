@@ -4,7 +4,12 @@
     <header class="ios-nav-bar" :class="{ 'is-scrolled': scrolledFromTop }">
       <div class="ios-nav-content">
         <!-- Leading slot. Default: back button on sub-routes. -->
-        <slot name="header-left" :is-sub-route="isSubRoute" :parent-title="parentTitle" :go-back="goBack">
+        <slot
+          name="header-left"
+          :is-sub-route="isSubRoute"
+          :parent-title="parentTitle"
+          :go-back="goBack"
+        >
           <button v-if="isSubRoute" class="ios-back-btn" @click="goBack">
             <AppIcon name="chevron_left" size="28px" />
             <span class="ios-back-label">{{ parentTitle }}</span>
@@ -124,11 +129,7 @@ import AppMenuDrawer from '../../vue/components/navigation/AppMenuDrawer.vue';
 import { AppIcon } from '@synkos/ui';
 import { getClientConfig } from '../../internal/app-config.js';
 import { getTabConfig } from '../internal/tab-config.js';
-import {
-  getTabStackTop,
-  popTabStack,
-  isTabStacksEnabled,
-} from '../internal/tab-stacks.js';
+import { getTabStackTop, popTabStack, isTabStacksEnabled } from '../internal/tab-stacks.js';
 import { useEdgeSwipeBack } from '../composables/useEdgeSwipeBack.js';
 import {
   navTrailingAction,

@@ -2,11 +2,7 @@ import { computed, type ComputedRef } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { getTabConfig } from '../internal/tab-config.js';
-import {
-  isTabStacksEnabled,
-  popTabStack,
-  useTabStacksRef,
-} from '../internal/tab-stacks.js';
+import { isTabStacksEnabled, popTabStack, useTabStacksRef } from '../internal/tab-stacks.js';
 
 /**
  * Reactive view over the active tab's navigation stack. Use it to render
@@ -70,9 +66,7 @@ export function useTabStack(): UseTabStackResult {
     return best;
   });
 
-  const stack = computed<readonly string[]>(
-    () => stacksRef.value.get(currentTabPath.value) ?? []
-  );
+  const stack = computed<readonly string[]>(() => stacksRef.value.get(currentTabPath.value) ?? []);
   const canPop = computed(() => stack.value.length > 1);
   const depth = computed(() => Math.max(0, stack.value.length - 1));
 

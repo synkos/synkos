@@ -25,7 +25,10 @@
 
       <!-- Cancel group (separated by a gap) -->
       <div class="app-action-sheet__group">
-        <button class="app-action-sheet__btn app-action-sheet__btn--cancel" @click="onDismiss(false)">
+        <button
+          class="app-action-sheet__btn app-action-sheet__btn--cancel"
+          @click="onDismiss(false)"
+        >
           {{ cancelLabel }}
         </button>
       </div>

@@ -35,7 +35,10 @@ const IMPACT_MAP: Record<
   'long-press': ImpactStyle.Medium,
 };
 
-const NOTIFICATION_MAP: Record<Extract<HapticEvent, 'success' | 'warning' | 'error'>, NotificationType> = {
+const NOTIFICATION_MAP: Record<
+  Extract<HapticEvent, 'success' | 'warning' | 'error'>,
+  NotificationType
+> = {
   success: NotificationType.Success,
   warning: NotificationType.Warning,
   error: NotificationType.Error,
