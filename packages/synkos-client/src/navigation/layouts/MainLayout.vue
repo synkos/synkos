@@ -1,7 +1,7 @@
 <template>
   <div class="app-layout">
     <!-- ── iOS Navigation Bar ────────────────────────────────────── -->
-    <header class="ios-nav-bar">
+    <header class="ios-nav-bar" :class="{ 'is-scrolled': scrolledFromTop }">
       <div class="ios-nav-content">
         <!-- Back button — visible on sub-routes -->
         <button v-if="isSubRoute" class="ios-back-btn" @click="goBack">
@@ -120,6 +120,22 @@ const appConfig = getClientConfig();
 // Provide the nav title setter so AppPageLargeTitle (in @synkos/ui) can inject it
 // without creating a circular package dependency.
 provide('synkos:set-nav-title', (title: string | null) => setNavTitle(title));
+
+// Counter incremented every time the user re-taps the active tab. AppPage
+// watches it and scrolls its container to the top — the iOS UITabBar gesture.
+// Provided via inject (not a singleton) so each MainLayout instance owns its
+// own signal — supports multiple shells in the same app (e.g. modals).
+const scrollToTopSignal = ref(0);
+provide('synkos:scroll-to-top-signal', scrollToTopSignal);
+
+// iOS scroll-edge appearance: nav bar is transparent while the active page
+// is at the top of its scroll, glass once content has scrolled. AppPage
+// reports its scroll state through this setter.
+const scrolledFromTop = ref(false);
+provide('synkos:set-scrolled-from-top', (scrolled: boolean) => {
+  scrolledFromTop.value = scrolled;
+});
+
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
@@ -177,7 +193,15 @@ function isTabActive(tab: { path: string }) {
 // source: tab tap, back gesture, programmatic push, deep link, browser back.
 function navigate(path: string) {
   const targetTab = tabs.value.find((t) => t.path === path);
-  if (!targetTab || isTabActive(targetTab)) return;
+  if (!targetTab) return;
+
+  // Re-tap on the active tab → scroll the active page to the top (iOS gesture).
+  if (isTabActive(targetTab)) {
+    void Haptics.impact({ style: ImpactStyle.Light });
+    scrollToTopSignal.value++;
+    return;
+  }
+
   void Haptics.impact({ style: ImpactStyle.Light });
   void router.push(path);
 }
@@ -202,20 +226,30 @@ function goBack() {
 }
 
 // ─── Navigation Bar ───────────────────────────────────────────────
-// `transform: translateZ(0)` keeps the backdrop-filter compositing layer
-// promoted at all times. Without this, WebKit creates the GPU layer lazily
-// on the first frame that has motion behind the blur — that promotion costs
-// 1-2 frames and shows up as a "jump" the first time the user changes tabs.
+// iOS scroll-edge appearance: at the top of the active page, the nav bar
+// has no fill and no border (`UINavigationBarAppearance.scrollEdgeAppearance`).
+// Once the content scrolls, the bar gains its glass background and hairline
+// border. We keep `backdrop-filter` always set so the GPU compositing layer
+// is allocated once at mount instead of being re-promoted on first scroll;
+// `transform: translateZ(0)` reinforces that promotion cross-engine.
 .ios-nav-bar {
   flex-shrink: 0;
   padding-top: env(safe-area-inset-top, 0px);
-  background: var(--glass-bg, #{$glass-bg});
+  background: transparent;
   backdrop-filter: $glass-blur;
   -webkit-backdrop-filter: $glass-blur;
-  border-bottom: 0.5px solid var(--glass-border, #{$glass-border});
+  border-bottom: 0.5px solid transparent;
   z-index: $z-raised;
   position: relative;
   transform: translateZ(0);
+  transition:
+    background 0.2s ease,
+    border-bottom-color 0.2s ease;
+
+  &.is-scrolled {
+    background: var(--glass-bg, #{$glass-bg});
+    border-bottom-color: var(--glass-border, #{$glass-border});
+  }
 }
 
 .ios-nav-content {
@@ -319,15 +353,15 @@ function goBack() {
   overflow: hidden;
 }
 
-// ─── Scroll wrapper ───────────────────────────────────────────────
+// ─── Transition wrapper ───────────────────────────────────────────
+// Pure container: clips the absolute-positioned page roots during the
+// route transition. Scroll is owned by `AppPage` so each tab keeps its own
+// scroll position across keep-alive cycles.
 .slide-wrapper {
   position: relative;
   flex: 1;
   min-height: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
+  overflow: hidden;
 }
 
 // ─── Tab Bar ──────────────────────────────────────────────────────
