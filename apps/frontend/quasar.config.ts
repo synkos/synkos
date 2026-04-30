@@ -2,7 +2,23 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file
 
 import { defineConfig } from '#q-app/wrappers';
-import { synkosExtendViteConf } from 'synkos/vite';
+
+// Loaded lazily — on a fresh checkout (CI, `pnpm create synkos`),
+// `synkos/vite` may not be built yet when Quasar reads this config
+// during `quasar prepare`'s postinstall hook. The next time the
+// config is evaluated (dev / build), `dist/` exists and the helper
+// is applied. Apps using `pnpm create synkos` get the same graceful
+// degradation — install succeeds, then `pnpm dev` picks up the
+// optimisations.
+let synkosExtendViteConf: ((conf: unknown) => void) | null = null;
+try {
+  ({ synkosExtendViteConf } = await import('synkos/vite'));
+} catch {
+  console.warn(
+    '[quasar.config] synkos/vite not available yet — skipping framework Vite tweaks. This is expected on a fresh install before `pnpm build` has run.',
+  );
+}
+
 export default defineConfig((ctx) => {
   return {
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
@@ -70,8 +86,9 @@ export default defineConfig((ctx) => {
         // workspace packages, vue-i18n and Capacitor plugins, plus
         // auto-discovered tab page warmup. Pass `extraOptimizeDeps` /
         // `extraWarmupFiles` if your app pulls in something the framework
-        // doesn't know about.
-        synkosExtendViteConf(viteConf);
+        // doesn't know about. No-op if the helper couldn't be loaded
+        // (see the lazy import at the top of this file).
+        synkosExtendViteConf?.(viteConf);
       },
       // viteVuePluginOptions: {},
       vitePlugins: [

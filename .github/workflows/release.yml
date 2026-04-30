@@ -27,19 +27,8 @@ jobs:
           cache: 'pnpm'
           registry-url: 'https://registry.npmjs.org'
 
-      # See ci.yml for why this is split: apps/frontend's postinstall runs
-      # `quasar prepare`, which loads a quasar.config.ts that imports
-      # `synkos/vite` — so the framework packages must be built first.
-      - name: Install dependencies (skip lifecycle scripts)
-        run: pnpm install --frozen-lockfile --ignore-scripts
-
-      - name: Build framework packages (so apps/* postinstalls resolve workspace deps)
-        run: pnpm --filter ./packages/synkos --filter @synkos/ui --filter @synkos/client build
-
-      - name: Run apps/* postinstall scripts
-        run: |
-          pnpm --filter frontend run postinstall
-          pnpm --filter web run postinstall
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
       - name: Create Release Pull Request or Publish to npm
         uses: changesets/action@v1
