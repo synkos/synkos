@@ -10,10 +10,67 @@ import {
 import type { AppConfig } from 'synkos';
 import type { AppTabRoute, TabMeta } from '../types.js';
 export type { TabMeta };
-import { setTabConfig } from './internal/tab-config.js';
+import { setTabConfig, getTabConfig } from './internal/tab-config.js';
 import { setSettingsConfig, ALL_SECTIONS } from './internal/settings-config.js';
 import { setPostAuthRoute, getPostAuthRoute } from './internal/post-auth.js';
+import { setTabTransitionName } from './internal/nav-state.js';
 import { useAuthStore } from '../auth/store.js';
+
+// ── Tab transition direction ───────────────────────────────────────────────────
+//
+// Computes the Vue `<transition>` name to apply on the route swap by comparing
+// the tab index of `from` vs `to`. Centralised here (router-level) so every
+// navigation path is covered: tab tap, back button, deep link, programmatic
+// router.push, browser back. The previous click-based logic in MainLayout left
+// every other navigation source on a stale direction.
+//
+// Names match the CSS classes in MainLayout's non-scoped <style> block:
+// `tab-slide-left`, `tab-slide-right`, `tab-fade`.
+
+function tabIndexOf(path: string): number {
+  const tabs = getTabConfig();
+  // First exact match wins; otherwise pick the deepest prefix match so that
+  // sub-routes (e.g. `/projects/:id`) inherit the index of their parent tab.
+  const exact = tabs.findIndex((t) => t.path === path);
+  if (exact !== -1) return exact;
+  let best = -1;
+  let bestLen = 0;
+  tabs.forEach((t, i) => {
+    if (t.path === '/') return;
+    if (path === t.path || path.startsWith(t.path + '/')) {
+      if (t.path.length > bestLen) {
+        best = i;
+        bestLen = t.path.length;
+      }
+    }
+  });
+  if (best !== -1) return best;
+  // Root tab as last-resort match for the literal '/' path.
+  return tabs.findIndex((t) => t.path === '/' && (path === '/' || path === ''));
+}
+
+function computeTabTransitionName(toPath: string, fromPath: string | undefined): string {
+  // Initial mount (no previous route) — never slide; cold start should not look
+  // like a navigation animation.
+  if (!fromPath) return 'tab-fade';
+  if (toPath === fromPath) return 'tab-fade';
+
+  const ti = tabIndexOf(toPath);
+  const fi = tabIndexOf(fromPath);
+
+  // At least one side isn't a tab (auth, modal, sub-route) → fade.
+  // Phase C will introduce a dedicated push transition for sub-routes.
+  if (ti === -1 || fi === -1) return 'tab-fade';
+  if (ti === fi) return 'tab-fade';
+  return ti > fi ? 'tab-slide-left' : 'tab-slide-right';
+}
+
+function installTabTransitionGuard(router: Router): void {
+  router.afterEach((to, from) => {
+    const fromPath = from.matched.length === 0 ? undefined : from.path;
+    setTabTransitionName(computeTabTransitionName(to.path, fromPath));
+  });
+}
 
 // Extend RouteMeta for type-safe i18n-aware nav bar fields
 declare module 'vue-router' {
@@ -403,6 +460,8 @@ export function createSynkosRouter(
     return true;
   });
 
+  installTabTransitionGuard(router);
+
   return router;
 }
 
@@ -548,4 +607,6 @@ export function setupSynkosRouter(router: Router, options: SynkosSetupOptions = 
 
     return true;
   });
+
+  installTabTransitionGuard(router);
 }

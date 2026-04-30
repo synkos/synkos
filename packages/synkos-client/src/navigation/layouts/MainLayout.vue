@@ -40,7 +40,7 @@
         <DeletionBanner />
         <div class="slide-wrapper">
           <router-view v-slot="{ Component }">
-            <transition :name="tabTransition">
+            <transition :name="tabTransitionName">
               <keep-alive :include="cachedViews">
                 <component :is="Component" :key="routeKey" />
               </keep-alive>
@@ -108,7 +108,12 @@ import AppMenuDrawer from '../../vue/components/navigation/AppMenuDrawer.vue';
 import { AppIcon } from '@synkos/ui';
 import { getClientConfig } from '../../internal/app-config.js';
 import { getTabConfig } from '../internal/tab-config.js';
-import { navTrailingAction, navTitleOverride, setNavTitle } from '../internal/nav-state.js';
+import {
+  navTrailingAction,
+  navTitleOverride,
+  setNavTitle,
+  tabTransitionName,
+} from '../internal/nav-state.js';
 
 const appConfig = getClientConfig();
 
@@ -138,7 +143,6 @@ const cachedViews = allTabs
   .filter((tab) => tab.cache)
   .map((tab) => tab.componentName ?? tab.name.charAt(0).toUpperCase() + tab.name.slice(1) + 'Page');
 
-const tabTransition = ref('tab-slide-left');
 const showMenu = ref(false);
 
 // ── Route helpers ──────────────────────────────────────────────────
@@ -167,25 +171,20 @@ function isTabActive(tab: { path: string }) {
 }
 
 // ── Navigation ─────────────────────────────────────────────────────
+// Direction of the route swap (slide-left / slide-right / fade) is decided by
+// `router.afterEach` in `setupSynkosRouter`, comparing tab indices of
+// `from` vs `to`. That makes the animation correct for every navigation
+// source: tab tap, back gesture, programmatic push, deep link, browser back.
 function navigate(path: string) {
-  const currentTab = tabs.value.find((t) => isTabActive(t));
   const targetTab = tabs.value.find((t) => t.path === path);
-  if (!targetTab || currentTab?.path === path) return;
-
-  const currentIndex = tabs.value.indexOf(currentTab!);
-  const targetIndex = tabs.value.indexOf(targetTab);
+  if (!targetTab || isTabActive(targetTab)) return;
   void Haptics.impact({ style: ImpactStyle.Light });
-  tabTransition.value = targetIndex > currentIndex ? 'tab-slide-left' : 'tab-slide-right';
   void router.push(path);
 }
 
 function goBack() {
   void Haptics.impact({ style: ImpactStyle.Light });
-  tabTransition.value = 'tab-slide-right';
   void router.back();
-  setTimeout(() => {
-    tabTransition.value = 'tab-slide-left';
-  }, 350);
 }
 </script>
 
@@ -203,6 +202,10 @@ function goBack() {
 }
 
 // ─── Navigation Bar ───────────────────────────────────────────────
+// `transform: translateZ(0)` keeps the backdrop-filter compositing layer
+// promoted at all times. Without this, WebKit creates the GPU layer lazily
+// on the first frame that has motion behind the blur — that promotion costs
+// 1-2 frames and shows up as a "jump" the first time the user changes tabs.
 .ios-nav-bar {
   flex-shrink: 0;
   padding-top: env(safe-area-inset-top, 0px);
@@ -212,6 +215,7 @@ function goBack() {
   border-bottom: 0.5px solid var(--glass-border, #{$glass-border});
   z-index: $z-raised;
   position: relative;
+  transform: translateZ(0);
 }
 
 .ios-nav-content {
@@ -327,6 +331,7 @@ function goBack() {
 }
 
 // ─── Tab Bar ──────────────────────────────────────────────────────
+// See `.ios-nav-bar` for why `translateZ(0)` is set.
 .ios-tab-bar {
   flex-shrink: 0;
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -336,6 +341,7 @@ function goBack() {
   border-top: 0.5px solid var(--glass-border, #{$glass-border});
   z-index: $z-raised;
   position: relative;
+  transform: translateZ(0);
 }
 
 .ios-tabs {
@@ -411,18 +417,36 @@ function goBack() {
      route components. Scoped selectors (data-v-xxx) are not reliable across
      keep-alive + router-view component boundaries in all WebKit versions. -->
 <style lang="scss">
-// ─── Tab push transitions ─────────────────────────────────────────
+// ─── Permanent GPU layer for the active page ──────────────────────
+// `will-change: transform` was previously set on the .tab-slide-*-enter-active
+// classes, meaning WebKit created the GPU compositing layer at the start of
+// the animation. That promotion cost ~1 frame and showed up as the well-known
+// "first tab change is jumpy" symptom. Setting it on the page root keeps the
+// layer alive while the page is mounted and removes the cost from the
+// animation's hot path.
+.slide-wrapper > * {
+  will-change: transform;
+}
+
+// ─── Tab transitions: shared base ─────────────────────────────────
+// All tab-* transitions share the same absolute-fill positioning so the
+// leaving page and the entering page can overlap during the swap.
+.tab-slide-left-enter-active,
+.tab-slide-left-leave-active,
+.tab-slide-right-enter-active,
+.tab-slide-right-leave-active,
+.tab-fade-enter-active,
+.tab-fade-leave-active {
+  position: absolute;
+  inset: 0;
+}
+
+// ─── Slide push transitions (forward / back across tabs) ──────────
 .tab-slide-left-enter-active,
 .tab-slide-left-leave-active,
 .tab-slide-right-enter-active,
 .tab-slide-right-leave-active {
   transition: transform var(--platform-transition-push, 0.32s cubic-bezier(0.36, 0.66, 0.04, 1));
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  will-change: transform;
 }
 
 .tab-slide-left-enter-from {
@@ -439,6 +463,19 @@ function goBack() {
   transform: translateX(100%);
 }
 
+// ─── Crossfade (default for cold start, sub-routes, non-tab swaps) ─
+// The default direction set by the router guard when one side isn't a tab
+// or on the very first navigation. Mimics iOS UITabBar's instant cut more
+// faithfully than a horizontal slide.
+.tab-fade-enter-active,
+.tab-fade-leave-active {
+  transition: opacity 0.18s ease-out;
+}
+.tab-fade-enter-from,
+.tab-fade-leave-to {
+  opacity: 0;
+}
+
 // ─── Nav bar title crossfade (large title collapse) ───────────────
 // position: absolute lets enter/leave overlap so it looks like a crossfade
 // instead of two titles stacking vertically.
@@ -453,5 +490,25 @@ function goBack() {
 .nav-title-fade-enter-from,
 .nav-title-fade-leave-to {
   opacity: 0;
+}
+
+// ─── Reduced motion ──────────────────────────────────────────────
+// Users who opt into reduced motion get an instant cut instead of any of the
+// transitions above. Keep a tiny non-zero duration so Vue still fires the
+// after-leave / after-enter hooks.
+@media (prefers-reduced-motion: reduce) {
+  .tab-slide-left-enter-active,
+  .tab-slide-left-leave-active,
+  .tab-slide-right-enter-active,
+  .tab-slide-right-leave-active,
+  .tab-fade-enter-active,
+  .tab-fade-leave-active,
+  .nav-title-fade-enter-active,
+  .nav-title-fade-leave-active {
+    transition-duration: 0.01ms !important;
+  }
+  .slide-wrapper > * {
+    will-change: auto;
+  }
 }
 </style>
