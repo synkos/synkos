@@ -25,6 +25,7 @@
     "dist/"
   ],
   "scripts": {
+    "prebuild": "rm -rf dist",
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
@@ -32,7 +33,7 @@
   },
   "peerDependencies": {
     "vue": "^3.0.0",
-    "vue-router": "^4.0.0"
+    "vue-router": "^5.0.0"
   },
   "publishConfig": {
     "access": "public"
