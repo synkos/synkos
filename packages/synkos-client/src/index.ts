@@ -44,6 +44,11 @@ export type { AppPlatform } from './composables/usePlatform.js';
 export { useNavAction } from './navigation/composables/useNavAction.js';
 export type { NavActionOptions } from './navigation/composables/useNavAction.js';
 export { useNavTitle } from './navigation/composables/useNavTitle.js';
+export { useEdgeSwipeBack } from './navigation/composables/useEdgeSwipeBack.js';
+export type {
+  UseEdgeSwipeBackOptions,
+  EdgeSwipeBindings,
+} from './navigation/composables/useEdgeSwipeBack.js';
 export { useSettings } from './vue/composables/useSettings.js';
 
 // ── Boot factories (individual) ───────────────────────────────────────────────

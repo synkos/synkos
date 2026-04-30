@@ -45,7 +45,7 @@
     <main class="page-container">
       <div class="page-stack">
         <DeletionBanner />
-        <div class="slide-wrapper">
+        <div class="slide-wrapper" v-on="edgeSwipe.handlers">
           <router-view v-slot="{ Component }">
             <transition :name="tabTransitionName">
               <keep-alive :include="cachedViews">
@@ -64,8 +64,9 @@
       :tabs="tabs"
       :is-active="isTabActive"
       :navigate="navigate"
+      :keyboard-open="keyboardOpen"
     >
-      <footer class="ios-tab-bar">
+      <footer class="ios-tab-bar" :class="{ 'is-hidden-by-keyboard': keyboardOpen }">
         <div class="ios-tabs">
           <button
             v-for="tab in tabs"
@@ -114,7 +115,7 @@
  *   ],
  * })
  */
-import { computed, isRef, provide, ref } from 'vue';
+import { computed, isRef, onMounted, onUnmounted, provide, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
@@ -123,6 +124,8 @@ import AppMenuDrawer from '../../vue/components/navigation/AppMenuDrawer.vue';
 import { AppIcon } from '@synkos/ui';
 import { getClientConfig } from '../../internal/app-config.js';
 import { getTabConfig } from '../internal/tab-config.js';
+import { getStoredTabPath } from '../internal/tab-history.js';
+import { useEdgeSwipeBack } from '../composables/useEdgeSwipeBack.js';
 import {
   navTrailingAction,
   navTitleOverride,
@@ -149,6 +152,37 @@ provide('synkos:scroll-to-top-signal', scrollToTopSignal);
 const scrolledFromTop = ref(false);
 provide('synkos:set-scrolled-from-top', (scrolled: boolean) => {
   scrolledFromTop.value = scrolled;
+});
+
+// iOS native: when the keyboard appears the tab bar slides off-screen so the
+// active input is never occluded. We mirror that with a CSS class. Listeners
+// are attached on mount via dynamic import so apps without
+// `@capacitor/keyboard` installed see no behaviour change.
+const keyboardOpen = ref(false);
+type KeyboardListener = { remove: () => void } | { remove: () => Promise<void> };
+let keyboardListeners: KeyboardListener[] = [];
+
+onMounted(async () => {
+  try {
+    const { Capacitor } = await import('@capacitor/core');
+    if (!Capacitor.isNativePlatform()) return;
+    const { Keyboard } = await import('@capacitor/keyboard');
+    keyboardListeners = await Promise.all([
+      Keyboard.addListener('keyboardWillShow', () => {
+        keyboardOpen.value = true;
+      }),
+      Keyboard.addListener('keyboardWillHide', () => {
+        keyboardOpen.value = false;
+      }),
+    ]);
+  } catch {
+    // Plugin not installed — keep tab bar visible during keyboard.
+  }
+});
+
+onUnmounted(() => {
+  for (const l of keyboardListeners) void l.remove();
+  keyboardListeners = [];
 });
 
 const { t } = useI18n();
@@ -179,6 +213,17 @@ const showMenu = ref(false);
 // ── Route helpers ──────────────────────────────────────────────────
 const isSubRoute = computed(() => tabs.value.every((tab) => tab.path !== route.path));
 
+// iOS edge-swipe-back: only armed on sub-routes (where there's something to
+// pop back to). Tab-root pages absorb the gesture so swipes don't accidentally
+// throw the user out of the shell.
+const edgeSwipe = useEdgeSwipeBack({
+  enabled: () => isSubRoute.value,
+  onSwipe: () => {
+    void Haptics.impact({ style: ImpactStyle.Light });
+    void router.back();
+  },
+});
+
 const pageTitle = computed(() => {
   if (navTitleOverride.value !== null) return navTitleOverride.value;
   if (route.meta?.titleKey) return t(route.meta.titleKey as string);
@@ -202,23 +247,38 @@ function isTabActive(tab: { path: string }) {
 }
 
 // ── Navigation ─────────────────────────────────────────────────────
-// Direction of the route swap (slide-left / slide-right / fade) is decided by
-// `router.afterEach` in `setupSynkosRouter`, comparing tab indices of
-// `from` vs `to`. That makes the animation correct for every navigation
-// source: tab tap, back gesture, programmatic push, deep link, browser back.
+// Direction of the route swap (slide-left / slide-right / fade / push) is
+// decided by `router.afterEach` in `setupSynkosRouter`, comparing tab
+// indices of `from` vs `to`. That makes the animation correct for every
+// navigation source: tab tap, back gesture, programmatic push, deep link,
+// browser back. Three things happen on tap of `path`:
+//
+// 1. Inactive tab → push to either the tab root, or — when
+//    `preserveTabHistory: true` — the deepest path previously visited
+//    inside that tab's stack (UITabBarController behaviour).
+// 2. Active tab AND we're at its root → emit scroll-to-top (UITabBar gesture).
+// 3. Active tab AND we're inside a sub-route of it → pop to the tab root.
 function navigate(path: string) {
   const targetTab = tabs.value.find((t) => t.path === path);
   if (!targetTab) return;
 
-  // Re-tap on the active tab → scroll the active page to the top (iOS gesture).
+  void Haptics.impact({ style: ImpactStyle.Light });
+
   if (isTabActive(targetTab)) {
-    void Haptics.impact({ style: ImpactStyle.Light });
-    scrollToTopSignal.value++;
+    if (route.path === path) {
+      // Already at root → scroll to top.
+      scrollToTopSignal.value++;
+    } else {
+      // Inside a sub-route of this tab → pop to root.
+      void router.push(path);
+    }
     return;
   }
 
-  void Haptics.impact({ style: ImpactStyle.Light });
-  void router.push(path);
+  // Switching to an inactive tab. Restore its stored deep path if per-tab
+  // history is enabled and we have one.
+  const restored = getStoredTabPath(path);
+  void router.push(restored && restored !== path ? restored : path);
 }
 
 function goBack() {
@@ -380,7 +440,9 @@ function goBack() {
 }
 
 // ─── Tab Bar ──────────────────────────────────────────────────────
-// See `.ios-nav-bar` for why `translateZ(0)` is set.
+// See `.ios-nav-bar` for why `translateZ(0)` is set. When the on-screen
+// keyboard is open the bar slides off-screen so it never sits visually
+// behind the keyboard surface — matches UITabBar's native behaviour.
 .ios-tab-bar {
   flex-shrink: 0;
   padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -391,6 +453,15 @@ function goBack() {
   z-index: $z-raised;
   position: relative;
   transform: translateZ(0);
+  transition:
+    transform 0.25s cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 0.2s ease;
+
+  &.is-hidden-by-keyboard {
+    transform: translateY(100%);
+    opacity: 0;
+    pointer-events: none;
+  }
 }
 
 .ios-tabs {

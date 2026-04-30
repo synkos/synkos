@@ -14,6 +14,7 @@ import { setTabConfig, getTabConfig } from './internal/tab-config.js';
 import { setSettingsConfig, ALL_SECTIONS } from './internal/settings-config.js';
 import { setPostAuthRoute, getPostAuthRoute } from './internal/post-auth.js';
 import { setTabTransitionName } from './internal/nav-state.js';
+import { enableTabHistory, recordTabPath } from './internal/tab-history.js';
 import { useAuthStore } from '../auth/store.js';
 
 // ── Tab transition direction ───────────────────────────────────────────────────
@@ -120,6 +121,30 @@ function installTabTransitionGuard(router: Router): void {
   router.afterEach((to, from) => {
     const fromPath = from.matched.length === 0 ? undefined : from.path;
     setTabTransitionName(computeTabTransitionName(to.path, fromPath));
+
+    // Per-tab history: store the deepest visited path under each tab so that
+    // switching back to that tab can restore it. No-op unless the app opted
+    // in via `preserveTabHistory: true`. Picks the longest matching tab path
+    // so sub-routes are recorded under their parent tab.
+    const tabs = getTabConfig();
+    let owningTab: { path: string } | undefined;
+    let owningLen = -1;
+    for (const t of tabs) {
+      if (t.path === '/') {
+        if (to.path === '/' && owningLen < 1) {
+          owningTab = t;
+          owningLen = 0;
+        }
+        continue;
+      }
+      if (to.path === t.path || to.path.startsWith(t.path + '/')) {
+        if (t.path.length > owningLen) {
+          owningTab = t;
+          owningLen = t.path.length;
+        }
+      }
+    }
+    if (owningTab) recordTabPath(owningTab.path, to.path);
   });
 }
 
@@ -215,6 +240,13 @@ export interface SynkosRouterOptions {
    * See {@link TabTransitionMode}.
    */
   tabTransition?: TabTransitionMode;
+  /**
+   * When `true`, switching back to a previously-visited tab restores its
+   * deepest visited path instead of going to the tab root. Mirrors iOS
+   * `UITabBarController`, which gives each tab its own navigation stack.
+   * Defaults to `false` for backwards compatibility.
+   */
+  preserveTabHistory?: boolean;
 }
 
 // ── Settings route map ─────────────────────────────────────────────────────────
@@ -468,6 +500,8 @@ export function createSynkosRouter(
   // Persist the tab transition mode for the router guard to read on each nav.
   if (opts.tabTransition) _tabTransitionMode = opts.tabTransition;
 
+  if (opts.preserveTabHistory) enableTabHistory();
+
   // Register tab config for MainLayout dynamic tab rendering
   setTabConfig([
     ...opts.appTabRoutes,
@@ -596,6 +630,13 @@ export interface SynkosSetupOptions {
    * See {@link TabTransitionMode}.
    */
   tabTransition?: TabTransitionMode;
+  /**
+   * When `true`, switching back to a previously-visited tab restores its
+   * deepest visited path instead of going to the tab root. Mirrors iOS
+   * `UITabBarController`, which gives each tab its own navigation stack.
+   * Defaults to `false` for backwards compatibility.
+   */
+  preserveTabHistory?: boolean;
 }
 
 export function setupSynkosRouter(router: Router, options: SynkosSetupOptions = {}): void {
@@ -603,6 +644,8 @@ export function setupSynkosRouter(router: Router, options: SynkosSetupOptions = 
 
   // Persist the tab transition mode for the router guard to read on each nav.
   if (options.tabTransition) _tabTransitionMode = options.tabTransition;
+
+  if (options.preserveTabHistory) enableTabHistory();
 
   // ── Discover tabs from meta.tab declarations ───────────────────────────────
   // router.getRoutes() returns all flat route records with resolved absolute paths.
