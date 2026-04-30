@@ -21,11 +21,19 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "@capacitor/app": "^8.0.0",
+    "@capacitor/haptics": "^8.0.0",
+    "@capacitor/keyboard": "^8.0.0",
+    "@capacitor/preferences": "^8.0.0",
+    "@capacitor/push-notifications": "^8.0.0",
+    "@capacitor/splash-screen": "^8.0.0",
+    "@capacitor/status-bar": "^8.0.0",
     "@synkos/ui": "workspace:*",
     "axios": "^1.14.0",
     "synkos": "workspace:*"
   },
   "peerDependencies": {
+    "@capacitor/core": "^8.0.0",
     "pinia": "^3.0.0",
     "quasar": "^2.0.0",
     "vue": "^3.0.0",

@@ -30,9 +30,16 @@ Native iOS fidelity for `MainLayout` — fixes the "first tab change is jumpy" s
 
 - `header-left`, `header-center`, `header-right`, `tab-bar`. Each ships with the existing rendering as the default. Scoped slot props expose the values needed to replicate or extend behaviour without re-reading state.
 
-**Optional Capacitor plugins** — install only if you want the feature:
+**Capacitor plugins are now framework dependencies.** Synkos uses Capacitor plugins internally — `@capacitor/haptics` is fired statically across the app, `@capacitor/preferences` is imported by the auth store, `@capacitor/keyboard` and `@capacitor/status-bar` drive the new keyboard / theme behaviours. They were previously expected to be installed by the consuming app, which made it easy to forget one and hit a runtime error or a missing feature. They're now declared as `dependencies` of `@synkos/client`, so `pnpm install @synkos/client` brings everything Synkos needs:
 
-- `@capacitor/status-bar` for theme-aware status bar.
-- `@capacitor/keyboard` for tab-bar-hides-with-keyboard.
+- `@capacitor/app`
+- `@capacitor/haptics`
+- `@capacitor/keyboard`
+- `@capacitor/preferences`
+- `@capacitor/push-notifications`
+- `@capacitor/splash-screen`
+- `@capacitor/status-bar`
 
-If they're not installed, the related code path no-ops at runtime.
+`@capacitor/core` stays as a peer dependency — the native bridge is per-app and the consumer must own its version.
+
+**Migration:** apps can drop these from their own `package.json` if they don't import them directly; pnpm will dedupe automatically. Apps that import Capacitor plugins themselves (e.g. `import { Haptics } from '@capacitor/haptics'`) should keep them as direct dependencies for clarity.
