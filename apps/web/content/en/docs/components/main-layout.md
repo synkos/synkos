@@ -33,3 +33,12 @@ createRouter({
   ],
 })
 ```
+
+## Slots
+
+| Name | Scope | Description |
+| --- | --- | --- |
+| `header-left` | `{ is-sub-route, parent-title, go-back }` | — |
+| `header-center` | `{ title, is-sub-route }` | — |
+| `header-right` | `{ action, open-menu }` | — |
+| `tab-bar` | `{ tabs, is-active, navigate, keyboard-open }` | — |

@@ -1,5 +1,19 @@
 [
   {
+    "name": "AppActionSheet",
+    "slug": "app-action-sheet",
+    "sourcePackage": "@synkos/ui",
+    "category": "Overlays",
+    "shortDescription": "iOS-style action sheet (UIActionSheet). Renders a grouped list of"
+  },
+  {
+    "name": "AppAlert",
+    "slug": "app-alert",
+    "sourcePackage": "@synkos/ui",
+    "category": "Overlays",
+    "shortDescription": "iOS-style alert dialog (UIAlertController in alert style). A centered,"
+  },
+  {
     "name": "AppBottomSheet",
     "slug": "app-bottom-sheet",
     "sourcePackage": "@synkos/ui",
@@ -67,7 +81,7 @@
     "slug": "app-page",
     "sourcePackage": "@synkos/ui",
     "category": "Layout",
-    "shortDescription": "Page wrapper that fills its container with the active theme's background."
+    "shortDescription": "Page wrapper that fills its container with the active theme's background"
   },
   {
     "name": "AppPageLargeTitle",
@@ -82,6 +96,13 @@
     "sourcePackage": "@synkos/ui",
     "category": "Feedback",
     "shortDescription": "Indeterminate loading spinner. Use it inline (next to text) or as a"
+  },
+  {
+    "name": "AppSwitch",
+    "slug": "app-switch",
+    "sourcePackage": "@synkos/ui",
+    "category": "Forms",
+    "shortDescription": "iOS-style toggle switch (UISwitch). Animated thumb glide with the"
   },
   {
     "name": "AuthFeedback",

@@ -18,6 +18,14 @@
 
 - [ ] `AppMenuDrawer` debería soportar inyección de secciones custom además de las built-in
 
+## @synkos/ui — pending (componentes nativos iOS faltantes)
+
+- [ ] `AppDatePicker` (UIDatePicker `.wheels`) — 3 wheels con momentum scroll, snap-to-center, hairline en la fila central, dim-fade gradual hacia los extremos. Modos: `date | time | datetime | countdown`. Haptic light en cada cambio de fila.
+- [ ] `AppContextMenu` (UIContextMenuInteraction) — long-press detection, scrim animado, menú anclado al elemento (con fallback de posición), preview opcional del target. Soporte teclado/accesibilidad.
+- [ ] `AppSearchBar` con la animación de "tap → expand" de iOS (search field translateY y `Cancel` button slides in).
+- [ ] Mid-drag visual tracking en `useEdgeSwipeBack` — la página sigue al dedo durante el drag, en lugar de sólo disparar `router.back()` en el release. Requiere coordinación con `MainLayout` para anular la transición CSS estándar y usar transforms en JS durante la gesture.
+- [ ] `AppPullToRefresh` con spinner nativo iOS (rubber-band) — el composable `usePullToRefresh` ya existe pero falta un componente UI completo.
+
 ---
 
 ## Completado ✅

@@ -2,6 +2,23 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file
 
 import { defineConfig } from '#q-app/wrappers';
+
+// Loaded lazily — on a fresh checkout (CI, `pnpm create synkos`),
+// `synkos/vite` may not be built yet when Quasar reads this config
+// during `quasar prepare`'s postinstall hook. The next time the
+// config is evaluated (dev / build), `dist/` exists and the helper
+// is applied. Apps using `pnpm create synkos` get the same graceful
+// degradation — install succeeds, then `pnpm dev` picks up the
+// optimisations.
+let synkosExtendViteConf: ((conf: unknown) => void) | null = null;
+try {
+  ({ synkosExtendViteConf } = await import('synkos/vite'));
+} catch {
+  console.warn(
+    '[quasar.config] synkos/vite not available yet — skipping framework Vite tweaks. This is expected on a fresh install before `pnpm build` has run.',
+  );
+}
+
 export default defineConfig((ctx) => {
   return {
     // https://v2.quasar.dev/quasar-cli-vite/prefetch-feature
@@ -48,7 +65,7 @@ export default defineConfig((ctx) => {
       // (RFC 6749 §3.1.2), so a hash-mode app never reaches its callback page.
       // When deploying the SPA to a static host, add a catch-all rewrite to
       // index.html so deep links resolve.
-      vueRouterMode: ctx.mode.capacitor ? 'hash' : 'history',
+      vueRouterMode: ctx.modeName === 'capacitor' ? 'hash' : 'history',
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,
@@ -65,63 +82,13 @@ export default defineConfig((ctx) => {
       // distDir
 
       extendViteConf(viteConf) {
-        if (!viteConf.resolve) viteConf.resolve = {};
-        viteConf.resolve.preserveSymlinks = true;
-
-        // Guarantee a single instance of shared singletons across all packages
-        // (app code + workspace packages like @synkos/client). Without this,
-        // preserveSymlinks + pnpm strict hoisting can resolve the same package
-        // to two different paths → two module instances → broken singletons
-        // (e.g. Pinia's activePinia, Vue's app injection context).
-        viteConf.resolve.dedupe = [
-          ...(viteConf.resolve.dedupe ?? []),
-          'vue',
-          'vue-router',
-          'pinia',
-          'vue-i18n',
-        ];
-
-        // pnpm strict hoisting doesn't symlink transitive deps — force Vite
-        // to bundle them inline so they don't need to be resolved at runtime.
-        // vue-i18n must be pre-bundled as a whole unit to prevent the circular
-        // @vue/shared → @vue/runtime-core dependency from resolving out-of-order,
-        // which causes the "isFunction is not a function" error at startup.
-        if (!viteConf.optimizeDeps) viteConf.optimizeDeps = {};
-
-        // Force pre-bundling so Vite doesn't discover deps lazily at navigation
-        // time and trigger full-page reloads (white flash on first route change).
-        //
-        // - @synkos/* workspace symlinks: skipped by default, cssInjectedByJs
-        //   side-effects lost otherwise.
-        // - @capacitor/*: discovered on first page navigation → reload flash.
-        // - vue-i18n: must be bundled as a unit to prevent @vue/shared circular dep.
-        viteConf.optimizeDeps.include = [
-          ...(viteConf.optimizeDeps.include ?? []),
-          '@synkos/ui',
-          '@synkos/client',
-          'vue-i18n',
-          '@intlify/core-base',
-          '@intlify/shared',
-          '@intlify/message-compiler',
-          '@vue/devtools-api',
-          '@capacitor/core',
-          '@capacitor/haptics',
-          '@capacitor/app',
-          '@capacitor/preferences',
-          '@capacitor/splash-screen',
-          '@capacitor/push-notifications',
-        ];
-
-        // Pre-transform the most-visited pages so their module graphs are fully
-        // resolved before any navigation, eliminating first-visit reload flashes.
-        if (!viteConf.server) viteConf.server = {};
-        viteConf.server.warmup = {
-          clientFiles: [
-            './src/pages/auth/LoginPage.vue',
-            './src/features/home/pages/HomePage.vue',
-            './src/pages/settings/ProfilePage.vue',
-          ],
-        };
+        // Synkos's recommended Vite settings: dedupe + optimizeDeps for
+        // workspace packages, vue-i18n and Capacitor plugins, plus
+        // auto-discovered tab page warmup. Pass `extraOptimizeDeps` /
+        // `extraWarmupFiles` if your app pulls in something the framework
+        // doesn't know about. No-op if the helper couldn't be loaded
+        // (see the lazy import at the top of this file).
+        synkosExtendViteConf?.(viteConf);
       },
       // viteVuePluginOptions: {},
       vitePlugins: [

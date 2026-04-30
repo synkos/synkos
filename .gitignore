@@ -47,3 +47,8 @@ temp/
 
 # Turbo (if added later)
 .turbo/
+
+# Cross-repo analysis docs left behind when developing alongside other projects
+synkos_issues.md
+synkos_issues_fixes.md
+synkos_design_issues.md

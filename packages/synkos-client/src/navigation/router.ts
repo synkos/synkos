@@ -10,10 +10,143 @@ import {
 import type { AppConfig } from 'synkos';
 import type { AppTabRoute, TabMeta } from '../types.js';
 export type { TabMeta };
-import { setTabConfig } from './internal/tab-config.js';
+import { setTabConfig, getTabConfig } from './internal/tab-config.js';
 import { setSettingsConfig, ALL_SECTIONS } from './internal/settings-config.js';
 import { setPostAuthRoute, getPostAuthRoute } from './internal/post-auth.js';
+import { setTabTransitionName } from './internal/nav-state.js';
+import { enableTabStacks, recordTabNavigation } from './internal/tab-stacks.js';
 import { useAuthStore } from '../auth/store.js';
+
+// ── Tab transition direction ───────────────────────────────────────────────────
+//
+// Computes the Vue `<transition>` name to apply on the route swap by comparing
+// the tab index of `from` vs `to`. Centralised here (router-level) so every
+// navigation path is covered: tab tap, back button, deep link, programmatic
+// router.push, browser back. The previous click-based logic in MainLayout left
+// every other navigation source on a stale direction.
+//
+// Names match the CSS classes in MainLayout's non-scoped <style> block:
+// `tab-slide-left`, `tab-slide-right`, `tab-fade`, `nav-push-forward`,
+// `nav-push-back`.
+
+/**
+ * How tab-to-tab navigation animates inside MainLayout.
+ *
+ * - `'push'` — horizontal slide between adjacent tabs (left/right based on
+ *   index). The default since launch; closest to Material BottomNavigation.
+ * - `'fade'` — crossfade between tabs. Closer to Apple's own apps which
+ *   tend to use cuts or subtle dissolves rather than horizontal motion.
+ * - `'none'` — instant cut, no animation. The most native-feeling option
+ *   on iOS — UITabBarController itself does not animate tab swaps.
+ *
+ * Sub-route push (e.g. /projects → /projects/:id) is unaffected by this
+ * option and always uses the dedicated `nav-push-*` transitions.
+ */
+export type TabTransitionMode = 'push' | 'fade' | 'none';
+
+let _tabTransitionMode: TabTransitionMode = 'push';
+
+function tabIndexOf(path: string): number {
+  const tabs = getTabConfig();
+  // First exact match wins; otherwise pick the deepest prefix match so that
+  // sub-routes (e.g. `/projects/:id`) inherit the index of their parent tab.
+  const exact = tabs.findIndex((t) => t.path === path);
+  if (exact !== -1) return exact;
+  let best = -1;
+  let bestLen = 0;
+  tabs.forEach((t, i) => {
+    if (t.path === '/') return;
+    if (path === t.path || path.startsWith(t.path + '/')) {
+      if (t.path.length > bestLen) {
+        best = i;
+        bestLen = t.path.length;
+      }
+    }
+  });
+  if (best !== -1) return best;
+  // Root tab as last-resort match for the literal '/' path.
+  return tabs.findIndex((t) => t.path === '/' && (path === '/' || path === ''));
+}
+
+/** Whether a path is a sub-route of a tab path (`/projects/123` of `/projects`). */
+function isSubRouteOf(path: string, tabPath: string): boolean {
+  if (tabPath === '/') return false;
+  return path.startsWith(tabPath + '/');
+}
+
+function computeTabTransitionName(toPath: string, fromPath: string | undefined): string {
+  // Initial mount (no previous route) — never animate; cold start should not
+  // look like a navigation animation.
+  if (!fromPath) return '';
+  if (toPath === fromPath) return '';
+
+  const tabs = getTabConfig();
+  const toTab = tabs.findIndex((t) => t.path === toPath);
+  const fromTab = tabs.findIndex((t) => t.path === fromPath);
+
+  // ── Sub-route push (forward / back) ────────────────────────────────────────
+  // Tab → sub-route of that tab: push forward. Sub-route of tab → tab: push
+  // back. Mirrors UINavigationController on iOS independently of the
+  // tabTransition option.
+  if (fromTab !== -1 && toTab === -1) {
+    if (isSubRouteOf(toPath, fromPath)) return 'nav-push-forward';
+  }
+  if (toTab !== -1 && fromTab === -1) {
+    if (isSubRouteOf(fromPath, toPath)) return 'nav-push-back';
+  }
+  // Sub-route → sub-route on the same stack: deeper or shallower.
+  if (toTab === -1 && fromTab === -1) {
+    if (isSubRouteOf(toPath, fromPath)) return 'nav-push-forward';
+    if (isSubRouteOf(fromPath, toPath)) return 'nav-push-back';
+  }
+
+  // ── Tab → tab ──────────────────────────────────────────────────────────────
+  const ti = tabIndexOf(toPath);
+  const fi = tabIndexOf(fromPath);
+  if (ti === -1 || fi === -1) return 'tab-fade';
+  if (ti === fi) return 'tab-fade';
+
+  switch (_tabTransitionMode) {
+    case 'none':
+      return '';
+    case 'fade':
+      return 'tab-fade';
+    case 'push':
+    default:
+      return ti > fi ? 'tab-slide-left' : 'tab-slide-right';
+  }
+}
+
+function installTabTransitionGuard(router: Router): void {
+  router.afterEach((to, from) => {
+    const fromPath = from.matched.length === 0 ? undefined : from.path;
+    setTabTransitionName(computeTabTransitionName(to.path, fromPath));
+
+    // Per-tab navigation stack: append on forward navigation, truncate on
+    // re-entry to a previously-visited path. No-op unless the app opted in
+    // via `stackNavigation: true`. Picks the longest matching tab path so
+    // sub-routes are recorded under their parent tab.
+    const tabs = getTabConfig();
+    let owningTab: { path: string } | undefined;
+    let owningLen = -1;
+    for (const t of tabs) {
+      if (t.path === '/') {
+        if (to.path === '/' && owningLen < 1) {
+          owningTab = t;
+          owningLen = 0;
+        }
+        continue;
+      }
+      if (to.path === t.path || to.path.startsWith(t.path + '/')) {
+        if (t.path.length > owningLen) {
+          owningTab = t;
+          owningLen = t.path.length;
+        }
+      }
+    }
+    if (owningTab) recordTabNavigation(owningTab.path, to.path);
+  });
+}
 
 // Extend RouteMeta for type-safe i18n-aware nav bar fields
 declare module 'vue-router' {
@@ -101,6 +234,23 @@ export interface SynkosRouterOptions {
    * If omitted, all sections are included.
    */
   settingsConfig?: SettingsConfig;
+  /**
+   * How tab-to-tab navigation animates. Defaults to `'push'` (horizontal slide).
+   * Use `'fade'` for a crossfade or `'none'` for instant cut (most iOS-native).
+   * See {@link TabTransitionMode}.
+   */
+  tabTransition?: TabTransitionMode;
+  /**
+   * When `true`, every tab gets its own navigation stack — the iOS
+   * `UITabBarController` model. Switching back to a previously-visited tab
+   * restores the top of its stack; back navigation (`MainLayout.goBack()`,
+   * the edge-swipe-back gesture, programmatic pops via `useTabStack().pop()`)
+   * pops the active tab's stack rather than Vue Router's global history.
+   * Forward navigation appends to the active tab's stack and truncates
+   * automatically on re-entry to a previously-visited path. Defaults to
+   * `false` for backwards compatibility.
+   */
+  stackNavigation?: boolean;
 }
 
 // ── Settings route map ─────────────────────────────────────────────────────────
@@ -351,6 +501,11 @@ export function createSynkosRouter(
   // Default post-auth target: first user-declared tab route, falling back to 'home'.
   setPostAuthRoute({ name: (opts.appTabRoutes[0]?.name as string) ?? 'home' });
 
+  // Persist the tab transition mode for the router guard to read on each nav.
+  if (opts.tabTransition) _tabTransitionMode = opts.tabTransition;
+
+  if (opts.stackNavigation) enableTabStacks();
+
   // Register tab config for MainLayout dynamic tab rendering
   setTabConfig([
     ...opts.appTabRoutes,
@@ -402,6 +557,8 @@ export function createSynkosRouter(
 
     return true;
   });
+
+  installTabTransitionGuard(router);
 
   return router;
 }
@@ -471,10 +628,32 @@ export interface SynkosSetupOptions {
    * Default: the first route with meta.tab, or 'home'.
    */
   homeRouteName?: string;
+  /**
+   * How tab-to-tab navigation animates. Defaults to `'push'` (horizontal slide).
+   * Use `'fade'` for a crossfade or `'none'` for instant cut (most iOS-native).
+   * See {@link TabTransitionMode}.
+   */
+  tabTransition?: TabTransitionMode;
+  /**
+   * When `true`, every tab gets its own navigation stack — the iOS
+   * `UITabBarController` model. Switching back to a previously-visited tab
+   * restores the top of its stack; back navigation (`MainLayout.goBack()`,
+   * the edge-swipe-back gesture, programmatic pops via `useTabStack().pop()`)
+   * pops the active tab's stack rather than Vue Router's global history.
+   * Forward navigation appends to the active tab's stack and truncates
+   * automatically on re-entry to a previously-visited path. Defaults to
+   * `false` for backwards compatibility.
+   */
+  stackNavigation?: boolean;
 }
 
 export function setupSynkosRouter(router: Router, options: SynkosSetupOptions = {}): void {
   const loginRoute = options.loginRouteName ?? 'auth-login';
+
+  // Persist the tab transition mode for the router guard to read on each nav.
+  if (options.tabTransition) _tabTransitionMode = options.tabTransition;
+
+  if (options.stackNavigation) enableTabStacks();
 
   // ── Discover tabs from meta.tab declarations ───────────────────────────────
   // router.getRoutes() returns all flat route records with resolved absolute paths.
@@ -548,4 +727,6 @@ export function setupSynkosRouter(router: Router, options: SynkosSetupOptions = 
 
     return true;
   });
+
+  installTabTransitionGuard(router);
 }

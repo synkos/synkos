@@ -39,11 +39,20 @@ export { useSignOut } from './composables/useSignOut.js';
 export { usePullToRefresh } from './composables/usePullToRefresh.js';
 export { useTheme } from './composables/useTheme.js';
 export type { AppTheme } from './composables/useTheme.js';
+export { useHaptic } from './composables/useHaptic.js';
+export type { HapticEvent } from './composables/useHaptic.js';
 export { usePlatform } from './composables/usePlatform.js';
 export type { AppPlatform } from './composables/usePlatform.js';
 export { useNavAction } from './navigation/composables/useNavAction.js';
 export type { NavActionOptions } from './navigation/composables/useNavAction.js';
 export { useNavTitle } from './navigation/composables/useNavTitle.js';
+export { useEdgeSwipeBack } from './navigation/composables/useEdgeSwipeBack.js';
+export type {
+  UseEdgeSwipeBackOptions,
+  EdgeSwipeBindings,
+} from './navigation/composables/useEdgeSwipeBack.js';
+export { useTabStack } from './navigation/composables/useTabStack.js';
+export type { UseTabStackResult } from './navigation/composables/useTabStack.js';
 export { useSettings } from './vue/composables/useSettings.js';
 
 // ── Boot factories (individual) ───────────────────────────────────────────────
@@ -72,7 +81,7 @@ export type {
 
 // setupSynkosRouter + synkosSettingsRoutes — headless routing (full control)
 export { setupSynkosRouter, synkosSettingsRoutes } from './navigation/router.js';
-export type { SynkosSetupOptions } from './navigation/router.js';
+export type { SynkosSetupOptions, TabTransitionMode } from './navigation/router.js';
 
 // Post-auth route — single source of truth for "where to go after login/verify".
 // Read with getPostAuthRoute(), override with setPostAuthRoute() if you need to
