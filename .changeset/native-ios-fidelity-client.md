@@ -24,7 +24,7 @@ Native iOS fidelity for `MainLayout` — fixes the "first tab change is jumpy" s
 **New options on `setupSynkosRouter` / `createSynkosRouter`:**
 
 - `tabTransition: 'push' | 'fade' | 'none'` — default `'push'` keeps current behaviour. `'fade'` matches Apple's own apps; `'none'` is the most native iOS feel (UITabBarController itself does not animate tab swaps).
-- `preserveTabHistory: boolean` — default `false`. When enabled, switching back to a previously-visited tab restores its deepest visited path instead of going to the tab root, mirroring UITabBarController's per-tab navigation stacks.
+- `stackNavigation: boolean` — default `false`. Enables the full iOS `UITabBarController` model: each tab gets its own navigation stack tracked in memory. Forward navigation appends, re-entry to a previously-visited path truncates, switching back to a previously-visited tab restores the top of its stack, and `MainLayout.goBack()` / the edge-swipe-back gesture pop the active tab's stack (using `router.replace()`) instead of hitting Vue Router's global history. A new `useTabStack()` composable exposes the active tab's stack reactively (`stack`, `canPop`, `depth`, `pop()`) for stack-aware UI.
 
 **New slots on `MainLayout`:**
 

@@ -51,6 +51,8 @@ export type {
   UseEdgeSwipeBackOptions,
   EdgeSwipeBindings,
 } from './navigation/composables/useEdgeSwipeBack.js';
+export { useTabStack } from './navigation/composables/useTabStack.js';
+export type { UseTabStackResult } from './navigation/composables/useTabStack.js';
 export { useSettings } from './vue/composables/useSettings.js';
 
 // ── Boot factories (individual) ───────────────────────────────────────────────

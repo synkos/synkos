@@ -124,7 +124,11 @@ import AppMenuDrawer from '../../vue/components/navigation/AppMenuDrawer.vue';
 import { AppIcon } from '@synkos/ui';
 import { getClientConfig } from '../../internal/app-config.js';
 import { getTabConfig } from '../internal/tab-config.js';
-import { getStoredTabPath } from '../internal/tab-history.js';
+import {
+  getTabStackTop,
+  popTabStack,
+  isTabStacksEnabled,
+} from '../internal/tab-stacks.js';
 import { useEdgeSwipeBack } from '../composables/useEdgeSwipeBack.js';
 import {
   navTrailingAction,
@@ -215,13 +219,11 @@ const isSubRoute = computed(() => tabs.value.every((tab) => tab.path !== route.p
 
 // iOS edge-swipe-back: only armed on sub-routes (where there's something to
 // pop back to). Tab-root pages absorb the gesture so swipes don't accidentally
-// throw the user out of the shell.
+// throw the user out of the shell. Calls into goBack() so the swipe and the
+// nav-bar back button share the same stack-aware behaviour.
 const edgeSwipe = useEdgeSwipeBack({
   enabled: () => isSubRoute.value,
-  onSwipe: () => {
-    void Haptics.impact({ style: ImpactStyle.Light });
-    void router.back();
-  },
+  onSwipe: () => goBack(),
 });
 
 const pageTitle = computed(() => {
@@ -254,8 +256,8 @@ function isTabActive(tab: { path: string }) {
 // browser back. Three things happen on tap of `path`:
 //
 // 1. Inactive tab → push to either the tab root, or — when
-//    `preserveTabHistory: true` — the deepest path previously visited
-//    inside that tab's stack (UITabBarController behaviour).
+//    `stackNavigation: true` — the top of that tab's navigation stack
+//    (UITabBarController behaviour).
 // 2. Active tab AND we're at its root → emit scroll-to-top (UITabBar gesture).
 // 3. Active tab AND we're inside a sub-route of it → pop to the tab root.
 function navigate(path: string) {
@@ -275,14 +277,30 @@ function navigate(path: string) {
     return;
   }
 
-  // Switching to an inactive tab. Restore its stored deep path if per-tab
-  // history is enabled and we have one.
-  const restored = getStoredTabPath(path);
+  // Switching to an inactive tab. Restore the top of its navigation stack
+  // when stack navigation is enabled, otherwise just go to the tab root.
+  const restored = getTabStackTop(path);
   void router.push(restored && restored !== path ? restored : path);
 }
 
+// Back-navigation: under stack mode, pop the active tab's stack and
+// `router.replace()` to the new top so the global Vue Router history
+// doesn't grow on each pop. Without stack mode, fall through to the
+// classic `router.back()`.
 function goBack() {
   void Haptics.impact({ style: ImpactStyle.Light });
+
+  if (isTabStacksEnabled()) {
+    const ownerTab = tabs.value.find((t) => isTabActive(t));
+    if (ownerTab) {
+      const newTop = popTabStack(ownerTab.path);
+      if (newTop !== null) {
+        void router.replace(newTop);
+        return;
+      }
+    }
+  }
+
   void router.back();
 }
 </script>
