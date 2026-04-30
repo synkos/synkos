@@ -3,7 +3,7 @@
     "slug": "composables",
     "title": "Composables",
     "description": "Reactive primitives that drop into any component setup.",
-    "count": 11
+    "count": 14
   },
   {
     "slug": "stores",
@@ -39,6 +39,6 @@
     "slug": "types",
     "title": "Types",
     "description": "Public TypeScript type aliases and interfaces.",
-    "count": 32
+    "count": 37
   }
 ]

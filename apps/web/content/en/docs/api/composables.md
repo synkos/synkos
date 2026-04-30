@@ -27,6 +27,43 @@ function useDrawer(initialOpen: boolean): { bindings: ComputedRef<{ modelValue: 
 
 ---
 
+## useEdgeSwipeBack
+
+<small>function</small>
+
+```ts
+function useEdgeSwipeBack(options: UseEdgeSwipeBackOptions): { handlers: EdgeSwipeBindings }
+```
+
+---
+
+## useHaptic
+
+<small>function</small>
+
+Centralised haptic feedback helper. Honours the user's
+`settings.haptics` preference and silently swallows runtime errors so a
+missing or unsupported plugin can't break a UI flow.
+
+```ts
+function useHaptic(): { trigger: (event: HapticEvent) => void }
+```
+
+**Example**
+
+```ts
+```ts
+const haptic = useHaptic();
+function onSave() {
+  haptic.trigger('press');
+  await save();
+  haptic.trigger('success');
+}
+```
+```
+
+---
+
 ## useNavAction
 
 <small>function</small>
@@ -103,6 +140,16 @@ function useSheetDrag(): { onDragEnd: () => void; onDragMove: (e: TouchEvent) =>
 
 ```ts
 function useSignOut(): { confirm: () => Promise<void>; isProcessing: Ref<boolean, boolean>; open: () => void; showDialog: Ref<boolean, boolean>; state: Ref<"confirm" | "farewell", "confirm" | "farewell">; wasGuest: Ref<boolean, boolean> }
+```
+
+---
+
+## useTabStack
+
+<small>function</small>
+
+```ts
+function useTabStack(): UseTabStackResult
 ```
 
 ---

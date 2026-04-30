@@ -121,6 +121,21 @@ interface DeviceInfo {
 
 ---
 
+## EdgeSwipeBindings
+
+<small>interface</small>
+
+```ts
+interface EdgeSwipeBindings {
+  pointercancel: (e: PointerEvent) => void
+  pointerdown: (e: PointerEvent) => void
+  pointermove: (e: PointerEvent) => void
+  pointerup: (e: PointerEvent) => void
+}
+```
+
+---
+
 ## ForgotPasswordDto
 
 <small>interface</small>
@@ -143,6 +158,21 @@ interface ForgotPasswordResult {
   expiresAt: string
   lastSentAt: string
 }
+```
+
+---
+
+## HapticEvent
+
+<small>type</small>
+
+Named haptic events mapped to the `@capacitor/haptics` primitive that best
+matches the iOS Human Interface Guidelines for that interaction. Centralised
+so the whole app speaks the same haptic vocabulary and the user's
+`settings.haptics` preference is honoured everywhere.
+
+```ts
+type HapticEvent = "tab-switch" | "nav-push" | "nav-back" | "select" | "toggle" | "press" | "long-press" | "success" | "warning" | "error"
 ```
 
 ---
@@ -377,6 +407,8 @@ interface SynkosRouterOptions {
   config: AppConfig
   notFoundComponent?: () => Promise<unknown>
   settingsConfig?: SettingsConfig
+  stackNavigation?: boolean
+  tabTransition?: TabTransitionMode
 }
 ```
 
@@ -391,6 +423,8 @@ interface SynkosSetupOptions {
   homeRouteName?: string
   loginRouteName?: string
   settingsConfig?: SettingsConfig
+  stackNavigation?: boolean
+  tabTransition?: TabTransitionMode
 }
 ```
 
@@ -414,6 +448,28 @@ interface TabMeta {
 
 ---
 
+## TabTransitionMode
+
+<small>type</small>
+
+How tab-to-tab navigation animates inside MainLayout.
+
+- `'push'` — horizontal slide between adjacent tabs (left/right based on
+  index). The default since launch; closest to Material BottomNavigation.
+- `'fade'` — crossfade between tabs. Closer to Apple's own apps which
+  tend to use cuts or subtle dissolves rather than horizontal motion.
+- `'none'` — instant cut, no animation. The most native-feeling option
+  on iOS — UITabBarController itself does not animate tab swaps.
+
+Sub-route push (e.g. /projects → /projects/:id) is unaffected by this
+option and always uses the dedicated `nav-push-*` transitions.
+
+```ts
+type TabTransitionMode = "push" | "fade" | "none"
+```
+
+---
+
 ## TokenPair
 
 <small>interface</small>
@@ -424,6 +480,43 @@ interface TokenPair {
   expiresIn: number
   refreshToken: string
 }
+```
+
+---
+
+## UseEdgeSwipeBackOptions
+
+<small>interface</small>
+
+Pointer-event handlers that implement the iOS edge-swipe-back gesture:
+a horizontal swipe starting within `edgeWidth` pixels of the left edge
+pops the current route when the swipe passes the distance or velocity
+threshold. Bind the returned handlers to the element that owns the page
+area (typically the slide wrapper inside `MainLayout`).
+
+The composable does not animate the page mid-gesture — Vue Router's pop
++ the standard `nav-push-back` transition handle the visual on release.
+Mid-drag tracking (the page following the finger) is a future
+enhancement; the gesture as-is is already discoverable and feels close
+to native on real devices.
+
+```ts
+interface UseEdgeSwipeBackOptions {
+  edgeWidth?: number
+  enabled?: () => boolean
+  onSwipe?: () => void
+  thresholdRatio?: number
+  velocityThreshold?: number
+}
+```
+
+**Example**
+
+```ts
+```ts
+const edgeSwipe = useEdgeSwipeBack({ enabled: () => isSubRoute.value });
+<div class="slide-wrapper" v-on="edgeSwipe.handlers">...</div>
+```
 ```
 
 ---
@@ -440,4 +533,43 @@ interface UsernameCheckResult {
   suggestions: string[]
   username: string
 }
+```
+
+---
+
+## UseTabStackResult
+
+<small>interface</small>
+
+Reactive view over the active tab's navigation stack. Use it to render
+stack-depth-aware UI (a breadcrumb trail, a "back to top" button that
+unwinds the whole stack at once) or to drive programmatic pops.
+
+Requires `setupSynkosRouter({ stackNavigation: true })`. With stack
+navigation disabled, `stack` is always `[]`, `canPop` is always
+`false`, and `pop()` falls back to a classic `router.back()`.
+
+```ts
+interface UseTabStackResult {
+  canPop: ComputedRef<boolean>
+  depth: ComputedRef<number>
+  stack: ComputedRef<readonly string[]>
+  pop: unknown
+}
+```
+
+**Example**
+
+```ts
+```ts
+<script setup lang="ts">
+import { useTabStack } from '@synkos/client'
+const { stack, canPop, depth, pop } = useTabStack()
+</script>
+
+<template>
+  <p>Depth in this tab: {{ depth }}</p>
+  <AppButton :disabled="!canPop" @click="pop">Back</AppButton>
+</template>
+```
 ```
