@@ -1,6 +1,6 @@
 {
   "name": "@synkos/client",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Synkos frontend client runtime (auth, API, stores, i18n, boot, Vue components)",
   "type": "module",
   "exports": {
