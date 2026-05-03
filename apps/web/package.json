@@ -1,6 +1,6 @@
 {
   "name": "web",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Synkos website — landing, documentation and blog",
   "private": true,
   "type": "module",
