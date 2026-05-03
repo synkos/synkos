@@ -1,5 +1,13 @@
 # web
 
+## 0.0.8
+
+### Patch Changes
+
+- Updated dependencies [818cfe9]
+  - @synkos/ui@0.7.1
+  - @synkos/client@0.5.5
+
 ## 0.0.7
 
 ### Patch Changes
