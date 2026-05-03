@@ -1,5 +1,13 @@
 # frontend
 
+## 1.0.11
+
+### Patch Changes
+
+- Updated dependencies [d709f5a]
+  - @synkos/ui@0.7.0
+  - @synkos/client@0.5.4
+
 ## 1.0.10
 
 ### Patch Changes
