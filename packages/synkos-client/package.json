@@ -28,6 +28,8 @@
     "@capacitor/push-notifications": "^8.0.0",
     "@capacitor/splash-screen": "^8.0.0",
     "@capacitor/status-bar": "^8.0.0",
+    "@capgo/capacitor-native-biometric": "^8.0.0",
+    "@capgo/capacitor-social-login": "^8.0.0",
     "@synkos/ui": "workspace:*",
     "axios": "^1.14.0",
     "synkos": "workspace:*"
