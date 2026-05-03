@@ -297,8 +297,10 @@ function onAfterLeave() {
   background: $glass-bg;
   backdrop-filter: $glass-blur;
   -webkit-backdrop-filter: $glass-blur;
-  border-top-left-radius: $radius-xl;
-  border-top-right-radius: $radius-xl;
+  // 20px corner radius matches iOS 26's "Liquid Glass" sheet presentation —
+  // visibly rounder than the older 14px without crossing into pill territory.
+  border-top-left-radius: $radius-4xl;
+  border-top-right-radius: $radius-4xl;
   box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.32);
   overflow: hidden;
   max-height: 92vh;
