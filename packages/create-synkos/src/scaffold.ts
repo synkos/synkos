@@ -22,6 +22,11 @@ const VARS_IN_CONTENT = new Set([
   'env.example',
   '.env.example',
   'tsconfig.json',
+  // iOS — both files reference {{APP_NAME}} / {{BUNDLE_ID}} so the
+  // scaffolded app boots on iOS sim without requiring `npx cap add ios`
+  // or any manual plist editing.
+  'Info.plist',
+  'project.pbxproj',
 ]);
 
 function shouldProcessContent(filename: string): boolean {

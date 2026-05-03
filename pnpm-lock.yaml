@@ -349,6 +349,12 @@ importers:
       '@capacitor/status-bar':
         specifier: ^8.0.0
         version: 8.0.2(@capacitor/core@8.3.1)
+      '@capgo/capacitor-native-biometric':
+        specifier: ^8.0.0
+        version: 8.4.2(@capacitor/core@8.3.1)
+      '@capgo/capacitor-social-login':
+        specifier: ^8.0.0
+        version: 8.3.17(@capacitor/core@8.3.1)
       '@synkos/ui':
         specifier: workspace:*
         version: link:../synkos-ui
