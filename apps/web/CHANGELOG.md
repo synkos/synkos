@@ -1,5 +1,12 @@
 # web
 
+## 0.0.5
+
+### Patch Changes
+
+- Updated dependencies [49a6a4b]
+  - @synkos/client@0.5.2
+
 ## 0.0.4
 
 ### Patch Changes
