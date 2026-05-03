@@ -10,7 +10,7 @@ import { defineConfig } from '#q-app/wrappers';
 // is applied. Apps using `pnpm create synkos` get the same graceful
 // degradation — install succeeds, then `pnpm dev` picks up the
 // optimisations.
-let synkosExtendViteConf: ((conf: unknown) => void) | null = null;
+let synkosExtendViteConf: typeof import('synkos/vite').synkosExtendViteConf | null = null;
 try {
   ({ synkosExtendViteConf } = await import('synkos/vite'));
 } catch {

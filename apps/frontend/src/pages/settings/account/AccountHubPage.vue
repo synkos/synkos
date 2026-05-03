@@ -38,15 +38,15 @@
 
       <div style="height: 32px" />
     </div>
-  </AppPage>
 
-  <SignOutDialog
-    v-model="showSignOutDialog"
-    :sign-out-state="signOutState"
-    :is-processing="signingOut"
-    :is-guest="wasGuest"
-    @confirm="confirmSignOut"
-  />
+    <SignOutDialog
+      v-model="showSignOutDialog"
+      :sign-out-state="signOutState"
+      :is-processing="signingOut"
+      :is-guest="wasGuest"
+      @confirm="confirmSignOut"
+    />
+  </AppPage>
 </template>
 
 <script setup lang="ts">
