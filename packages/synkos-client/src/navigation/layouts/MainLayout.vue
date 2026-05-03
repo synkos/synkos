@@ -141,8 +141,13 @@ import {
 const appConfig = getClientConfig();
 
 // Provide the nav title setter so AppPageLargeTitle (in @synkos/ui) can inject it
-// without creating a circular package dependency.
-provide('synkos:set-nav-title', (title: string | null) => setNavTitle(title));
+// without creating a circular package dependency. The optional `owner` symbol
+// lets the consumer scope its clears so a leaving page doesn't blank a title
+// the entering page just set (router-view swap puts new `setup` before old
+// `onUnmounted`).
+provide('synkos:set-nav-title', (title: string | null, owner?: symbol) =>
+  setNavTitle(title, owner)
+);
 
 // Counter incremented every time the user re-taps the active tab. AppPage
 // watches it and scrolls its container to the top — the iOS UITabBar gesture.

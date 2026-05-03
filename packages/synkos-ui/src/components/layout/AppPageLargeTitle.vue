@@ -28,7 +28,7 @@
  *   <!-- list of messages -->
  * </AppPage>
  */
-import { inject, onMounted, onUnmounted, ref, watch } from 'vue';
+import { inject, onActivated, onDeactivated, onMounted, onUnmounted, ref, watch } from 'vue';
 
 const props = defineProps<{
   /** Title shown large at the top and crossfaded into the nav bar on scroll. */
@@ -43,8 +43,15 @@ defineSlots<{
 }>();
 
 // Injected by MainLayout — collapses the title into the nav bar on scroll.
-// Falls back to a no-op if used outside a Synkos layout.
-const setNavTitle = inject<(title: string | null) => void>('synkos:set-nav-title', () => {});
+// The second arg is an owner symbol: clears (`null`) only take effect when
+// this component still owns the current title, so a leaving page can't blank
+// a title an entering page just set. Falls back to a no-op outside a Synkos
+// layout.
+const setNavTitle = inject<(title: string | null, owner?: symbol) => void>(
+  'synkos:set-nav-title',
+  () => {}
+);
+const owner = Symbol();
 
 const titleEl = ref<HTMLElement | null>(null);
 let observer: IntersectionObserver | null = null;
@@ -57,7 +64,7 @@ function setupObserver() {
     ([entry]) => {
       // When the large title is fully or partially hidden above the fold, inject
       // the compact title into the nav bar. When it's back in view, clear it.
-      setNavTitle(entry.isIntersecting ? null : props.title);
+      setNavTitle(entry.isIntersecting ? null : props.title, owner);
     },
     {
       // A thin horizontal threshold at the top of the scroll container:
@@ -72,6 +79,11 @@ function setupObserver() {
 
 onMounted(setupObserver);
 
+// keep-alive: when this page comes back, IntersectionObserver may have been
+// disconnected (and the new page's clear may have blanked the nav title).
+// Re-attach so scroll state is observed again.
+onActivated(setupObserver);
+
 // Re-observe if the title text changes (e.g., async data load)
 watch(
   () => props.title,
@@ -79,15 +91,19 @@ watch(
     // If already collapsed, update the nav bar title immediately
     if (titleEl.value) {
       const rect = titleEl.value.getBoundingClientRect();
-      if (rect.bottom <= 0) setNavTitle(newTitle);
+      if (rect.bottom <= 0) setNavTitle(newTitle, owner);
     }
   }
 );
 
-onUnmounted(() => {
+function teardown() {
   observer?.disconnect();
-  setNavTitle(null);
-});
+  observer = null;
+  setNavTitle(null, owner);
+}
+
+onDeactivated(teardown);
+onUnmounted(teardown);
 </script>
 
 <style lang="scss" scoped>

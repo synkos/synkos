@@ -19,12 +19,38 @@ export const navTitleOverride = ref<string | null>(null);
  */
 export const tabTransitionName = ref<string>('tab-fade');
 
-export function setNavTrailing(action: NavTrailingAction | null) {
+// ── Owner tracking ─────────────────────────────────────────────────────────
+//
+// Vue's `<router-view>` swap mounts the new component (running its `setup`)
+// BEFORE unmounting the old one. Without owner-checked clears, the leaving
+// page's `onUnmounted` would blank a title the entering page just set.
+//
+// Each call site (a `useNavTitle()` instance, an `AppPageLargeTitle`) passes
+// a `Symbol` token. `setX(null, owner)` only clears if `owner` still matches
+// — late cleanups from a leaving component become no-ops.
+let titleOwner: symbol | null = null;
+let trailingOwner: symbol | null = null;
+
+export function setNavTrailing(action: NavTrailingAction | null, owner?: symbol) {
+  if (action === null) {
+    if (owner !== undefined && trailingOwner !== owner) return;
+    navTrailingAction.value = null;
+    trailingOwner = null;
+    return;
+  }
   navTrailingAction.value = action;
+  trailingOwner = owner ?? null;
 }
 
-export function setNavTitle(title: string | null) {
+export function setNavTitle(title: string | null, owner?: symbol) {
+  if (title === null) {
+    if (owner !== undefined && titleOwner !== owner) return;
+    navTitleOverride.value = null;
+    titleOwner = null;
+    return;
+  }
   navTitleOverride.value = title;
+  titleOwner = owner ?? null;
 }
 
 export function setTabTransitionName(name: string) {
