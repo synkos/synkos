@@ -133,6 +133,20 @@
     "shortDescription": "Layout for `/auth/*` routes — a thin wrapper around `<router-view>` that"
   },
   {
+    "name": "IOSSheet",
+    "slug": "ios-sheet",
+    "sourcePackage": "@synkos/ui",
+    "category": "Overlays",
+    "shortDescription": "Modal sheet that emulates the native iOS 15+ \"sheet presentation\" — slides"
+  },
+  {
+    "name": "IOSSpinner",
+    "slug": "ios-spinner",
+    "sourcePackage": "@synkos/ui",
+    "category": "Feedback",
+    "shortDescription": "Native-style iOS activity indicator (the 12-bar `UIActivityIndicatorView`"
+  },
+  {
     "name": "LegalBottomSheet",
     "slug": "legal-bottom-sheet",
     "sourcePackage": "@synkos/client",

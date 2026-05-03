@@ -108,7 +108,7 @@ onUnmounted(teardown);
 
 <style lang="scss" scoped>
 .app-page-large-title {
-  padding: $space-10 $space-10 0;
+  padding: $space-10 $space-10 $space-8;
 }
 
 .title-row {

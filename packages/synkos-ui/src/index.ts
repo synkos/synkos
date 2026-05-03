@@ -5,6 +5,7 @@ export { default as AppButton } from './components/actions/AppButton.vue';
 export { default as AppEmptyState } from './components/feedback/AppEmptyState.vue';
 export { default as AppSpinner } from './components/feedback/AppSpinner.vue';
 export { default as AppCircularProgress } from './components/feedback/AppCircularProgress.vue';
+export { default as IOSSpinner } from './components/feedback/IOSSpinner.vue';
 
 // ── Forms ─────────────────────────────────────────────────────────────────────
 export { default as SegmentControl } from './components/forms/SegmentControl.vue';
@@ -29,6 +30,7 @@ export { default as AppActionSheet } from './components/overlays/AppActionSheet.
 export type { ActionSheetAction } from './components/overlays/AppActionSheet.vue';
 export { default as AppAlert } from './components/overlays/AppAlert.vue';
 export type { AlertAction } from './components/overlays/AppAlert.vue';
+export { default as IOSSheet } from './components/overlays/IOSSheet.vue';
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 export { getIcon, icons, registerIcons } from './icons/index.js';
