@@ -1,4 +1,4 @@
-import { onUnmounted } from 'vue';
+import { onActivated, onDeactivated, onUnmounted } from 'vue';
 import { setNavTrailing } from '../internal/nav-state.js';
 
 export interface NavActionOptions {
@@ -8,6 +8,12 @@ export interface NavActionOptions {
 }
 
 export function useNavAction(options: NavActionOptions) {
-  setNavTrailing(options);
-  onUnmounted(() => setNavTrailing(null));
+  const owner = Symbol();
+  const apply = () => setNavTrailing(options, owner);
+  const clear = () => setNavTrailing(null, owner);
+
+  apply();
+  onActivated(apply);
+  onDeactivated(clear);
+  onUnmounted(clear);
 }
