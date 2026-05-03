@@ -145,9 +145,8 @@ const appConfig = getClientConfig();
 // lets the consumer scope its clears so a leaving page doesn't blank a title
 // the entering page just set (router-view swap puts new `setup` before old
 // `onUnmounted`).
-provide(
-  'synkos:set-nav-title',
-  (title: string | null, owner?: symbol) => setNavTitle(title, owner)
+provide('synkos:set-nav-title', (title: string | null, owner?: symbol) =>
+  setNavTitle(title, owner)
 );
 
 // Counter incremented every time the user re-taps the active tab. AppPage
