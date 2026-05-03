@@ -32,7 +32,7 @@
     "@capgo/capacitor-native-biometric": "^8.0.0",
     "@capgo/capacitor-social-login": "^8.3.11",
     "@quasar/extras": "^1.16.4",
-    "@synkos/client": "^0.5.1",
+    "@synkos/client": "^0.5.2",
     "@synkos/ui": "^0.6.0",
     "axios": "^1.14.0",
     "pinia": "^3.0.1",
